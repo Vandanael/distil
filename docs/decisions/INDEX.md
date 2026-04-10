@@ -17,3 +17,5 @@ Les ADR sont crees via le skill `adr-new` (a venir).
 | [ADR-003](ADR-003-supabase-magic-link.md) | Supabase magic link pour l'authentification | accepte | 2026-04-10 |
 | [ADR-004](ADR-004-readability-parsing.md) | Readability Mozilla pour le parsing d'articles | accepte | 2026-04-10 |
 | [ADR-005](ADR-005-shadcn-retokenise.md) | shadcn/ui retokenise plutot que Tailwind brut | accepte | 2026-04-10 |
+| [ADR-006](ADR-006-format-profil-hybride.md) | Format hybride pour le profil utilisateur | accepte | 2026-04-10 |
+| [ADR-007](ADR-007-stockage-highlights-ancrage-texte.md) | Stockage des highlights par ancrage texte avec fallback | accepte | 2026-04-10 |
