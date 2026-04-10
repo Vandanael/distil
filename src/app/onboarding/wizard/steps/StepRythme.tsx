@@ -6,7 +6,7 @@ type Props = {
 }
 
 const OPTIONS = [
-  { value: 5,  label: '5 articles',  desc: 'Lecteur selectif' },
+  { value: 5, label: '5 articles', desc: 'Lecteur selectif' },
   { value: 10, label: '10 articles', desc: 'Rythme equilibre' },
   { value: 20, label: '20 articles', desc: 'Veille soutenue' },
   { value: 30, label: '30 articles', desc: 'Absorption maximale' },

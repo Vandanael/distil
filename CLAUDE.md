@@ -22,16 +22,16 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 
 ## Stack technique
 
-| Couche | Choix |
-|---|---|
-| Framework | Next.js 15 App Router, TypeScript strict |
-| Style | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut) |
-| Base de donnees | Supabase : Postgres + pgvector + Auth |
-| IA / agents | Claude Managed Agents (Anthropic) |
-| Embeddings | Voyage voyage-3 |
-| Tests | Vitest (unit), Playwright (E2E) |
-| Observabilite | Sentry |
-| Deploy | Vercel |
+| Couche          | Choix                                                        |
+| --------------- | ------------------------------------------------------------ |
+| Framework       | Next.js 15 App Router, TypeScript strict                     |
+| Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut) |
+| Base de donnees | Supabase : Postgres + pgvector + Auth                        |
+| IA / agents     | Claude Managed Agents (Anthropic)                            |
+| Embeddings      | Voyage voyage-3                                              |
+| Tests           | Vitest (unit), Playwright (E2E)                              |
+| Observabilite   | Sentry                                                       |
+| Deploy          | Vercel                                                       |
 
 ---
 

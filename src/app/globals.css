@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -52,64 +52,64 @@
 
 :root {
   /* Palette Distil — Le Monde x Substack */
-  --background: #FBF9F4;
-  --foreground: #11284B;
-  --card: #FFFFFF;
-  --card-foreground: #11284B;
-  --popover: #FFFFFF;
-  --popover-foreground: #11284B;
-  --primary: #D94E1F;
-  --primary-foreground: #FBF9F4;
-  --secondary: #11284B;
-  --secondary-foreground: #FBF9F4;
-  --muted: #F0EDE6;
-  --muted-foreground: #5A6A80;
-  --accent: #D94E1F;
-  --accent-foreground: #FBF9F4;
-  --destructive: #DC2626;
-  --border: #D4CFC5;
-  --input: #D4CFC5;
-  --ring: #D94E1F;
+  --background: #fbf9f4;
+  --foreground: #11284b;
+  --card: #ffffff;
+  --card-foreground: #11284b;
+  --popover: #ffffff;
+  --popover-foreground: #11284b;
+  --primary: #d94e1f;
+  --primary-foreground: #fbf9f4;
+  --secondary: #11284b;
+  --secondary-foreground: #fbf9f4;
+  --muted: #f0ede6;
+  --muted-foreground: #5a6a80;
+  --accent: #d94e1f;
+  --accent-foreground: #fbf9f4;
+  --destructive: #dc2626;
+  --border: #d4cfc5;
+  --input: #d4cfc5;
+  --ring: #d94e1f;
   --radius: 0.5rem;
   /* sidebar non utilise MVP */
-  --sidebar: #F0EDE6;
-  --sidebar-foreground: #11284B;
-  --sidebar-primary: #D94E1F;
-  --sidebar-primary-foreground: #FBF9F4;
-  --sidebar-accent: #F0EDE6;
-  --sidebar-accent-foreground: #11284B;
-  --sidebar-border: #D4CFC5;
-  --sidebar-ring: #D94E1F;
+  --sidebar: #f0ede6;
+  --sidebar-foreground: #11284b;
+  --sidebar-primary: #d94e1f;
+  --sidebar-primary-foreground: #fbf9f4;
+  --sidebar-accent: #f0ede6;
+  --sidebar-accent-foreground: #11284b;
+  --sidebar-border: #d4cfc5;
+  --sidebar-ring: #d94e1f;
 }
 
 .dark {
   /* Dark mode — Sprint 10 */
-  --background: #0E1F38;
-  --foreground: #FBF9F4;
-  --card: #11284B;
-  --card-foreground: #FBF9F4;
-  --popover: #11284B;
-  --popover-foreground: #FBF9F4;
-  --primary: #E8693D;
-  --primary-foreground: #FBF9F4;
-  --secondary: #1A3A6B;
-  --secondary-foreground: #FBF9F4;
-  --muted: #1A3A6B;
-  --muted-foreground: #94A3B8;
-  --accent: #E8693D;
-  --accent-foreground: #FBF9F4;
-  --destructive: #EF4444;
-  --border: #1E3A5F;
-  --input: #1E3A5F;
-  --ring: #E8693D;
-  --sidebar: #11284B;
-  --sidebar-foreground: #FBF9F4;
-  --sidebar-primary: #E8693D;
-  --sidebar-primary-foreground: #FBF9F4;
-  --sidebar-accent: #1A3A6B;
-  --sidebar-accent-foreground: #FBF9F4;
-  --sidebar-border: #1E3A5F;
-  --sidebar-ring: #E8693D;
+  --background: #0e1f38;
+  --foreground: #fbf9f4;
+  --card: #11284b;
+  --card-foreground: #fbf9f4;
+  --popover: #11284b;
+  --popover-foreground: #fbf9f4;
+  --primary: #e8693d;
+  --primary-foreground: #fbf9f4;
+  --secondary: #1a3a6b;
+  --secondary-foreground: #fbf9f4;
+  --muted: #1a3a6b;
+  --muted-foreground: #94a3b8;
+  --accent: #e8693d;
+  --accent-foreground: #fbf9f4;
+  --destructive: #ef4444;
+  --border: #1e3a5f;
+  --input: #1e3a5f;
+  --ring: #e8693d;
+  --sidebar: #11284b;
+  --sidebar-foreground: #fbf9f4;
+  --sidebar-primary: #e8693d;
+  --sidebar-primary-foreground: #fbf9f4;
+  --sidebar-accent: #1a3a6b;
+  --sidebar-accent-foreground: #fbf9f4;
+  --sidebar-border: #1e3a5f;
+  --sidebar-ring: #e8693d;
 }
 
 @layer base {

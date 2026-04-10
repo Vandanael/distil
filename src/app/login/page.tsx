@@ -46,8 +46,7 @@ export default function LoginPage() {
             Lien envoyé.
           </p>
           <p className="font-[family-name:var(--font-geist)] text-sm text-muted-foreground">
-            Vérifiez votre boite mail pour{' '}
-            <span className="text-foreground">{email}</span>.
+            Vérifiez votre boite mail pour <span className="text-foreground">{email}</span>.
           </p>
         </div>
       </main>
@@ -86,16 +85,10 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <p className="text-sm text-destructive font-[family-name:var(--font-geist)]">
-            {error}
-          </p>
+          <p className="text-sm text-destructive font-[family-name:var(--font-geist)]">{error}</p>
         )}
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loading || !email}
-        >
+        <Button type="submit" className="w-full" disabled={loading || !email}>
           {loading ? 'Envoi en cours...' : 'Recevoir un lien magique'}
         </Button>
       </form>

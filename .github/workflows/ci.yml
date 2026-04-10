@@ -2,13 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
-  check:
-    name: Lint, typecheck, tests
+  ci:
+    name: lint / format / typecheck / test / build / budget
     runs-on: ubuntu-latest
 
     steps:
@@ -21,25 +21,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: pnpm
 
-      - name: Installer les dependances
-        run: pnpm install
+      - name: Install
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm lint
 
+      - name: Format check
+        run: pnpm format:check
+
       - name: Typecheck
-        run: pnpm tsc --noEmit
+        run: pnpm typecheck
 
       - name: Tests unitaires
-        run: pnpm test
+        run: pnpm test:run
 
-      - name: Installer Playwright
-        run: pnpm playwright install chromium --with-deps
+      - name: Build
+        run: pnpm build
+        # Sans .env.local, les guards Supabase court-circuitent l'auth
 
-      - name: Tests E2E
-        run: pnpm e2e
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      - name: Budget JS
+        run: pnpm check:budget

@@ -23,9 +23,11 @@ export function StepRecap({ interests, sources, dailyCap, serendipityQuota }: Pr
             Interets
           </dt>
           <dd className="font-[family-name:var(--font-source-serif)] text-sm text-foreground">
-            {interests.length > 0
-              ? interests.join(', ')
-              : <span className="text-muted-foreground italic">Non definis</span>}
+            {interests.length > 0 ? (
+              interests.join(', ')
+            ) : (
+              <span className="text-muted-foreground italic">Non definis</span>
+            )}
           </dd>
         </div>
 
@@ -34,9 +36,11 @@ export function StepRecap({ interests, sources, dailyCap, serendipityQuota }: Pr
             Sources preferees
           </dt>
           <dd className="font-[family-name:var(--font-source-serif)] text-sm text-foreground">
-            {sources.length > 0
-              ? sources.join(', ')
-              : <span className="text-muted-foreground italic">Non definies</span>}
+            {sources.length > 0 ? (
+              sources.join(', ')
+            ) : (
+              <span className="text-muted-foreground italic">Non definies</span>
+            )}
           </dd>
         </div>
 

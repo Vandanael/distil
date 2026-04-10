@@ -85,7 +85,9 @@ export default function ExpressPage() {
           >
             <option value="">-- Selectionnez --</option>
             {SECTORS.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s} value={s}>
+                {s}
+              </option>
             ))}
           </select>
         </div>

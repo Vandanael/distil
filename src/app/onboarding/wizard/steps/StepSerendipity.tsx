@@ -17,12 +17,12 @@ const OPTIONS = [
     desc: 'Quelques decouvertes ponctuelles. Recommande.',
   },
   {
-    value: 0.30,
+    value: 0.3,
     label: '30%',
     desc: 'Un tiers de votre feed sort de votre zone de confort.',
   },
   {
-    value: 0.50,
+    value: 0.5,
     label: '50%',
     desc: 'Exploration active. Ideal pour casser les bulles.',
   },
@@ -36,7 +36,9 @@ export function StepSerendipity({ quota, onChange }: Props) {
           Serendipite
         </h2>
         <p className="font-[family-name:var(--font-source-serif)] text-sm text-muted-foreground">
-          {"Quelle part d'articles hors de votre profil souhaitez-vous recevoir ? C'est une protection active contre les bulles de filtre."}
+          {
+            "Quelle part d'articles hors de votre profil souhaitez-vous recevoir ? C'est une protection active contre les bulles de filtre."
+          }
         </p>
       </div>
 

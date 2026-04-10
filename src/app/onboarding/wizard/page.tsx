@@ -8,56 +8,10 @@ import { StepRythme } from './steps/StepRythme'
 import { StepSerendipity } from './steps/StepSerendipity'
 import { StepRecap } from './steps/StepRecap'
 import { createProfile } from '../actions'
-
-type WizardState = {
-  step: 1 | 2 | 3 | 4 | 5
-  interests: string[]
-  sources: string[]
-  dailyCap: number
-  serendipityQuota: number
-}
-
-type WizardAction =
-  | { type: 'SET_INTERESTS'; interests: string[] }
-  | { type: 'SET_SOURCES'; sources: string[] }
-  | { type: 'SET_DAILY_CAP'; cap: number }
-  | { type: 'SET_SERENDIPITY'; quota: number }
-  | { type: 'NEXT' }
-  | { type: 'PREV' }
-
-const INITIAL_STATE: WizardState = {
-  step: 1,
-  interests: [],
-  sources: [],
-  dailyCap: 10,
-  serendipityQuota: 0.15,
-}
-
-const TOTAL_STEPS = 5
-
-function reducer(state: WizardState, action: WizardAction): WizardState {
-  switch (action.type) {
-    case 'SET_INTERESTS':
-      return { ...state, interests: action.interests }
-    case 'SET_SOURCES':
-      return { ...state, sources: action.sources }
-    case 'SET_DAILY_CAP':
-      return { ...state, dailyCap: action.cap }
-    case 'SET_SERENDIPITY':
-      return { ...state, serendipityQuota: action.quota }
-    case 'NEXT':
-      return state.step < TOTAL_STEPS
-        ? { ...state, step: (state.step + 1) as WizardState['step'] }
-        : state
-    case 'PREV':
-      return state.step > 1
-        ? { ...state, step: (state.step - 1) as WizardState['step'] }
-        : state
-  }
-}
+import { wizardReducer, INITIAL_STATE, TOTAL_STEPS } from './reducer'
 
 export default function WizardPage() {
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
+  const [state, dispatch] = useReducer(wizardReducer, INITIAL_STATE)
   const [isPending, startTransition] = useTransition()
 
   function handleSubmit() {
@@ -80,7 +34,9 @@ export default function WizardPage() {
         {/* Indicateur de progression */}
         <div className="space-y-2">
           <div className="flex justify-between font-[family-name:var(--font-geist)] text-xs text-muted-foreground">
-            <span>Etape {state.step} sur {TOTAL_STEPS}</span>
+            <span>
+              Etape {state.step} sur {TOTAL_STEPS}
+            </span>
           </div>
           <div className="h-1 bg-muted rounded-full overflow-hidden">
             <div

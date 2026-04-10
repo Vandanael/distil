@@ -15,16 +15,15 @@ export type ProfileUpdate = {
 
 export async function updateProfile(input: ProfileUpdate) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     throw new Error('Non authentifie')
   }
 
-  const { error } = await supabase
-    .from('profiles')
-    .update(input)
-    .eq('id', user.id)
+  const { error } = await supabase.from('profiles').update(input).eq('id', user.id)
 
   if (error) {
     throw new Error(error.message)

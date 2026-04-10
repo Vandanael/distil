@@ -15,7 +15,9 @@ export type ProfileInput = {
 
 export async function createProfile(input: ProfileInput) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     throw new Error('Non authentifie')

@@ -1,6 +1,7 @@
 Declenche le skill lesson-capture.
 
 Si le titre et le contenu de la lecon ne sont pas fournis dans la commande, demande a l'utilisateur :
+
 1. Le titre court et factuel de la lecon
 2. Le contexte (qu'est-ce qu'on faisait ?)
 3. Le probleme rencontre

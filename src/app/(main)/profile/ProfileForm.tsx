@@ -8,8 +8,18 @@ import { Label } from '@/components/ui/label'
 import { updateProfile } from './actions'
 
 const SECTORS = [
-  'Consulting', 'Design', 'Developpement', 'Finance', 'Ingenierie',
-  'Journalisme', 'Marketing', 'Medecine', 'Produit', 'Recherche', 'Droit', 'Autre',
+  'Consulting',
+  'Design',
+  'Developpement',
+  'Finance',
+  'Ingenierie',
+  'Journalisme',
+  'Marketing',
+  'Medecine',
+  'Produit',
+  'Recherche',
+  'Droit',
+  'Autre',
 ]
 
 type ProfileData = {
@@ -42,8 +52,14 @@ export function ProfileForm({ profile }: Props) {
       await updateProfile({
         profile_text: profileText || undefined,
         sector: sector || undefined,
-        interests: interests.split(',').map((s) => s.trim()).filter(Boolean),
-        pinned_sources: sources.split(',').map((s) => s.trim()).filter(Boolean),
+        interests: interests
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
+        pinned_sources: sources
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
         daily_cap: dailyCap,
         serendipity_quota: serendipityQuota,
         show_scores: showScores,
@@ -83,7 +99,9 @@ export function ProfileForm({ profile }: Props) {
         >
           <option value="">-- Selectionnez --</option>
           {SECTORS.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       </div>
@@ -104,7 +122,8 @@ export function ProfileForm({ profile }: Props) {
 
       <div className="space-y-2">
         <Label htmlFor="sources" className="font-[family-name:var(--font-geist)] text-sm">
-          Sources preferees <span className="text-muted-foreground">(separees par des virgules)</span>
+          Sources preferees{' '}
+          <span className="text-muted-foreground">(separees par des virgules)</span>
         </Label>
         <Input
           id="sources"
@@ -130,7 +149,9 @@ export function ProfileForm({ profile }: Props) {
             className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm font-[family-name:var(--font-geist)] text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             {[5, 10, 20, 30].map((v) => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>
+                {v}
+              </option>
             ))}
           </select>
         </div>
@@ -147,8 +168,10 @@ export function ProfileForm({ profile }: Props) {
             data-testid="serendipity-select"
             className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm font-[family-name:var(--font-geist)] text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
-            {[0, 0.15, 0.30, 0.50].map((v) => (
-              <option key={v} value={v}>{Math.round(v * 100)}%</option>
+            {[0, 0.15, 0.3, 0.5].map((v) => (
+              <option key={v} value={v}>
+                {Math.round(v * 100)}%
+              </option>
             ))}
           </select>
         </div>
@@ -164,7 +187,10 @@ export function ProfileForm({ profile }: Props) {
           data-testid="show-scores-toggle"
           className="h-4 w-4 rounded border-input accent-primary"
         />
-        <Label htmlFor="show-scores" className="font-[family-name:var(--font-geist)] text-sm cursor-pointer">
+        <Label
+          htmlFor="show-scores"
+          className="font-[family-name:var(--font-geist)] text-sm cursor-pointer"
+        >
           Afficher les scores de pertinence
         </Label>
       </div>
