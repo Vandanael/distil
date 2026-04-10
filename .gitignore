@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 playwright-report/
 test-results/
+
+# docs privees (notes de sprint, ADR, specs produit — hors repo)
+/docs/
