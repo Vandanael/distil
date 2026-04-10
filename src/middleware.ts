@@ -36,14 +36,29 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Routes publiques : login et callback
+  // Routes publiques : pas d'auth requise
   const isPublic =
     pathname.startsWith("/login") || pathname.startsWith("/auth");
+
+  // Routes onboarding : auth requise, pas de check profil
+  const isOnboarding = pathname.startsWith("/onboarding");
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // Utilisateur connecté sur /login -> renvoyer vers /feed
+  if (user && pathname === "/login") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/feed";
+    return NextResponse.redirect(url);
+  }
+
+  // Onboarding accessible à tout utilisateur connecté
+  if (user && isOnboarding) {
+    return supabaseResponse;
   }
 
   return supabaseResponse;
