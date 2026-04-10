@@ -1,9 +1,15 @@
 import type { Metadata } from 'next'
-import { Quintessential, Geist } from 'next/font/google'
+import { Bodoni_Moda, Quintessential, Geist } from 'next/font/google'
 import './globals.css'
 
-/* Titres display : Quintessential
-   Calligraphique, caractere unique, associations litteraires (pas tech) */
+/* Logo : Bodoni Moda — exclusivement pour le mot "Distil" */
+const bodoni = Bodoni_Moda({
+  variable: '--font-bodoni',
+  subsets: ['latin'],
+  weight: ['400', '700'],
+})
+
+/* Titres display : Quintessential */
 const quintessential = Quintessential({
   variable: '--font-quintessential',
   subsets: ['latin'],
@@ -27,7 +33,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr" className={`${quintessential.variable} ${geist.variable} h-full antialiased`}>
+    <html
+      lang="fr"
+      className={`${bodoni.variable} ${quintessential.variable} ${geist.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   )
