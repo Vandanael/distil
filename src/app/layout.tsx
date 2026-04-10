@@ -1,25 +1,16 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Lora, Geist } from 'next/font/google'
+import { Quintessential, Geist } from 'next/font/google'
 import './globals.css'
 
-/* Titres display : Cormorant Garamond
-   Haute-contraste, magistral en italique, associations litteraires (pas tech) */
-const cormorant = Cormorant_Garamond({
-  variable: '--font-cormorant',
+/* Titres display : Quintessential
+   Calligraphique, caractere unique, associations litteraires (pas tech) */
+const quintessential = Quintessential({
+  variable: '--font-quintessential',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
+  weight: '400',
 })
 
-/* Corps de lecture : Lora
-   Serif humaniste, pense pour l'ecran, chaleureux */
-const lora = Lora({
-  variable: '--font-lora',
-  subsets: ['latin'],
-  style: ['normal', 'italic'],
-})
-
-/* UI / labels / donnees : Geist */
+/* Corps + UI : Geist sans-serif */
 const geist = Geist({
   variable: '--font-geist',
   subsets: ['latin'],
@@ -36,10 +27,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="fr"
-      className={`${cormorant.variable} ${lora.variable} ${geist.variable} h-full antialiased`}
-    >
+    <html lang="fr" className={`${quintessential.variable} ${geist.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   )

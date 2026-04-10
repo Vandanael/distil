@@ -9,7 +9,7 @@ export default function OnboardingPage() {
           <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
             Personnalisation
           </p>
-          <h1 className="font-heading text-5xl font-semibold italic leading-tight text-foreground">
+          <h1 className="font-heading text-5xl leading-tight text-foreground">
             Comment lisez-vous ?
           </h1>
           <div className="h-px bg-border" />
