@@ -39,71 +39,82 @@ export default function ExpressPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8 bg-background">
-      <div className="text-center space-y-2">
-        <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-foreground">
-          En quelques mots
-        </h1>
-        <p className="font-[family-name:var(--font-source-serif)] text-muted-foreground max-w-sm">
-          {"Decrivez librement ce qui vous interesse. L'IA s'adapte a votre style."}
-        </p>
+    <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
+      <div className="w-full max-w-md space-y-10">
+        {/* En-tete */}
+        <div className="space-y-4">
+          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
+            Methode rapide
+          </p>
+          <h1 className="font-heading text-4xl font-semibold text-foreground">En quelques mots</h1>
+          <p className="font-body text-base text-muted-foreground">
+            {"Decrivez librement ce qui vous interesse. L'IA s'adapte a votre style."}
+          </p>
+          <div className="h-px bg-border" />
+        </div>
+
+        {/* Formulaire */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label
+              htmlFor="profile-text"
+              className="font-ui text-xs uppercase tracking-wider text-muted-foreground"
+            >
+              {"Vos centres d'interet"}
+            </Label>
+            <Textarea
+              id="profile-text"
+              placeholder="Ex: PM senior, product strategy, IA appliquee, startups B2B..."
+              value={profileText}
+              onChange={(e) => setProfileText(e.target.value)}
+              rows={4}
+              disabled={isPending}
+              data-testid="profile-text"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="sector"
+              className="font-ui text-xs uppercase tracking-wider text-muted-foreground"
+            >
+              Secteur
+            </Label>
+            <select
+              id="sector"
+              value={sector}
+              onChange={(e) => setSector(e.target.value)}
+              disabled={isPending}
+              data-testid="sector-select"
+              className="h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <option value="">-- Selectionnez --</option>
+              {SECTORS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Button
+              type="submit"
+              className="w-full h-11"
+              disabled={isPending}
+              data-testid="submit-express"
+            >
+              {isPending ? 'Creation du profil...' : 'Demarrer Distil'}
+            </Button>
+            <Link
+              href="/onboarding/wizard"
+              className="block text-center font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
+            >
+              Personnaliser davantage &rarr;
+            </Link>
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5">
-        <div className="space-y-2">
-          <Label
-            htmlFor="profile-text"
-            className="font-[family-name:var(--font-geist)] text-sm text-foreground"
-          >
-            {"Vos centres d'interet"} <span className="text-muted-foreground">(optionnel)</span>
-          </Label>
-          <Textarea
-            id="profile-text"
-            placeholder="Ex: PM senior, product strategy, IA appliquee, startups B2B, lecture longue forme..."
-            value={profileText}
-            onChange={(e) => setProfileText(e.target.value)}
-            rows={4}
-            disabled={isPending}
-            data-testid="profile-text"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label
-            htmlFor="sector"
-            className="font-[family-name:var(--font-geist)] text-sm text-foreground"
-          >
-            Secteur <span className="text-muted-foreground">(optionnel)</span>
-          </Label>
-          <select
-            id="sector"
-            value={sector}
-            onChange={(e) => setSector(e.target.value)}
-            disabled={isPending}
-            data-testid="sector-select"
-            className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm font-[family-name:var(--font-geist)] text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">-- Selectionnez --</option>
-            {SECTORS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-3 pt-2">
-          <Button type="submit" disabled={isPending} data-testid="submit-express">
-            {isPending ? 'Creation du profil...' : 'Demarrer'}
-          </Button>
-          <Link
-            href="/onboarding/wizard"
-            className="text-center text-sm text-muted-foreground hover:text-foreground font-[family-name:var(--font-geist)] transition-colors"
-          >
-            Personnaliser davantage
-          </Link>
-        </div>
-      </form>
     </main>
   )
 }

@@ -20,11 +20,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -38,43 +33,54 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
+  --color-popover: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Radius 0 — coins francs, identite editoriale */
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
+  --radius-2xl: 0rem;
+  --radius-3xl: 0rem;
+  --radius-4xl: 0rem;
 }
 
 :root {
-  /* Palette Distil — Le Monde x Substack */
-  --background: #fbf9f4;
-  --foreground: #11284b;
+  /* Palette Distil — Editorial */
+  --background: #fbf9f4; /* creme : papier */
+  --foreground: #11284b; /* marine : encre */
   --card: #ffffff;
   --card-foreground: #11284b;
   --popover: #ffffff;
   --popover-foreground: #11284b;
-  --primary: #d94e1f;
+
+  /* Primary = marine (autorite, CTA principal) */
+  --primary: #11284b;
   --primary-foreground: #fbf9f4;
-  --secondary: #11284b;
-  --secondary-foreground: #fbf9f4;
+
+  /* Secondary = creme muet (bouton secondaire discret) */
+  --secondary: #f0ede6;
+  --secondary-foreground: #11284b;
+
+  /* Muted */
   --muted: #f0ede6;
   --muted-foreground: #5a6a80;
+
+  /* Accent = orange Distil (marque, hover, emphase editoriale) */
   --accent: #d94e1f;
   --accent-foreground: #fbf9f4;
+
   --destructive: #dc2626;
   --border: #d4cfc5;
   --input: #d4cfc5;
-  --ring: #d94e1f;
-  --radius: 0.5rem;
+  --ring: #d94e1f; /* focus ring = orange */
+  --radius: 0rem; /* coins francs */
+
   /* sidebar non utilise MVP */
   --sidebar: #f0ede6;
   --sidebar-foreground: #11284b;
-  --sidebar-primary: #d94e1f;
+  --sidebar-primary: #11284b;
   --sidebar-primary-foreground: #fbf9f4;
   --sidebar-accent: #f0ede6;
   --sidebar-accent-foreground: #11284b;
@@ -90,8 +96,8 @@
   --card-foreground: #fbf9f4;
   --popover: #11284b;
   --popover-foreground: #fbf9f4;
-  --primary: #e8693d;
-  --primary-foreground: #fbf9f4;
+  --primary: #fbf9f4;
+  --primary-foreground: #11284b;
   --secondary: #1a3a6b;
   --secondary-foreground: #fbf9f4;
   --muted: #1a3a6b;
@@ -104,8 +110,8 @@
   --ring: #e8693d;
   --sidebar: #11284b;
   --sidebar-foreground: #fbf9f4;
-  --sidebar-primary: #e8693d;
-  --sidebar-primary-foreground: #fbf9f4;
+  --sidebar-primary: #fbf9f4;
+  --sidebar-primary-foreground: #11284b;
   --sidebar-accent: #1a3a6b;
   --sidebar-accent-foreground: #fbf9f4;
   --sidebar-border: #1e3a5f;
@@ -118,8 +124,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    line-height: 1.6;
   }
   html {
-    @apply font-sans;
+    @apply font-ui;
   }
 }

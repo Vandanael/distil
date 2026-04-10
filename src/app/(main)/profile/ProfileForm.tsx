@@ -68,10 +68,15 @@ export function ProfileForm({ profile }: Props) {
     })
   }
 
+  const selectClass =
+    'h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
+
+  const labelClass = 'font-ui text-[10px] uppercase tracking-wider text-muted-foreground'
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="profile-text" className="font-[family-name:var(--font-geist)] text-sm">
+        <Label htmlFor="profile-text" className={labelClass}>
           {"Centres d'interet"}
         </Label>
         <Textarea
@@ -86,7 +91,7 @@ export function ProfileForm({ profile }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="sector" className="font-[family-name:var(--font-geist)] text-sm">
+        <Label htmlFor="sector" className={labelClass}>
           Secteur
         </Label>
         <select
@@ -95,7 +100,7 @@ export function ProfileForm({ profile }: Props) {
           onChange={(e) => setSector(e.target.value)}
           disabled={isPending}
           data-testid="sector-select"
-          className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm font-[family-name:var(--font-geist)] text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className={selectClass}
         >
           <option value="">-- Selectionnez --</option>
           {SECTORS.map((s) => (
@@ -107,8 +112,8 @@ export function ProfileForm({ profile }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="interests" className="font-[family-name:var(--font-geist)] text-sm">
-          Mots-cles <span className="text-muted-foreground">(separes par des virgules)</span>
+        <Label htmlFor="interests" className={labelClass}>
+          Mots-cles
         </Label>
         <Input
           id="interests"
@@ -121,9 +126,8 @@ export function ProfileForm({ profile }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="sources" className="font-[family-name:var(--font-geist)] text-sm">
-          Sources preferees{' '}
-          <span className="text-muted-foreground">(separees par des virgules)</span>
+        <Label htmlFor="sources" className={labelClass}>
+          Sources preferees
         </Label>
         <Input
           id="sources"
@@ -137,7 +141,7 @@ export function ProfileForm({ profile }: Props) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="daily-cap" className="font-[family-name:var(--font-geist)] text-sm">
+          <Label htmlFor="daily-cap" className={labelClass}>
             Articles par jour
           </Label>
           <select
@@ -146,7 +150,7 @@ export function ProfileForm({ profile }: Props) {
             onChange={(e) => setDailyCap(Number(e.target.value))}
             disabled={isPending}
             data-testid="daily-cap-select"
-            className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm font-[family-name:var(--font-geist)] text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={selectClass}
           >
             {[5, 10, 20, 30].map((v) => (
               <option key={v} value={v}>
@@ -157,7 +161,7 @@ export function ProfileForm({ profile }: Props) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="serendipity" className="font-[family-name:var(--font-geist)] text-sm">
+          <Label htmlFor="serendipity" className={labelClass}>
             Serendipite
           </Label>
           <select
@@ -166,7 +170,7 @@ export function ProfileForm({ profile }: Props) {
             onChange={(e) => setSerendipityQuota(Number(e.target.value))}
             disabled={isPending}
             data-testid="serendipity-select"
-            className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm font-[family-name:var(--font-geist)] text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={selectClass}
           >
             {[0, 0.15, 0.3, 0.5].map((v) => (
               <option key={v} value={v}>
@@ -185,12 +189,9 @@ export function ProfileForm({ profile }: Props) {
           onChange={(e) => setShowScores(e.target.checked)}
           disabled={isPending}
           data-testid="show-scores-toggle"
-          className="h-4 w-4 rounded border-input accent-primary"
+          className="h-4 w-4 border-input accent-primary"
         />
-        <Label
-          htmlFor="show-scores"
-          className="font-[family-name:var(--font-geist)] text-sm cursor-pointer"
-        >
+        <Label htmlFor="show-scores" className="font-ui text-sm cursor-pointer">
           Afficher les scores de pertinence
         </Label>
       </div>
@@ -199,11 +200,7 @@ export function ProfileForm({ profile }: Props) {
         <Button type="submit" disabled={isPending} data-testid="save-profile">
           {isPending ? 'Enregistrement...' : 'Enregistrer'}
         </Button>
-        {saved && (
-          <span className="font-[family-name:var(--font-geist)] text-sm text-muted-foreground">
-            Profil mis a jour.
-          </span>
-        )}
+        {saved && <span className="font-ui text-sm text-muted-foreground">Profil mis a jour.</span>}
       </div>
     </form>
   )

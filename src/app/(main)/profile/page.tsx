@@ -35,15 +35,12 @@ export default async function ProfilePage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center p-8 bg-background">
-      <div className="w-full max-w-xl space-y-8">
-        <div className="space-y-1">
-          <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-foreground">
-            Preferences
-          </h1>
-          <p className="font-[family-name:var(--font-source-serif)] text-muted-foreground text-sm">
-            {user.email}
-          </p>
+    <main className="flex min-h-full flex-col p-8 md:p-16 bg-background">
+      <div className="w-full max-w-xl space-y-10">
+        <div className="space-y-4 border-b border-border pb-8">
+          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
+          <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
+          <p className="font-body text-sm text-muted-foreground">{user.email}</p>
         </div>
         <ProfileForm profile={profile} />
       </div>

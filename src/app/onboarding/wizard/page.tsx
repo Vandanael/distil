@@ -32,15 +32,16 @@ export default function WizardPage() {
     <main className="flex flex-1 flex-col items-center justify-center p-8 bg-background">
       <div className="w-full max-w-md space-y-8">
         {/* Indicateur de progression */}
-        <div className="space-y-2">
-          <div className="flex justify-between font-[family-name:var(--font-geist)] text-xs text-muted-foreground">
-            <span>
-              Etape {state.step} sur {TOTAL_STEPS}
+        <div className="space-y-3">
+          <div className="flex items-baseline justify-between">
+            <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Wizard</p>
+            <span className="font-ui text-xs tabular-nums text-muted-foreground">
+              {state.step} / {TOTAL_STEPS}
             </span>
           </div>
-          <div className="h-1 bg-muted rounded-full overflow-hidden">
+          <div className="h-px bg-border overflow-hidden">
             <div
-              className="h-full bg-primary transition-all duration-300"
+              className="h-full bg-accent transition-all duration-300"
               style={{ width: `${(state.step / TOTAL_STEPS) * 100}%` }}
             />
           </div>
