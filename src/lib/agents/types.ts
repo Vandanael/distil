@@ -29,6 +29,7 @@ export type ScoringRequest = {
   profile: UserProfile
   candidates: ArticleCandidate[]
   runId: string
+  archivedTags?: string[]
 }
 
 export type ScoringResult = {

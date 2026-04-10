@@ -15,6 +15,7 @@ export default async function FeedPage() {
   }> = []
 
   let rejectedCount = 0
+  let showScores = true
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const supabase = await createClient()
@@ -23,6 +24,14 @@ export default async function FeedPage() {
     } = await supabase.auth.getUser()
 
     if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('show_scores')
+        .eq('id', user.id)
+        .single()
+
+      showScores = profile?.show_scores ?? true
+
       const { data } = await supabase
         .from('articles')
         .select('id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity')
@@ -89,7 +98,7 @@ export default async function FeedPage() {
                 siteName={a.site_name}
                 excerpt={a.excerpt}
                 readingTimeMinutes={a.reading_time_minutes}
-                score={a.score}
+                score={showScores ? a.score : null}
                 isSerendipity={a.is_serendipity}
               />
             ))

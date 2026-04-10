@@ -6,7 +6,7 @@ const BATCH_SIZE = 10
 
 export async function runScoringAgent(request: ScoringRequest): Promise<ScoringResult> {
   const start = Date.now()
-  const { profile, candidates, runId } = request
+  const { profile, candidates, runId, archivedTags = [] } = request
 
   let scored: ScoredArticle[] = []
   const agentType: 'managed' | 'messages' = 'messages'
@@ -17,7 +17,7 @@ export async function runScoringAgent(request: ScoringRequest): Promise<ScoringR
     const batches = chunk(candidates, BATCH_SIZE)
 
     for (const batch of batches) {
-      const results = await scoreWithMessagesApi(profile, batch)
+      const results = await scoreWithMessagesApi(profile, batch, archivedTags)
       scored = scored.concat(results)
     }
   } catch (err) {

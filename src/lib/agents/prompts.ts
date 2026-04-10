@@ -14,7 +14,11 @@ Regles de scoring :
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.`
 }
 
-export function buildUserPrompt(profile: UserProfile, candidates: ArticleCandidate[]): string {
+export function buildUserPrompt(
+  profile: UserProfile,
+  candidates: ArticleCandidate[],
+  archivedTags: string[] = []
+): string {
   const profileLines: string[] = []
 
   if (profile.profileText) {
@@ -28,6 +32,12 @@ export function buildUserPrompt(profile: UserProfile, candidates: ArticleCandida
   }
   if (profile.pinnedSources.length > 0) {
     profileLines.push(`Sources favorites : ${profile.pinnedSources.join(', ')}`)
+  }
+
+  if (archivedTags.length > 0) {
+    profileLines.push(
+      `Sujets lus et archives recemment : ${archivedTags.join(', ')} (signaux d'interet confirmes)`
+    )
   }
 
   const serendipityCount = Math.round(profile.serendipityQuota * profile.dailyCap)
