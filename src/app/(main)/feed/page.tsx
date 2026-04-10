@@ -6,7 +6,7 @@ export default function FeedPage() {
         {/* En-tete editorial */}
         <div className="space-y-4 border-b border-border pb-8">
           <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Feed</p>
-          <h1 className="font-heading text-5xl font-semibold leading-tight text-foreground">
+          <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">
             Votre veille du jour
           </h1>
           <p className="font-body text-base text-muted-foreground">

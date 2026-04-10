@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import { Bodoni_Moda, Quintessential, Geist } from 'next/font/google'
+import { Playfair_Display, Quintessential, Geist } from 'next/font/google'
 import './globals.css'
 
-/* Logo : Bodoni Moda — exclusivement pour le mot "Distil" */
-const bodoni = Bodoni_Moda({
-  variable: '--font-bodoni',
+/* Logo : Playfair Display — exclusivement pour le mot "DISTIL" */
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
   subsets: ['latin'],
   weight: ['400', '700'],
 })
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${bodoni.variable} ${quintessential.variable} ${geist.variable} h-full antialiased`}
+      className={`${playfair.variable} ${quintessential.variable} ${geist.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
