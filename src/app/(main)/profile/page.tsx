@@ -3,6 +3,16 @@ import { redirect } from 'next/navigation'
 import { ProfileForm } from './ProfileForm'
 
 export default async function ProfilePage() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return (
+      <main className="flex flex-1 flex-col items-center justify-center p-8 bg-background">
+        <p className="font-[family-name:var(--font-geist)] text-sm text-muted-foreground">
+          Configurez .env.local pour activer le profil.
+        </p>
+      </main>
+    )
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

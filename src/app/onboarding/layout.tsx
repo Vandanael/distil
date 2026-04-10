@@ -6,6 +6,11 @@ export default async function OnboardingLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Sans credentials Supabase (dev sans .env.local), on laisse passer
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return <>{children}</>
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
