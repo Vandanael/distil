@@ -1,19 +1,25 @@
 import type { Metadata } from 'next'
-import { Fraunces, Source_Serif_4, Geist } from 'next/font/google'
+import { Cormorant_Garamond, Lora, Geist } from 'next/font/google'
 import './globals.css'
 
-const fraunces = Fraunces({
-  variable: '--font-fraunces',
+/* Titres display : Cormorant Garamond
+   Haute-contraste, magistral en italique, associations litteraires (pas tech) */
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
   subsets: ['latin'],
-  axes: ['opsz', 'SOFT', 'WONK'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
 })
 
-const sourceSerif4 = Source_Serif_4({
-  variable: '--font-source-serif',
+/* Corps de lecture : Lora
+   Serif humaniste, pense pour l'ecran, chaleureux */
+const lora = Lora({
+  variable: '--font-lora',
   subsets: ['latin'],
-  axes: ['opsz'],
+  style: ['normal', 'italic'],
 })
 
+/* UI / labels / donnees : Geist */
 const geist = Geist({
   variable: '--font-geist',
   subsets: ['latin'],
@@ -32,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${fraunces.variable} ${sourceSerif4.variable} ${geist.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${lora.variable} ${geist.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
