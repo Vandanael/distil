@@ -44,7 +44,6 @@ export function ArticleCard({
   scoredAt,
   wordCount,
 }: Props) {
-  const [hovered, setHovered] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
   const relativeDate = formatRelativeDate(scoredAt)
@@ -66,36 +65,29 @@ export function ArticleCard({
     <Link
       href={`/article/${id}`}
       className="group relative block space-y-2 border-b border-border pb-6 last:border-0"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       data-testid={`article-card-${id}`}
     >
       <div className="flex items-start justify-between gap-4">
         <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
           {title ?? 'Sans titre'}
         </h2>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {score !== null && (
             <span
-              className={[
-                'font-ui text-xs tabular-nums transition-opacity',
-                hovered ? 'opacity-100 text-accent' : 'opacity-0',
-              ].join(' ')}
+              className="font-ui text-xs tabular-nums text-muted-foreground/50"
               data-testid={`score-${id}`}
             >
               {score}
             </span>
           )}
+          {/* Toujours visible et tappable — opacity basse au repos, normale au hover */}
           <button
             type="button"
             onClick={handleDismiss}
             disabled={isDismissing}
             aria-label="Masquer cet article"
             data-testid={`dismiss-${id}`}
-            className={[
-              'font-ui text-base leading-none text-muted-foreground/40 transition-opacity hover:text-muted-foreground disabled:opacity-20',
-              hovered ? 'opacity-100' : 'opacity-0',
-            ].join(' ')}
+            className="font-ui text-base leading-none text-muted-foreground/25 transition-opacity hover:text-muted-foreground/70 disabled:opacity-20 p-1 -mr-1"
           >
             ×
           </button>

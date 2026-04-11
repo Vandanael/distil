@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { ArticleCard } from './ArticleCard'
 
 vi.mock('../../article/[id]/actions', () => ({
@@ -33,29 +33,6 @@ describe('ArticleCard', () => {
   it('affiche le temps de lecture', () => {
     render(<ArticleCard {...BASE_PROPS} />)
     expect(screen.getByText('4 min')).toBeTruthy()
-  })
-
-  it('affiche le score masque par defaut', () => {
-    render(<ArticleCard {...BASE_PROPS} />)
-    const score = screen.getByTestId('score-abc-123')
-    expect(score.className).toContain('opacity-0')
-  })
-
-  it('revele le score au hover', () => {
-    render(<ArticleCard {...BASE_PROPS} />)
-    const card = screen.getByTestId('article-card-abc-123')
-    fireEvent.mouseEnter(card)
-    const score = screen.getByTestId('score-abc-123')
-    expect(score.className).toContain('opacity-100')
-  })
-
-  it('masque le score quand la souris quitte', () => {
-    render(<ArticleCard {...BASE_PROPS} />)
-    const card = screen.getByTestId('article-card-abc-123')
-    fireEvent.mouseEnter(card)
-    fireEvent.mouseLeave(card)
-    const score = screen.getByTestId('score-abc-123')
-    expect(score.className).toContain('opacity-0')
   })
 
   it('affiche le badge Decouverte si serendipity', () => {
@@ -94,17 +71,15 @@ describe('ArticleCard', () => {
     expect(screen.queryByTestId('paywall-badge-abc-123')).toBeNull()
   })
 
-  it('affiche le bouton dismiss masque par defaut', () => {
+  it('affiche le bouton dismiss toujours present et tappable', () => {
     render(<ArticleCard {...BASE_PROPS} />)
     const btn = screen.getByTestId('dismiss-abc-123')
-    expect(btn.className).toContain('opacity-0')
+    expect(btn).toBeTruthy()
+    expect(btn.getAttribute('aria-label')).toBe('Masquer cet article')
   })
 
-  it('revele le bouton dismiss au hover', () => {
-    render(<ArticleCard {...BASE_PROPS} />)
-    const card = screen.getByTestId('article-card-abc-123')
-    fireEvent.mouseEnter(card)
-    const btn = screen.getByTestId('dismiss-abc-123')
-    expect(btn.className).toContain('opacity-100')
+  it('le score est toujours visible quand fourni', () => {
+    render(<ArticleCard {...BASE_PROPS} score={82} />)
+    expect(screen.getByTestId('score-abc-123')).toBeTruthy()
   })
 })
