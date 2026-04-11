@@ -60,3 +60,6 @@ supabase/.temp/
 # Netlify
 .netlify
 deno.lock
+
+# Claude Code (local config, skills, commands)
+.claude/
