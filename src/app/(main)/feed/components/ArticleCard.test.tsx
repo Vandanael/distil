@@ -12,6 +12,7 @@ const BASE_PROPS = {
   isSerendipity: false,
   origin: 'agent',
   scoredAt: null,
+  wordCount: 850,
 }
 
 describe('ArticleCard', () => {
@@ -72,5 +73,20 @@ describe('ArticleCard', () => {
     render(<ArticleCard {...BASE_PROPS} />)
     const link = screen.getByTestId('article-card-abc-123')
     expect(link.getAttribute('href')).toBe('/article/abc-123')
+  })
+
+  it('affiche le badge Paywall si wordCount null', () => {
+    render(<ArticleCard {...BASE_PROPS} wordCount={null} />)
+    expect(screen.getByTestId('paywall-badge-abc-123')).toBeTruthy()
+  })
+
+  it('affiche le badge Paywall si wordCount zero', () => {
+    render(<ArticleCard {...BASE_PROPS} wordCount={0} />)
+    expect(screen.getByTestId('paywall-badge-abc-123')).toBeTruthy()
+  })
+
+  it('ne pas afficher le badge Paywall si wordCount positif', () => {
+    render(<ArticleCard {...BASE_PROPS} wordCount={850} />)
+    expect(screen.queryByTestId('paywall-badge-abc-123')).toBeNull()
   })
 })

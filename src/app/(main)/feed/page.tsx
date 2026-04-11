@@ -14,6 +14,7 @@ export default async function FeedPage() {
     is_serendipity: boolean
     origin: string
     scored_at: string | null
+    word_count: number | null
   }> = []
 
   let rejectedCount = 0
@@ -38,7 +39,7 @@ export default async function FeedPage() {
       const { data } = await supabase
         .from('articles')
         .select(
-          'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin, scored_at'
+          'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin, scored_at, word_count'
         )
         .eq('user_id', user.id)
         .in('status', ['accepted', 'read'])
@@ -113,6 +114,7 @@ export default async function FeedPage() {
               isSerendipity={a.is_serendipity}
               origin={a.origin}
               scoredAt={a.scored_at}
+              wordCount={a.word_count}
             />
           ))
         )}

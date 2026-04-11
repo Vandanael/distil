@@ -13,6 +13,7 @@ type Props = {
   isSerendipity: boolean
   origin: string
   scoredAt: string | null
+  wordCount: number | null
 }
 
 function formatRelativeDate(dateStr: string | null): string | null {
@@ -39,9 +40,11 @@ export function ArticleCard({
   isSerendipity,
   origin,
   scoredAt,
+  wordCount,
 }: Props) {
   const [hovered, setHovered] = useState(false)
   const relativeDate = formatRelativeDate(scoredAt)
+  const isPaywall = wordCount === null || wordCount === 0
 
   return (
     <Link
@@ -83,8 +86,18 @@ export function ArticleCard({
           <span
             className="font-ui text-[11px] uppercase tracking-wider text-accent"
             data-testid={`serendipity-badge-${id}`}
+            title="Article hors de vos habituelles — introduit pour elargir votre veille"
           >
             Découverte
+          </span>
+        )}
+        {isPaywall && (
+          <span
+            className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground/50"
+            data-testid={`paywall-badge-${id}`}
+            title="Contenu non accessible — article probablement derriere un paywall"
+          >
+            Paywall
           </span>
         )}
         {origin === 'bookmarklet' && (

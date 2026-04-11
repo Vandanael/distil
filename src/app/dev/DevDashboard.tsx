@@ -20,6 +20,7 @@ const MOCK_ARTICLES = [
     isSerendipity: false,
     origin: 'agent',
     scoredAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    wordCount: 1200,
   },
   {
     id: 'mock-2',
@@ -32,6 +33,7 @@ const MOCK_ARTICLES = [
     isSerendipity: true,
     origin: 'agent',
     scoredAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+    wordCount: null, // paywall demo
   },
   {
     id: 'mock-3',
@@ -43,6 +45,7 @@ const MOCK_ARTICLES = [
     isSerendipity: false,
     origin: 'bookmarklet',
     scoredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    wordCount: 2100,
   },
 ]
 

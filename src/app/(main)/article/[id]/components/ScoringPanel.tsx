@@ -35,8 +35,9 @@ export function ScoringPanel({ score, justification, isSerendipity }: Props) {
         </span>
         {isSerendipity && (
           <span
-            className="font-ui text-[10px] uppercase tracking-wider text-accent"
+            className="font-ui text-[10px] uppercase tracking-wider text-accent cursor-help"
             data-testid="serendipity-badge"
+            title="Article hors de vos habituelles — introduit pour elargir votre veille"
           >
             Decouverte
           </span>

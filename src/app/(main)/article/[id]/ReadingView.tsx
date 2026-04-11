@@ -131,12 +131,50 @@ export function ReadingView({
         </div>
 
         {/* Contenu selectionnable */}
-        <div
-          ref={contentRef}
-          className="prose prose-sm max-w-none font-body text-foreground [&_h2]:font-heading [&_h2]:text-xl [&_h2]:mt-8 [&_h2]:mb-3 [&_p]:mb-4 [&_p]:leading-relaxed [&_a]:text-accent [&_a]:no-underline [&_a:hover]:underline"
-          data-testid="article-content"
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
+        {contentHtml ? (
+          <div
+            ref={contentRef}
+            className="prose prose-sm max-w-none font-body text-foreground [&_h2]:font-heading [&_h2]:text-xl [&_h2]:mt-8 [&_h2]:mb-3 [&_p]:mb-4 [&_p]:leading-relaxed [&_a]:text-accent [&_a]:no-underline [&_a:hover]:underline"
+            data-testid="article-content"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
+        ) : (
+          <div
+            ref={contentRef}
+            className="space-y-6 py-8 border border-border p-6"
+            data-testid="article-content-unavailable"
+          >
+            <p className="font-ui text-[10px] uppercase tracking-widest text-muted-foreground">
+              Contenu non disponible
+            </p>
+            <p className="font-body text-sm text-muted-foreground leading-relaxed">
+              Le contenu de cet article n&apos;a pas pu etre recupere — il est probablement protege
+              par un paywall ou inaccessible au parsing.
+            </p>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 font-ui text-sm text-accent hover:underline"
+            >
+              Lire sur {siteName ?? extractDomain(url)}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="square"
+                aria-hidden="true"
+              >
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          </div>
+        )}
 
         {/* Bas de page */}
         <div className="border-t border-border pt-8">
