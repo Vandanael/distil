@@ -20,7 +20,7 @@ type DiscoveryResult = {
  * Construit les requêtes de recherche depuis le profil utilisateur.
  * On croise les intérêts avec les sources pinned pour cibler les articles.
  */
-function buildSearchQueries(profile: UserProfile): string[] {
+export function buildSearchQueries(profile: UserProfile): string[] {
   const { interests, pinnedSources, profileText, profileStructured } = profile
 
   // Preference de langue : fr, en, ou both (defaut)
