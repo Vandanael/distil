@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from './ProfileForm'
 import { TokensSection } from './TokensSection'
+import { PushSubscribe } from '@/components/PushSubscribe'
 import { listApiTokens } from './token-actions'
 
 export default async function ProfilePage() {
@@ -57,7 +58,8 @@ export default async function ProfilePage() {
             | undefined,
         }}
       />
-      <div className="border-t border-border pt-8">
+      <div className="border-t border-border pt-8 space-y-8">
+        <PushSubscribe />
         <TokensSection tokens={tokens} />
       </div>
     </div>

@@ -23,7 +23,8 @@ Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.`
 export function buildUserPrompt(
   profile: UserProfile,
   candidates: ArticleCandidate[],
-  archivedTags: string[] = []
+  archivedTags: string[] = [],
+  negativeExamples: string[] = []
 ): string {
   const profileLines: string[] = []
 
@@ -43,6 +44,12 @@ export function buildUserPrompt(
   if (archivedTags.length > 0) {
     profileLines.push(
       `Sujets lus et archives recemment : ${archivedTags.join(', ')} (signaux d'interet confirmes)`
+    )
+  }
+
+  if (negativeExamples.length > 0) {
+    profileLines.push(
+      `Sujets explicitement rejetes comme HORS SUJET par l'utilisateur (score < 20, accepted = false obligatoire) : ${negativeExamples.join(' | ')}`
     )
   }
 

@@ -30,6 +30,7 @@ export type ScoringRequest = {
   candidates: ArticleCandidate[]
   runId: string
   archivedTags?: string[]
+  negativeExamples?: string[] // titres/sujets rejetes comme hors sujet
 }
 
 export type ScoringResult = {

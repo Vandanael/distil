@@ -72,6 +72,19 @@ export async function POST() {
 
   const knownUrls = (existingArticles ?? []).map((a) => a.url)
 
+  // Signaux negatifs : articles rejetes comme hors sujet (30 derniers jours)
+  const { data: dismissed } = await supabase
+    .from('articles')
+    .select('title, site_name')
+    .eq('user_id', user.id)
+    .eq('rejection_reason', 'off_topic')
+    .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+    .limit(15)
+
+  const negativeExamples = (dismissed ?? [])
+    .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+    .filter(Boolean)
+
   // Créer le scoring_run
   const { data: run, error: runError } = await supabase
     .from('scoring_runs')
@@ -136,11 +149,12 @@ export async function POST() {
     })
   }
 
-  // 3. Scorer les candidats
+  // 3. Scorer les candidats (avec signaux negatifs)
   const scoringResult = await runScoringAgent({
     profile: userProfile,
     candidates,
     runId: run.id,
+    negativeExamples,
   })
 
   const accepted = scoringResult.scored.filter((a) => a.accepted)

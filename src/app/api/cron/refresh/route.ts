@@ -10,6 +10,7 @@ import { runDiscoveryAgent } from '@/lib/agents/discovery-agent'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { parseUrl } from '@/lib/parsing/readability'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
+import { sendPushNotification } from '@/lib/push/send'
 import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
 
 export async function POST(req: NextRequest) {
@@ -64,14 +65,26 @@ export async function POST(req: NextRequest) {
         serendipityQuota: profile.serendipity_quota ?? 0.15,
       }
 
-      // URLs deja connues (7 derniers jours)
-      const { data: existingArticles } = await supabase
-        .from('articles')
-        .select('url')
-        .eq('user_id', profile.id)
-        .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      // URLs deja connues (7 derniers jours) + signaux negatifs
+      const [existingResult, dismissedResult] = await Promise.all([
+        supabase
+          .from('articles')
+          .select('url')
+          .eq('user_id', profile.id)
+          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+        supabase
+          .from('articles')
+          .select('title, site_name')
+          .eq('user_id', profile.id)
+          .eq('rejection_reason', 'off_topic')
+          .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+          .limit(15),
+      ])
 
-      const knownUrls = (existingArticles ?? []).map((a) => a.url)
+      const knownUrls = (existingResult.data ?? []).map((a) => a.url)
+      const negativeExamples = (dismissedResult.data ?? [])
+        .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+        .filter(Boolean)
 
       // Creer le scoring_run
       const { data: run, error: runError } = await supabase
@@ -143,11 +156,12 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      // Score
+      // Score (avec signaux negatifs)
       const scoringResult = await runScoringAgent({
         profile: userProfile,
         candidates,
         runId: run.id,
+        negativeExamples,
       })
 
       const accepted = scoringResult.scored.filter((a) => a.accepted)
@@ -218,6 +232,22 @@ export async function POST(req: NextRequest) {
           duration_ms: scoringResult.durationMs,
         })
         .eq('id', run.id)
+
+      // Push notification si l'utilisateur est abonne et a de nouveaux articles
+      if (accepted.length > 0) {
+        const pushSub = (profile.profile_structured as Record<string, unknown> | null)
+          ?.pushSubscription as PushSubscriptionJSON | undefined
+        if (pushSub?.endpoint) {
+          void sendPushNotification(pushSub, {
+            title: 'Distil',
+            body:
+              accepted.length === 1
+                ? '1 nouvel article dans votre veille.'
+                : `${accepted.length} nouveaux articles dans votre veille.`,
+            url: '/feed',
+          })
+        }
+      }
 
       results.push({
         userId: profile.id,

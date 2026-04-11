@@ -18,7 +18,8 @@ type ApiResponse = {
 export async function scoreWithMessagesApi(
   profile: UserProfile,
   candidates: ArticleCandidate[],
-  archivedTags: string[] = []
+  archivedTags: string[] = [],
+  negativeExamples: string[] = []
 ): Promise<ScoredArticle[]> {
   const client = new Anthropic()
 
@@ -26,7 +27,12 @@ export async function scoreWithMessagesApi(
     model: MODEL,
     max_tokens: 4096,
     system: buildSystemPrompt(),
-    messages: [{ role: 'user', content: buildUserPrompt(profile, candidates, archivedTags) }],
+    messages: [
+      {
+        role: 'user',
+        content: buildUserPrompt(profile, candidates, archivedTags, negativeExamples),
+      },
+    ],
   })
 
   const text = message.content.find((b) => b.type === 'text')?.text ?? ''
