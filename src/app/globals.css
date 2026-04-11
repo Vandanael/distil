@@ -154,3 +154,26 @@
     animation: none;
   }
 }
+
+/* Sprint 21 : View Transitions entre pages */
+::view-transition-old(root) {
+  animation: 100ms ease-out both fade-out;
+}
+::view-transition-new(root) {
+  animation: 150ms ease-in both fade-in;
+}
+
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
