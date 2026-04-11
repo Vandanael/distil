@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Quintessential, Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 /* Logo : Playfair Display — exclusivement pour le mot "DISTIL" */
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
+          <Toaster position="bottom-center" />
         </ThemeProvider>
       </body>
     </html>

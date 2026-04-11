@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -21,6 +22,16 @@ const SECTORS = [
   'Droit',
   'Autre',
 ]
+
+async function runScoring(urls: string[]): Promise<{ accepted: number; rejected: number }> {
+  const res = await fetch('/api/scoring/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ urls }),
+  })
+  if (!res.ok) throw new Error('Erreur serveur')
+  return res.json() as Promise<{ accepted: number; rejected: number }>
+}
 
 type ProfileData = {
   profile_text: string | null
@@ -44,6 +55,9 @@ export function ProfileForm({ profile }: Props) {
   const [showScores, setShowScores] = useState(profile.show_scores)
   const [saved, setSaved] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [showScoringPanel, setShowScoringPanel] = useState(false)
+  const [scoringUrls, setScoringUrls] = useState('')
+  const [isScoringPending, startScoringTransition] = useTransition()
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -201,6 +215,75 @@ export function ProfileForm({ profile }: Props) {
           {isPending ? 'Enregistrement...' : 'Enregistrer'}
         </Button>
         {saved && <span className="font-ui text-sm text-muted-foreground">Profil mis a jour.</span>}
+      </div>
+
+      {/* Declencheur de scoring manuel */}
+      <div className="border-t border-border pt-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <p className="font-ui text-sm font-medium text-foreground">Lancer le scoring</p>
+            <p className="font-body text-xs text-muted-foreground">
+              Collez des URLs d&apos;articles, Distil les analyse et les score.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowScoringPanel(!showScoringPanel)}
+            data-testid="toggle-scoring-panel"
+          >
+            {showScoringPanel ? 'Fermer' : 'Analyser des articles'}
+          </Button>
+        </div>
+
+        {showScoringPanel && (
+          <div className="space-y-3 border border-border p-4">
+            <Label className="font-ui text-[10px] uppercase tracking-wider text-muted-foreground">
+              URLs a analyser (une par ligne)
+            </Label>
+            <Textarea
+              placeholder={`https://example.com/article-1\nhttps://example.com/article-2`}
+              value={scoringUrls}
+              onChange={(e) => setScoringUrls(e.target.value)}
+              rows={5}
+              disabled={isScoringPending}
+              data-testid="scoring-urls-input"
+            />
+            <Button
+              type="button"
+              size="sm"
+              disabled={isScoringPending || !scoringUrls.trim()}
+              data-testid="run-scoring-btn"
+              onClick={() => {
+                const urls = scoringUrls
+                  .split('\n')
+                  .map((u) => u.trim())
+                  .filter((u) => u.startsWith('http'))
+                if (urls.length === 0) {
+                  toast.error('Aucune URL valide')
+                  return
+                }
+                startScoringTransition(async () => {
+                  const toastId = toast.loading(`Analyse de ${urls.length} article${urls.length > 1 ? 's' : ''}...`)
+                  try {
+                    const result = await runScoring(urls)
+                    toast.success(
+                      `${result.accepted} retenu${result.accepted > 1 ? 's' : ''}, ${result.rejected} rejet${result.rejected > 1 ? 'é' : 'é'}`,
+                      { id: toastId }
+                    )
+                    setScoringUrls('')
+                    setShowScoringPanel(false)
+                  } catch {
+                    toast.error('Erreur lors du scoring', { id: toastId })
+                  }
+                })
+              }}
+            >
+              {isScoringPending ? 'Analyse en cours...' : 'Analyser'}
+            </Button>
+          </div>
+        )}
       </div>
     </form>
   )

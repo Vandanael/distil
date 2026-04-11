@@ -11,6 +11,7 @@ type Props = {
   readingTimeMinutes: number | null
   score: number | null
   isSerendipity: boolean
+  origin: string
 }
 
 export function ArticleCard({
@@ -21,6 +22,7 @@ export function ArticleCard({
   readingTimeMinutes,
   score,
   isSerendipity,
+  origin,
 }: Props) {
   const [hovered, setHovered] = useState(false)
 
@@ -66,6 +68,14 @@ export function ArticleCard({
             data-testid={`serendipity-badge-${id}`}
           >
             Découverte
+          </span>
+        )}
+        {origin === 'bookmarklet' && (
+          <span
+            className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground/60"
+            data-testid={`origin-badge-${id}`}
+          >
+            Sauvegardé
           </span>
         )}
       </div>

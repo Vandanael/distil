@@ -1,6 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
+import { toast } from 'sonner'
 import { keepArticle } from '../actions'
 import { Button } from '@/components/ui/button'
 
@@ -19,6 +20,7 @@ export function RejectedCard({ id, title, siteName, rejectionReason, score, url 
   function handleKeep() {
     startTransition(async () => {
       await keepArticle(id)
+      toast.success('Article remis dans le feed')
     })
   }
 

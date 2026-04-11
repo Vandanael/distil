@@ -18,16 +18,18 @@ const MOCK_ARTICLES = [
     readingTimeMinutes: 8,
     score: 87,
     isSerendipity: false,
+    origin: 'agent',
   },
   {
     id: 'mock-2',
     title: 'Against Productivity Culture',
     siteName: 'harpers.org',
     excerpt:
-      'The relentless optimisation of time has made us more efficient and less human. A case for slowness.',
+      'The relentless optimisation de time has made us more efficient and less human. A case for slowness.',
     readingTimeMinutes: 12,
     score: 61,
     isSerendipity: true,
+    origin: 'agent',
   },
   {
     id: 'mock-3',
@@ -37,6 +39,7 @@ const MOCK_ARTICLES = [
     readingTimeMinutes: 5,
     score: 94,
     isSerendipity: false,
+    origin: 'bookmarklet',
   },
 ]
 

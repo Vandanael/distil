@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { saveNote } from '../actions'
@@ -20,6 +21,7 @@ export function NoteEditor({ articleId, highlightId, highlightText, onClose }: P
     if (!content.trim()) return
     startTransition(async () => {
       await saveNote(articleId, content.trim(), highlightId)
+      toast.success('Note enregistrée')
       setContent('')
       onClose()
     })

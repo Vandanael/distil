@@ -10,6 +10,7 @@ const BASE_PROPS = {
   readingTimeMinutes: 4,
   score: 82,
   isSerendipity: false,
+  origin: 'agent',
 }
 
 describe('ArticleCard', () => {

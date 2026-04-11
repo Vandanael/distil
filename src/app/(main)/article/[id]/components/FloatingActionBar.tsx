@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { archiveArticle } from '../actions'
 import { NoteEditor } from './NoteEditor'
 import { TagInput } from './TagInput'
@@ -21,6 +22,7 @@ export function FloatingActionBar({ articleId, pendingHighlight }: Props) {
     startTransition(async () => {
       await archiveArticle(articleId)
       setArchived(true)
+      toast.success('Article archivé')
     })
   }
 
