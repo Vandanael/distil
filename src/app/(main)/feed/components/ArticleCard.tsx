@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { dismissArticle } from '../../article/[id]/actions'
 
@@ -45,19 +45,32 @@ export function ArticleCard({
   wordCount,
 }: Props) {
   const [dismissed, setDismissed] = useState(false)
+  const [showFeedback, setShowFeedback] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
+  const feedbackRef = useRef<HTMLDivElement>(null)
   const relativeDate = formatRelativeDate(scoredAt)
   const isPaywall = wordCount === null || wordCount === 0
 
+  // Ferme le popover si clic en dehors
+  useEffect(() => {
+    if (!showFeedback) return
+    function onOutside(e: MouseEvent) {
+      if (feedbackRef.current && !feedbackRef.current.contains(e.target as Node)) {
+        setShowFeedback(false)
+      }
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [showFeedback])
+
   if (dismissed) return null
 
-  function handleDismiss(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
+  function handleDismiss(reason: 'off_topic' | 'already_read') {
+    setShowFeedback(false)
     startDismissTransition(async () => {
-      await dismissArticle(id)
+      await dismissArticle(id, reason)
       setDismissed(true)
-      toast.success('Article masqué')
+      toast.success(reason === 'off_topic' ? 'Article masqué — signal envoyé' : 'Article masqué')
     })
   }
 
@@ -71,7 +84,7 @@ export function ArticleCard({
         <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
           {title ?? 'Sans titre'}
         </h2>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="relative flex items-center gap-2 shrink-0" ref={feedbackRef}>
           {score !== null && (
             <span
               className="font-ui text-xs tabular-nums text-muted-foreground/50"
@@ -80,17 +93,44 @@ export function ArticleCard({
               {score}
             </span>
           )}
-          {/* Toujours visible et tappable — opacity basse au repos, normale au hover */}
+          {/* Bouton dismiss — toujours tappable, ouvre le popover de feedback */}
           <button
             type="button"
-            onClick={handleDismiss}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setShowFeedback((v) => !v)
+            }}
             disabled={isDismissing}
             aria-label="Masquer cet article"
             data-testid={`dismiss-${id}`}
-            className="font-ui text-base leading-none text-muted-foreground/25 transition-opacity hover:text-muted-foreground/70 disabled:opacity-20 p-1 -mr-1"
+            className="font-ui text-base leading-none text-muted-foreground/25 transition-colors hover:text-muted-foreground/70 disabled:opacity-20 p-1 -mr-1"
           >
             ×
           </button>
+          {showFeedback && (
+            <div
+              className="absolute right-0 top-6 z-20 flex flex-col gap-0 border border-border bg-background shadow-sm min-w-[130px]"
+              onClick={(e) => e.preventDefault()}
+            >
+              <button
+                type="button"
+                onClick={() => handleDismiss('off_topic')}
+                className="px-3 py-2 text-left font-ui text-xs text-foreground hover:bg-muted transition-colors"
+                data-testid={`feedback-off-topic-${id}`}
+              >
+                Hors sujet
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDismiss('already_read')}
+                className="px-3 py-2 text-left font-ui text-xs text-foreground hover:bg-muted transition-colors border-t border-border"
+                data-testid={`feedback-already-read-${id}`}
+              >
+                Deja lu ailleurs
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -66,7 +66,10 @@ export async function saveNote(
   })
 }
 
-export async function dismissArticle(articleId: string): Promise<void> {
+export async function dismissArticle(
+  articleId: string,
+  reason: 'off_topic' | 'already_read' | 'dismissed_by_user' = 'dismissed_by_user'
+): Promise<void> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -75,7 +78,7 @@ export async function dismissArticle(articleId: string): Promise<void> {
 
   await supabase
     .from('articles')
-    .update({ status: 'rejected', rejection_reason: 'dismissed_by_user' })
+    .update({ status: 'rejected', rejection_reason: reason })
     .eq('id', articleId)
     .eq('user_id', user.id)
 

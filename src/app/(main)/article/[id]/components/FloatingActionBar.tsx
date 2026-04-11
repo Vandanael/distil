@@ -8,15 +8,36 @@ import { TagInput } from './TagInput'
 
 type Props = {
   articleId: string
+  articleTitle: string | null
+  articleUrl: string
   pendingHighlight: { id: string; text: string } | null
 }
 
-export function FloatingActionBar({ articleId, pendingHighlight }: Props) {
+export function FloatingActionBar({
+  articleId,
+  articleTitle,
+  articleUrl,
+  pendingHighlight,
+}: Props) {
   const [showNote, setShowNote] = useState(false)
   const [showTag, setShowTag] = useState(false)
   const [tags, setTags] = useState<string[]>([])
   const [archived, setArchived] = useState(false)
   const [isPending, startTransition] = useTransition()
+
+  async function handleShare() {
+    const shareData = { title: articleTitle ?? 'Article Distil', url: articleUrl }
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch {
+        // Annule par l'utilisateur — pas d'erreur a afficher
+      }
+    } else {
+      await navigator.clipboard.writeText(articleUrl)
+      toast.success('Lien copie')
+    }
+  }
 
   function handleArchive() {
     startTransition(async () => {
@@ -66,6 +87,14 @@ export function FloatingActionBar({ articleId, pendingHighlight }: Props) {
             ))}
           </div>
         )}
+        <button
+          type="button"
+          onClick={() => void handleShare()}
+          className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
+          data-testid="action-share"
+        >
+          Partager
+        </button>
         <button
           type="button"
           onClick={() => {

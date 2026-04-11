@@ -193,7 +193,12 @@ export function ReadingView({
         onHighlightSaved={(highlightId, text) => setPendingHighlight({ id: highlightId, text })}
       />
 
-      <FloatingActionBar articleId={id} pendingHighlight={pendingHighlight} />
+      <FloatingActionBar
+        articleId={id}
+        articleTitle={title}
+        articleUrl={url}
+        pendingHighlight={pendingHighlight}
+      />
     </>
   )
 }

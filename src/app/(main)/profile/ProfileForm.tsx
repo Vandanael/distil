@@ -51,6 +51,7 @@ type ProfileData = {
   daily_cap: number
   serendipity_quota: number
   show_scores: boolean
+  language?: 'fr' | 'en' | 'both'
 }
 
 type Props = { profile: ProfileData }
@@ -60,10 +61,12 @@ export function ProfileForm({ profile }: Props) {
   const [sector, setSector] = useState(profile.sector ?? '')
   const [interests, setInterests] = useState(profile.interests.join(', '))
   const [sources, setSources] = useState(profile.pinned_sources.join(', '))
+  const [language, setLanguage] = useState<'fr' | 'en' | 'both'>(profile.language ?? 'both')
   const [dailyCap, setDailyCap] = useState(profile.daily_cap)
   const [serendipityQuota, setSerendipityQuota] = useState(profile.serendipity_quota)
   const [showScores, setShowScores] = useState(profile.show_scores)
   const [saved, setSaved] = useState(false)
+  const [sourcesSavedHint, setSourcesSavedHint] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [showScoringPanel, setShowScoringPanel] = useState(false)
   const [scoringUrls, setScoringUrls] = useState('')
@@ -73,6 +76,12 @@ export function ProfileForm({ profile }: Props) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSaved(false)
+    setSourcesSavedHint(false)
+    const newSources = sources
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    const sourcesChanged = newSources.join(',') !== profile.pinned_sources.join(',')
     startTransition(async () => {
       await updateProfile({
         profile_text: profileText || undefined,
@@ -81,15 +90,14 @@ export function ProfileForm({ profile }: Props) {
           .split(',')
           .map((s) => s.trim())
           .filter(Boolean),
-        pinned_sources: sources
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
+        pinned_sources: newSources,
         daily_cap: dailyCap,
         serendipity_quota: serendipityQuota,
         show_scores: showScores,
+        language,
       })
       setSaved(true)
+      if (sourcesChanged) setSourcesSavedHint(true)
     })
   }
 
@@ -162,6 +170,29 @@ export function ProfileForm({ profile }: Props) {
           disabled={isPending}
           data-testid="sources-input"
         />
+        {sourcesSavedHint && (
+          <p className="font-ui text-[10px] text-muted-foreground/70">
+            Ces sources seront incluses lors du prochain rafraichissement.
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="language" className={labelClass}>
+          Langue des articles
+        </Label>
+        <select
+          id="language"
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as 'fr' | 'en' | 'both')}
+          disabled={isPending}
+          data-testid="language-select"
+          className={selectClass}
+        >
+          <option value="both">Francais et anglais</option>
+          <option value="fr">Francais uniquement</option>
+          <option value="en">Anglais uniquement</option>
+        </select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -236,12 +267,16 @@ export function ProfileForm({ profile }: Props) {
             <p className="font-body text-xs text-muted-foreground">
               Distil cherche de nouveaux articles depuis vos sources et centres d&apos;intérêt.
             </p>
+            <p className="font-ui text-[10px] text-muted-foreground/60">
+              Actualisation automatique chaque matin a 6h30.
+            </p>
           </div>
           <Button
             type="button"
             size="sm"
             disabled={isRefreshPending}
             data-testid="refresh-feed-btn"
+            title="Actualisation automatique chaque matin a 6h30"
             onClick={() => {
               startRefreshTransition(async () => {
                 const toastId = toast.loading('Recherche de nouveaux articles...')

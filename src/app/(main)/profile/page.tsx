@@ -31,7 +31,7 @@ export default async function ProfilePage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'profile_text, sector, interests, pinned_sources, daily_cap, serendipity_quota, show_scores'
+      'profile_text, sector, interests, pinned_sources, daily_cap, serendipity_quota, show_scores, profile_structured'
     )
     .eq('id', user.id)
     .single()
@@ -47,7 +47,16 @@ export default async function ProfilePage() {
         <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
         <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
-      <ProfileForm profile={profile} />
+      <ProfileForm
+        profile={{
+          ...profile,
+          language: (profile.profile_structured as Record<string, unknown> | null)?.language as
+            | 'fr'
+            | 'en'
+            | 'both'
+            | undefined,
+        }}
+      />
       <div className="border-t border-border pt-8">
         <TokensSection tokens={tokens} />
       </div>

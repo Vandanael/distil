@@ -40,6 +40,9 @@ export function AppHeader() {
           <Link href="/archive" className="hover:text-foreground transition-colors">
             Archives
           </Link>
+          <Link href="/highlights" className="hover:text-foreground transition-colors">
+            Highlights
+          </Link>
           <Link href="/profile" className="hover:text-foreground transition-colors">
             Profil
           </Link>

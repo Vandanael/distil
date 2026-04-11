@@ -21,7 +21,18 @@ type DiscoveryResult = {
  * On croise les intérêts avec les sources pinned pour cibler les articles.
  */
 function buildSearchQueries(profile: UserProfile): string[] {
-  const { interests, pinnedSources, profileText } = profile
+  const { interests, pinnedSources, profileText, profileStructured } = profile
+
+  // Preference de langue : fr, en, ou both (defaut)
+  const language = (profileStructured as Record<string, unknown> | null)?.language as
+    | string
+    | undefined
+  const langSuffix =
+    language === 'fr'
+      ? ' actualite analyse français'
+      : language === 'en'
+        ? ' analysis insight english'
+        : ''
 
   // Termes de recherche : intérêts + profil texte
   const topics =
@@ -44,7 +55,7 @@ function buildSearchQueries(profile: UserProfile): string[] {
 
   // Requêtes thématiques sans source imposée (pour la diversité)
   for (const topic of topics.slice(0, MAX_SEARCHES - queries.length)) {
-    queries.push(`${topic} article analyse 2024 2025 -top10 -listicle`)
+    queries.push(`${topic} article analyse 2024 2025 -top10 -listicle${langSuffix}`)
   }
 
   return queries.slice(0, MAX_SEARCHES)
