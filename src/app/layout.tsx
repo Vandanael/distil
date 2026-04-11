@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Playfair_Display, Quintessential, Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
@@ -28,12 +28,15 @@ export const metadata: Metadata = {
   title: 'Distil',
   description: 'Veille intelligente. Moins de bruit, mieux lu.',
   manifest: '/manifest.webmanifest',
-  themeColor: '#1c3028',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Distil',
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#1c3028',
 }
 
 export default function RootLayout({
