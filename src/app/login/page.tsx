@@ -72,7 +72,7 @@ export default function LoginPage() {
         {/* Masthead */}
         <div className="space-y-5">
           <div className="space-y-4">
-            <h1 className="font-logo uppercase text-7xl tracking-tight text-foreground">Distil</h1>
+            <h1 className="font-logo uppercase text-5xl md:text-7xl tracking-tight text-foreground">Distil</h1>
             <div className="h-0.5 w-10 bg-accent" />
           </div>
           <p className="font-body text-lg leading-relaxed text-muted-foreground">

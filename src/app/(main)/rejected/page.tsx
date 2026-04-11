@@ -32,8 +32,7 @@ export default async function RejectedPage() {
   }
 
   return (
-    <main className="flex min-h-full flex-col p-8 md:p-16 bg-background">
-      <div className="w-full max-w-2xl space-y-10">
+    <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
         {/* En-tete */}
         <div className="space-y-4 border-b border-border pb-8">
           <Link
@@ -73,7 +72,6 @@ export default async function RejectedPage() {
             ))
           )}
         </div>
-      </div>
-    </main>
+    </div>
   )
 }

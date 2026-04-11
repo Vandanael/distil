@@ -53,8 +53,7 @@ export function ReadingView({
 
   return (
     <>
-      <main className="flex min-h-full flex-col p-8 pb-24 md:p-16 md:pb-24 bg-background">
-        <div className="w-full max-w-2xl space-y-10">
+      <div className="max-w-2xl mx-auto px-4 py-8 pb-24 md:py-12 md:pb-24 space-y-10 w-full">
           {/* Navigation */}
           <Link
             href="/feed"
@@ -125,8 +124,7 @@ export function ReadingView({
               &larr; Retour au feed
             </Link>
           </div>
-        </div>
-      </main>
+      </div>
 
       <HighlightPopover
         articleId={id}

@@ -11,15 +11,13 @@ export default async function ProfilePage() {
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {
     return (
-      <main className="flex min-h-full flex-col p-8 md:p-16 bg-background">
-        <div className="w-full max-w-xl space-y-10">
-          <div className="space-y-4 border-b border-border pb-8">
-            <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
-            <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
-          </div>
-          <TokensSection tokens={[]} />
+      <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
+        <div className="space-y-4 border-b border-border pb-8">
+          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
+          <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
         </div>
-      </main>
+        <TokensSection tokens={[]} />
+      </div>
     )
   }
 
@@ -43,18 +41,16 @@ export default async function ProfilePage() {
   const tokens = await listApiTokens()
 
   return (
-    <main className="flex min-h-full flex-col p-8 md:p-16 bg-background">
-      <div className="w-full max-w-xl space-y-10">
-        <div className="space-y-4 border-b border-border pb-8">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
-          <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
-          <p className="font-body text-sm text-muted-foreground">{user.email}</p>
-        </div>
-        <ProfileForm profile={profile} />
-        <div className="border-t border-border pt-8">
-          <TokensSection tokens={tokens} />
-        </div>
+    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
+      <div className="space-y-4 border-b border-border pb-8">
+        <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
+        <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
+        <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
-    </main>
+      <ProfileForm profile={profile} />
+      <div className="border-t border-border pt-8">
+        <TokensSection tokens={tokens} />
+      </div>
+    </div>
   )
 }

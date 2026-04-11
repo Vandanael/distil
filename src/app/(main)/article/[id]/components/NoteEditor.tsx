@@ -27,7 +27,7 @@ export function NoteEditor({ articleId, highlightId, highlightText, onClose }: P
 
   return (
     <div
-      className="fixed bottom-20 right-8 z-40 w-80 space-y-3 border border-border bg-background p-4 shadow-lg"
+      className="fixed bottom-20 inset-x-4 z-40 space-y-3 border border-border bg-background p-4 shadow-lg md:inset-x-auto md:right-8 md:w-80"
       data-testid="note-editor"
     >
       {highlightText && (

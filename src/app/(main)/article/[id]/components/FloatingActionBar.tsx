@@ -52,7 +52,7 @@ export function FloatingActionBar({ articleId, pendingHighlight }: Props) {
       )}
 
       <div
-        className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-6 border-t border-border bg-background px-8 py-4"
+        className="fixed bottom-0 left-0 right-0 z-30 flex flex-wrap items-center justify-center gap-4 border-t border-border bg-background px-4 py-4"
         data-testid="floating-action-bar"
       >
         {tags.length > 0 && (

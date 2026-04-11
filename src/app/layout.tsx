@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Quintessential, Geist } from 'next/font/google'
+import { ThemeProvider } from 'next-themes'
 import './globals.css'
 
 /* Logo : Playfair Display — exclusivement pour le mot "DISTIL" */
@@ -25,6 +26,13 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: 'Distil',
   description: 'Veille intelligente. Moins de bruit, mieux lu.',
+  manifest: '/manifest.webmanifest',
+  themeColor: '#1c3028',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Distil',
+  },
 }
 
 export default function RootLayout({
@@ -36,8 +44,13 @@ export default function RootLayout({
     <html
       lang="fr"
       className={`${playfair.variable} ${quintessential.variable} ${geist.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }

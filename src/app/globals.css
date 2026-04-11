@@ -90,7 +90,7 @@
 }
 
 .dark {
-  /* Dark mode — Sprint 10 */
+  /* Dark mode — palette vert foret coherente (pas de bleu marine) */
   --background: #0d1a11;
   --foreground: #fbf9f4;
   --card: #1c3028;
@@ -101,21 +101,21 @@
   --primary-foreground: #1c3028;
   --secondary: #244030;
   --secondary-foreground: #fbf9f4;
-  --muted: #1a3a6b;
-  --muted-foreground: #94a3b8;
+  --muted: #1a2e20;           /* vert tres fonce (correction : etait bleu #1a3a6b) */
+  --muted-foreground: #8aab94; /* vert-gris clair lisible */
   --accent: #e8693d;
   --accent-foreground: #fbf9f4;
   --destructive: #ef4444;
-  --border: #1e3a5f;
-  --input: #1e3a5f;
+  --border: #2a4a38;           /* vert-gris fonce (correction : etait bleu #1e3a5f) */
+  --input: #2a4a38;            /* idem */
   --ring: #e8693d;
-  --sidebar: #11284b;
+  --sidebar: #0d2018;
   --sidebar-foreground: #fbf9f4;
   --sidebar-primary: #fbf9f4;
-  --sidebar-primary-foreground: #11284b;
-  --sidebar-accent: #1a3a6b;
+  --sidebar-primary-foreground: #0d2018;
+  --sidebar-accent: #1a2e20;
   --sidebar-accent-foreground: #fbf9f4;
-  --sidebar-border: #1e3a5f;
+  --sidebar-border: #2a4a38;
   --sidebar-ring: #e8693d;
 }
 

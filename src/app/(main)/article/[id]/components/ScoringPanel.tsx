@@ -14,9 +14,9 @@ function ScoreBar({ score }: { score: number }) {
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-1 bg-border rounded-full overflow-hidden">
+      <div className="flex-1 h-1 bg-border rounded-none overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all ${color}`}
+          className={`h-full rounded-none transition-all ${color}`}
           style={{ width: `${score}%` }}
         />
       </div>
