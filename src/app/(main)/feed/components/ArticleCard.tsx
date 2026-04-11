@@ -6,6 +6,18 @@ import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { dismissArticle } from '../../article/[id]/actions'
 
+function MiniScoreBar({ score }: { score: number }) {
+  const color = score >= 70 ? 'bg-emerald-500' : score >= 40 ? 'bg-amber-400' : 'bg-red-400'
+  return (
+    <div
+      className="h-1 w-10 bg-border overflow-hidden shrink-0"
+      title={`Score de pertinence : ${score}/100`}
+    >
+      <div className={`h-full ${color}`} style={{ width: `${score}%` }} />
+    </div>
+  )
+}
+
 type Props = {
   id: string
   title: string | null
@@ -18,6 +30,7 @@ type Props = {
   scoredAt: string | null
   wordCount: number | null
   ogImageUrl: string | null
+  staggerIndex?: number
 }
 
 function formatRelativeDate(dateStr: string | null): string | null {
@@ -46,6 +59,7 @@ export function ArticleCard({
   scoredAt,
   wordCount,
   ogImageUrl,
+  staggerIndex = 0,
 }: Props) {
   const [dismissed, setDismissed] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
@@ -111,19 +125,17 @@ export function ArticleCard({
       href={`/article/${id}`}
       className="group relative block space-y-2 border-b border-border pb-6 last:border-0"
       data-testid={`article-card-${id}`}
+      data-article-card
+      style={{ '--stagger': staggerIndex } as React.CSSProperties}
     >
       <div className="flex items-start justify-between gap-4">
-        <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
+        <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-150">
           {title ?? 'Sans titre'}
         </h2>
         <div className="relative flex items-center gap-2 shrink-0" ref={feedbackRef}>
           {score !== null && (
-            <span
-              className="font-ui text-xs tabular-nums text-muted-foreground/50 cursor-help"
-              title="Score de pertinence Distil (0-100)"
-              data-testid={`score-${id}`}
-            >
-              {score}
+            <span data-testid={`score-${id}`}>
+              <MiniScoreBar score={score} />
             </span>
           )}
           {/* Bouton dismiss — toujours tappable, ouvre le popover de feedback */}

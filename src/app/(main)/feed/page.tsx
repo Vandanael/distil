@@ -142,10 +142,11 @@ export default async function FeedPage() {
         {articles.length === 0 ? (
           <EmptyFeed />
         ) : (
-          articles.map((a) => (
+          articles.map((a, i) => (
             <ArticleCard
               key={a.id}
               id={a.id}
+              staggerIndex={i}
               title={a.title}
               siteName={a.site_name}
               excerpt={a.excerpt}
