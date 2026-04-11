@@ -87,4 +87,22 @@ describe('buildUserPrompt', () => {
     const prompt = buildUserPrompt(profileMinimal, CANDIDATES)
     expect(prompt).toContain('IA')
   })
+
+  it('inclut les tags archives dans le prompt', () => {
+    const prompt = buildUserPrompt(PROFILE, CANDIDATES, ['machine-learning', 'produit'])
+    expect(prompt).toContain('machine-learning')
+    expect(prompt).toContain('produit')
+    expect(prompt).toContain('archives')
+  })
+
+  it('sans tags archives, pas de section feedback', () => {
+    const prompt = buildUserPrompt(PROFILE, CANDIDATES, [])
+    expect(prompt).not.toContain('archives recemment')
+  })
+
+  it('fonctionne sans le 3eme argument', () => {
+    const prompt = buildUserPrompt(PROFILE, CANDIDATES)
+    expect(prompt).toContain('PM senior')
+    expect(prompt).not.toContain('archives recemment')
+  })
 })

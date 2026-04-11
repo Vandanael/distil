@@ -57,5 +57,6 @@ AGENTS.md
 .env.local.example
 supabase/.temp/
 
-# Local Netlify folder
+# Netlify
 .netlify
+deno.lock

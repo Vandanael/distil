@@ -24,14 +24,14 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 
 | Couche          | Choix                                                        |
 | --------------- | ------------------------------------------------------------ |
-| Framework       | Next.js 15 App Router, TypeScript strict                     |
+| Framework       | Next.js 16 App Router, TypeScript strict                     |
 | Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut) |
 | Base de donnees | Supabase : Postgres + pgvector + Auth                        |
-| IA / agents     | Claude Managed Agents (Anthropic)                            |
+| IA / agents     | Claude Messages API (Anthropic) - Haiku pour scoring         |
 | Embeddings      | Voyage voyage-3                                              |
 | Tests           | Vitest (unit), Playwright (E2E)                              |
-| Observabilite   | Sentry                                                       |
-| Deploy          | Vercel                                                       |
+| Observabilite   | Netlify function logs + Supabase logs                        |
+| Deploy          | Netlify                                                      |
 
 ---
 
@@ -43,7 +43,7 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 - Imports : chemins absolus via `@/` (alias src/). Pas d'imports relatifs remontants (`../../`).
 - Textes UI et docs : jamais de tiret cadratin. Utiliser le tiret demi-cadratin (`-`) ou reformuler.
 - Commentaires : en francais, concis, uniquement si la logique n'est pas auto-explicite.
-- Pas de `console.log` en production. Sentry pour les erreurs, structured logging pour le reste.
+- Pas de `console.log` en production. Netlify function logs pour les erreurs server-side.
 - Server Components par defaut. `'use client'` uniquement si interactivite reelle necessaire.
 
 ---
