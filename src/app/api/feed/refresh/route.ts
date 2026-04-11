@@ -10,6 +10,7 @@ import { runDiscoveryAgent } from '@/lib/agents/discovery-agent'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { parseUrl } from '@/lib/parsing/readability'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
+import { checkRefreshRateLimit } from '@/lib/rate-limit'
 import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
 
 export async function POST() {
@@ -38,6 +39,14 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json({ error: 'Non authentifie' }, { status: 401 })
+  }
+
+  const retryAfter = await checkRefreshRateLimit(supabase, user.id)
+  if (retryAfter !== null) {
+    return NextResponse.json(
+      { error: 'Trop de requetes. Attendez quelques minutes avant de relancer.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+    )
   }
 
   // Charger le profil
