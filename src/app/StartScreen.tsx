@@ -66,18 +66,23 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
         </div>
 
         {/* Articles du dernier cron */}
-        {articles.length > 0 && (
-          <div className="space-y-4">
-            <p className="font-ui text-[10px] uppercase tracking-widest text-muted-foreground/60">
-              Articles selectionnes ce matin
-            </p>
+        <div className="space-y-4">
+          <p className="font-ui text-[10px] uppercase tracking-widest text-muted-foreground/60">
+            Articles selectionnes ce matin
+          </p>
+          {articles.length > 0 ? (
             <div className="space-y-6">
               {articles.map((article, i) => (
                 <ArticlePreview key={i} article={article} />
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="font-body text-sm text-muted-foreground italic">
+              Distil analyse le web en ce moment meme. Revenez dans quelques minutes pour
+              decouvrir votre premiere selection.
+            </p>
+          )}
+        </div>
 
         {/* CTA */}
         <div className="space-y-3">

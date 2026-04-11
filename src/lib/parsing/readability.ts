@@ -38,8 +38,15 @@ export function parseHtml(html: string, url: string): ParsedArticle {
 
   const ogImageUrl =
     dom.window.document
+      .querySelector('meta[property="og:image:secure_url"]')
+      ?.getAttribute('content') ??
+    dom.window.document
       .querySelector('meta[property="og:image"]')
-      ?.getAttribute('content') ?? null
+      ?.getAttribute('content') ??
+    dom.window.document
+      .querySelector('meta[name="twitter:image"]')
+      ?.getAttribute('content') ??
+    null
 
   return {
     url,
