@@ -66,6 +66,22 @@ export async function saveNote(
   })
 }
 
+export async function dismissArticle(articleId: string): Promise<void> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  await supabase
+    .from('articles')
+    .update({ status: 'rejected', rejection_reason: 'dismissed_by_user' })
+    .eq('id', articleId)
+    .eq('user_id', user.id)
+
+  revalidatePath('/feed')
+}
+
 export async function addTag(articleId: string, tagName: string): Promise<void> {
   const supabase = await createClient()
   const {

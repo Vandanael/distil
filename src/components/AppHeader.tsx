@@ -37,6 +37,9 @@ export function AppHeader() {
           <Link href="/search" className="hover:text-foreground transition-colors">
             Recherche
           </Link>
+          <Link href="/archive" className="hover:text-foreground transition-colors">
+            Archives
+          </Link>
           <Link href="/profile" className="hover:text-foreground transition-colors">
             Profil
           </Link>

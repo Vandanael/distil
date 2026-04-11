@@ -1,6 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ArticleCard } from './ArticleCard'
+
+vi.mock('../../article/[id]/actions', () => ({
+  dismissArticle: vi.fn().mockResolvedValue(undefined),
+}))
 
 const BASE_PROPS = {
   id: 'abc-123',
@@ -88,5 +92,19 @@ describe('ArticleCard', () => {
   it('ne pas afficher le badge Paywall si wordCount positif', () => {
     render(<ArticleCard {...BASE_PROPS} wordCount={850} />)
     expect(screen.queryByTestId('paywall-badge-abc-123')).toBeNull()
+  })
+
+  it('affiche le bouton dismiss masque par defaut', () => {
+    render(<ArticleCard {...BASE_PROPS} />)
+    const btn = screen.getByTestId('dismiss-abc-123')
+    expect(btn.className).toContain('opacity-0')
+  })
+
+  it('revele le bouton dismiss au hover', () => {
+    render(<ArticleCard {...BASE_PROPS} />)
+    const card = screen.getByTestId('article-card-abc-123')
+    fireEvent.mouseEnter(card)
+    const btn = screen.getByTestId('dismiss-abc-123')
+    expect(btn.className).toContain('opacity-100')
   })
 })

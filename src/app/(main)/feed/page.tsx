@@ -88,6 +88,13 @@ export default async function FeedPage() {
             </Link>
           )}
           <Link
+            href="/archive"
+            className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
+            data-testid="link-archive"
+          >
+            Archives &rarr;
+          </Link>
+          <Link
             href="/search"
             className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
             data-testid="link-search"

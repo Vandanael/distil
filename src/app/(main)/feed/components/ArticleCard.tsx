@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
+import { dismissArticle } from '../../article/[id]/actions'
 
 type Props = {
   id: string
@@ -43,13 +45,27 @@ export function ArticleCard({
   wordCount,
 }: Props) {
   const [hovered, setHovered] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+  const [isDismissing, startDismissTransition] = useTransition()
   const relativeDate = formatRelativeDate(scoredAt)
   const isPaywall = wordCount === null || wordCount === 0
+
+  if (dismissed) return null
+
+  function handleDismiss(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    startDismissTransition(async () => {
+      await dismissArticle(id)
+      setDismissed(true)
+      toast.success('Article masqué')
+    })
+  }
 
   return (
     <Link
       href={`/article/${id}`}
-      className="group block space-y-2 border-b border-border pb-6 last:border-0"
+      className="group relative block space-y-2 border-b border-border pb-6 last:border-0"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       data-testid={`article-card-${id}`}
@@ -58,17 +74,32 @@ export function ArticleCard({
         <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
           {title ?? 'Sans titre'}
         </h2>
-        {score !== null && (
-          <span
+        <div className="flex items-center gap-3 shrink-0">
+          {score !== null && (
+            <span
+              className={[
+                'font-ui text-xs tabular-nums transition-opacity',
+                hovered ? 'opacity-100 text-accent' : 'opacity-0',
+              ].join(' ')}
+              data-testid={`score-${id}`}
+            >
+              {score}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleDismiss}
+            disabled={isDismissing}
+            aria-label="Masquer cet article"
+            data-testid={`dismiss-${id}`}
             className={[
-              'shrink-0 font-ui text-xs tabular-nums transition-opacity',
-              hovered ? 'opacity-100 text-accent' : 'opacity-0',
+              'font-ui text-base leading-none text-muted-foreground/40 transition-opacity hover:text-muted-foreground disabled:opacity-20',
+              hovered ? 'opacity-100' : 'opacity-0',
             ].join(' ')}
-            data-testid={`score-${id}`}
           >
-            {score}
-          </span>
-        )}
+            ×
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
