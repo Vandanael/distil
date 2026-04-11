@@ -65,8 +65,10 @@ export function buildUserPrompt(
     url: c.url,
     title: c.title,
     site_name: c.siteName,
+    author: c.author ?? null,
+    published_at: c.publishedAt ?? null,
     excerpt: c.excerpt,
-    content_preview: c.contentText.slice(0, 800),
+    content_preview: c.contentText.slice(0, 2000),
   }))
 
   return `PROFIL UTILISATEUR :

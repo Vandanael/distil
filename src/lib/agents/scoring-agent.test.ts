@@ -26,6 +26,8 @@ const CANDIDATES = [
     excerpt: null,
     contentText: 'Contenu 1',
     siteName: null,
+    author: null,
+    publishedAt: null,
   },
   {
     url: 'https://example.com/2',
@@ -33,6 +35,8 @@ const CANDIDATES = [
     excerpt: null,
     contentText: 'Contenu 2',
     siteName: null,
+    author: null,
+    publishedAt: null,
   },
 ]
 

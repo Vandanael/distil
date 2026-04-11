@@ -58,7 +58,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             <div className="h-0.5 w-10 bg-accent" />
           </div>
           <p className="font-body text-lg leading-relaxed text-muted-foreground">
-            Votre veille du matin. Triee par ce qui compte vraiment.
+            Votre veille quotidienne, sans le bruit.
           </p>
           <p className="font-body text-sm text-muted-foreground/70">
             Chaque jour, Distil lit le web pour vous et ne garde que l&apos;essentiel.

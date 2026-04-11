@@ -78,7 +78,7 @@ export default function LoginPage() {
             <div className="h-0.5 w-10 bg-accent" />
           </div>
           <p className="font-body text-lg leading-relaxed text-muted-foreground">
-            Votre veille. Triée par ce qui compte.
+            Votre veille quotidienne, sans le bruit.
           </p>
         </div>
 

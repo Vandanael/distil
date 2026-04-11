@@ -140,6 +140,8 @@ export async function POST() {
       excerpt: r.value.excerpt,
       contentText: r.value.contentText,
       siteName: r.value.siteName,
+      author: r.value.author ?? null,
+      publishedAt: r.value.publishedAt ?? null,
     }))
     .filter((c) => c.contentText.length > 200) // filtre les pages sans contenu
 

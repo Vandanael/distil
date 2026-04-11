@@ -19,6 +19,8 @@ const CANDIDATES: ArticleCandidate[] = [
     excerpt: 'How AI is changing the PM role',
     contentText: 'Product managers are increasingly using AI tools...',
     siteName: 'example.com',
+    author: null,
+    publishedAt: null,
   },
 ]
 

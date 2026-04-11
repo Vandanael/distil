@@ -106,6 +106,8 @@ export async function POST(request: Request) {
       excerpt: r.value.excerpt,
       contentText: r.value.contentText,
       siteName: r.value.siteName,
+      author: r.value.author ?? null,
+      publishedAt: r.value.publishedAt ?? null,
     }))
 
   if (candidates.length === 0) {
