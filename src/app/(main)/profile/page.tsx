@@ -1,14 +1,24 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from './ProfileForm'
+import { TokensSection } from './TokensSection'
+import { listApiTokens } from './token-actions'
 
 export default async function ProfilePage() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (
+    process.env.DEV_BYPASS_AUTH === 'true' ||
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
     return (
-      <main className="flex flex-1 flex-col items-center justify-center p-8 bg-background">
-        <p className="font-[family-name:var(--font-geist)] text-sm text-muted-foreground">
-          Configurez .env.local pour activer le profil.
-        </p>
+      <main className="flex min-h-full flex-col p-8 md:p-16 bg-background">
+        <div className="w-full max-w-xl space-y-10">
+          <div className="space-y-4 border-b border-border pb-8">
+            <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
+            <h1 className="font-heading text-4xl font-semibold text-foreground">Preferences</h1>
+          </div>
+          <TokensSection tokens={[]} />
+        </div>
       </main>
     )
   }
@@ -18,9 +28,7 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -30,9 +38,9 @@ export default async function ProfilePage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile) {
-    redirect('/onboarding')
-  }
+  if (!profile) redirect('/onboarding')
+
+  const tokens = await listApiTokens()
 
   return (
     <main className="flex min-h-full flex-col p-8 md:p-16 bg-background">
@@ -43,6 +51,9 @@ export default async function ProfilePage() {
           <p className="font-body text-sm text-muted-foreground">{user.email}</p>
         </div>
         <ProfileForm profile={profile} />
+        <div className="border-t border-border pt-8">
+          <TokensSection tokens={tokens} />
+        </div>
       </div>
     </main>
   )

@@ -2,6 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
+  // Bypass auth en dev local (DEV_BYPASS_AUTH=true dans .env.local)
+  if (process.env.DEV_BYPASS_AUTH === 'true') {
+    return NextResponse.next({ request })
+  }
+
   // Sans credentials Supabase (dev sans .env.local), on laisse passer
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.next({ request })

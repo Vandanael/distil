@@ -12,8 +12,12 @@ type Props = {
 export default async function SearchPage({ searchParams }: Props) {
   const { q: query = '', mode = 'fulltext' } = await searchParams
 
-  // Pas de Supabase en dev sans .env.local
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  // Bypass auth ou Supabase non configure
+  if (
+    process.env.DEV_BYPASS_AUTH === 'true' ||
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
     return <SearchShell query={query} results={[]} />
   }
 
