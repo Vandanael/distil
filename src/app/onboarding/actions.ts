@@ -39,5 +39,5 @@ export async function createProfile(input: ProfileInput) {
     throw new Error(error.message)
   }
 
-  redirect('/feed')
+  redirect('/onboarding/welcome')
 }
