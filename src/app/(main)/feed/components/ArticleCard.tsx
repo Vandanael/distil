@@ -48,8 +48,17 @@ export function ArticleCard({
   const [showFeedback, setShowFeedback] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
   const feedbackRef = useRef<HTMLDivElement>(null)
+  const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cancelledRef = useRef(false)
   const relativeDate = formatRelativeDate(scoredAt)
   const isPaywall = wordCount === null || wordCount === 0
+
+  // Nettoyage du timeout d'annulation au demontage
+  useEffect(() => {
+    return () => {
+      if (undoRef.current) clearTimeout(undoRef.current)
+    }
+  }, [])
 
   // Ferme le popover si clic en dehors
   useEffect(() => {
@@ -67,11 +76,31 @@ export function ArticleCard({
 
   function handleDismiss(reason: 'off_topic' | 'already_read') {
     setShowFeedback(false)
-    startDismissTransition(async () => {
-      await dismissArticle(id, reason)
-      setDismissed(true)
-      toast.success(reason === 'off_topic' ? 'Article masqué — signal envoyé' : 'Article masqué')
+    setDismissed(true)
+    cancelledRef.current = false
+    if (undoRef.current) clearTimeout(undoRef.current)
+
+    const label = reason === 'off_topic' ? 'Article masque — signal envoye' : 'Article masque'
+    toast.success(label, {
+      action: {
+        label: 'Annuler',
+        onClick: () => {
+          cancelledRef.current = true
+          if (undoRef.current) clearTimeout(undoRef.current)
+          setDismissed(false)
+        },
+      },
+      duration: 4000,
     })
+
+    // Execute le server action apres le delai (sauf si annule)
+    undoRef.current = setTimeout(() => {
+      if (!cancelledRef.current) {
+        startDismissTransition(async () => {
+          await dismissArticle(id, reason)
+        })
+      }
+    }, 4000)
   }
 
   return (
@@ -87,7 +116,8 @@ export function ArticleCard({
         <div className="relative flex items-center gap-2 shrink-0" ref={feedbackRef}>
           {score !== null && (
             <span
-              className="font-ui text-xs tabular-nums text-muted-foreground/50"
+              className="font-ui text-xs tabular-nums text-muted-foreground/50 cursor-help"
+              title="Score de pertinence Distil (0-100)"
               data-testid={`score-${id}`}
             >
               {score}
@@ -104,7 +134,7 @@ export function ArticleCard({
             disabled={isDismissing}
             aria-label="Masquer cet article"
             data-testid={`dismiss-${id}`}
-            className="font-ui text-base leading-none text-muted-foreground/25 transition-colors hover:text-muted-foreground/70 disabled:opacity-20 p-1 -mr-1"
+            className="font-ui text-base leading-none text-muted-foreground/40 transition-colors hover:text-muted-foreground/70 disabled:opacity-20 p-1 -mr-1"
           >
             ×
           </button>
@@ -147,9 +177,14 @@ export function ArticleCard({
         )}
         {isSerendipity && (
           <span
-            className="font-ui text-[11px] uppercase tracking-wider text-accent"
+            className="font-ui text-[11px] uppercase tracking-wider text-accent cursor-help"
             data-testid={`serendipity-badge-${id}`}
-            title="Article hors de vos habituelles — introduit pour elargir votre veille"
+            title="Article hors de vos sources habituelles — introduit pour elargir votre veille"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              toast.info('Article hors de vos sources habituelles — introduit pour elargir votre veille.')
+            }}
           >
             Découverte
           </span>

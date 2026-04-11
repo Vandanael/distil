@@ -111,8 +111,20 @@ export async function GET() {
     month: 'long',
     year: 'numeric',
   })
+  const exportDateIso = new Date().toISOString().slice(0, 10)
 
-  const lines: string[] = [`# Notes Distil — ${exportDate}`, '']
+  const lines: string[] = [
+    '---',
+    `date: ${exportDateIso}`,
+    'source: Distil',
+    'tags:',
+    '  - distil',
+    '  - notes',
+    '---',
+    '',
+    `# Notes Distil — ${exportDate}`,
+    '',
+  ]
 
   for (const [, art] of byArticle) {
     lines.push(`## ${art.title ?? 'Sans titre'}`)

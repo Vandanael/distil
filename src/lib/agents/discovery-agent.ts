@@ -10,6 +10,29 @@ const MODEL = 'claude-haiku-4-5-20251001'
 const MAX_SEARCHES = 6
 const MAX_URLS_PER_RUN = 20
 
+// Sources de qualite utilisees quand l'utilisateur n'en a pas pinne (< 2)
+const DEFAULT_SOURCES_FR = [
+  'lemonde.fr',
+  'liberation.fr',
+  'theconversation.com',
+  'usbeketrica.com',
+  'wired.com',
+]
+const DEFAULT_SOURCES_EN = [
+  'wired.com',
+  'technologyreview.com',
+  'theverge.com',
+  'arstechnica.com',
+  'stratechery.com',
+]
+const DEFAULT_SOURCES_BOTH = [
+  'theconversation.com',
+  'wired.com',
+  'lemonde.fr',
+  'technologyreview.com',
+  'usbeketrica.com',
+]
+
 type DiscoveryResult = {
   urls: string[]
   durationMs: number
@@ -42,10 +65,20 @@ export function buildSearchQueries(profile: UserProfile): string[] {
         ? [profileText.slice(0, 80)]
         : ['intelligence artificielle', 'technologie', 'product management']
 
+  // Sources effectives : pinnees par l'utilisateur, ou sources par defaut si < 2 pinnees
+  const effectiveSources =
+    pinnedSources.length >= 2
+      ? pinnedSources
+      : language === 'fr'
+        ? DEFAULT_SOURCES_FR
+        : language === 'en'
+          ? DEFAULT_SOURCES_EN
+          : DEFAULT_SOURCES_BOTH
+
   const queries: string[] = []
 
-  // Requêtes ciblées par source (on prend les 3 premières sources pinnées)
-  for (const source of pinnedSources.slice(0, 3)) {
+  // Requêtes ciblées par source (on prend les 3 premières sources effectives)
+  for (const source of effectiveSources.slice(0, 3)) {
     const domain = source
       .replace(/^https?:\/\//, '')
       .replace(/\/.*$/, '')
