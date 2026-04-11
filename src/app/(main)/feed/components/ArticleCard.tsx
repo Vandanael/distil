@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { dismissArticle } from '../../article/[id]/actions'
@@ -16,6 +17,7 @@ type Props = {
   origin: string
   scoredAt: string | null
   wordCount: number | null
+  ogImageUrl: string | null
 }
 
 function formatRelativeDate(dateStr: string | null): string | null {
@@ -43,6 +45,7 @@ export function ArticleCard({
   origin,
   scoredAt,
   wordCount,
+  ogImageUrl,
 }: Props) {
   const [dismissed, setDismissed] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
@@ -213,6 +216,20 @@ export function ArticleCard({
         )}
       </div>
 
+      {ogImageUrl && (
+        <div className="relative w-full aspect-[2/1] overflow-hidden mt-1">
+          <Image
+            src={ogImageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 672px"
+            className="object-cover"
+            onError={(e) => {
+              ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+            }}
+          />
+        </div>
+      )}
       {excerpt && <p className="font-body text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
     </Link>
   )

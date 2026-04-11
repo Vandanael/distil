@@ -194,6 +194,7 @@ export async function POST(req: NextRequest) {
                 content_text: parsed?.contentText ?? null,
                 excerpt: parsed?.excerpt ?? null,
                 word_count: parsed?.wordCount ?? null,
+                og_image_url: parsed?.ogImageUrl ?? null,
                 reading_time_minutes: parsed?.readingTimeMinutes ?? null,
                 score: scored.score,
                 justification: scored.justification,

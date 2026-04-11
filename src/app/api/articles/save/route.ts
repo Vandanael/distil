@@ -168,6 +168,7 @@ export async function POST(request: Request) {
       excerpt: parsed.excerpt,
       word_count: parsed.wordCount,
       reading_time_minutes: parsed.readingTimeMinutes,
+      og_image_url: parsed.ogImageUrl,
       score: scored.score,
       justification: scored.justification,
       is_serendipity: scored.isSerendipity,

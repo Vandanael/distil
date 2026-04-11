@@ -17,6 +17,7 @@ const BASE_PROPS = {
   origin: 'agent',
   scoredAt: null,
   wordCount: 850,
+  ogImageUrl: null,
 }
 
 describe('ArticleCard', () => {

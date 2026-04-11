@@ -13,6 +13,7 @@ export type ParsedArticle = {
   excerpt: string | null
   wordCount: number
   readingTimeMinutes: number
+  ogImageUrl: string | null
 }
 
 const WORDS_PER_MINUTE = 238
@@ -35,6 +36,11 @@ export function parseHtml(html: string, url: string): ParsedArticle {
   const wordCount = contentText.split(/\s+/).filter(Boolean).length
   const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE))
 
+  const ogImageUrl =
+    dom.window.document
+      .querySelector('meta[property="og:image"]')
+      ?.getAttribute('content') ?? null
+
   return {
     url,
     title: article.title ?? null,
@@ -46,5 +52,6 @@ export function parseHtml(html: string, url: string): ParsedArticle {
     excerpt: article.excerpt ?? null,
     wordCount,
     readingTimeMinutes,
+    ogImageUrl,
   }
 }

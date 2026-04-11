@@ -21,6 +21,7 @@ const MOCK_ARTICLES = [
     origin: 'agent',
     scoredAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     wordCount: 1200,
+    ogImageUrl: null,
   },
   {
     id: 'mock-2',
@@ -34,6 +35,7 @@ const MOCK_ARTICLES = [
     origin: 'agent',
     scoredAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
     wordCount: null, // paywall demo
+    ogImageUrl: null,
   },
   {
     id: 'mock-3',
@@ -46,6 +48,7 @@ const MOCK_ARTICLES = [
     origin: 'bookmarklet',
     scoredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     wordCount: 2100,
+    ogImageUrl: null,
   },
 ]
 
