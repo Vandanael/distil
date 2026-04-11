@@ -28,12 +28,11 @@ export default async function SearchPage({ searchParams }: Props) {
 
   if (!user) redirect('/login')
 
-  const results =
-    query.trim()
-      ? mode === 'semantic'
-        ? await searchSemantic(user.id, query)
-        : await searchFullText(user.id, query)
-      : []
+  const results = query.trim()
+    ? mode === 'semantic'
+      ? await searchSemantic(user.id, query)
+      : await searchFullText(user.id, query)
+    : []
 
   return <SearchShell query={query} results={results} />
 }

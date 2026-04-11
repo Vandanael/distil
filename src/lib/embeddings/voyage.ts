@@ -5,7 +5,10 @@ const VOYAGE_API_URL = 'https://api.voyageai.com/v1/embeddings'
 const VOYAGE_MODEL = 'voyage-3'
 
 export class EmbeddingError extends Error {
-  constructor(message: string, public readonly statusCode?: number) {
+  constructor(
+    message: string,
+    public readonly statusCode?: number
+  ) {
     super(message)
     this.name = 'EmbeddingError'
   }
@@ -64,10 +67,8 @@ export async function generateEmbeddingBatch(texts: string[]): Promise<number[][
     throw new EmbeddingError(`Voyage AI erreur ${response.status}`, response.status)
   }
 
-  const data: VoyageResponse = await response.json() as VoyageResponse
+  const data: VoyageResponse = (await response.json()) as VoyageResponse
 
   // Retourne les embeddings dans l'ordre original
-  return data.data
-    .sort((a, b) => a.index - b.index)
-    .map((item) => item.embedding)
+  return data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding)
 }

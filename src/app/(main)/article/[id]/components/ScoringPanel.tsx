@@ -5,12 +5,7 @@ type Props = {
 }
 
 function ScoreBar({ score }: { score: number }) {
-  const color =
-    score >= 70
-      ? 'bg-emerald-500'
-      : score >= 40
-        ? 'bg-amber-400'
-        : 'bg-red-400'
+  const color = score >= 70 ? 'bg-emerald-500' : score >= 40 ? 'bg-amber-400' : 'bg-red-400'
 
   return (
     <div className="flex items-center gap-3">
@@ -21,7 +16,8 @@ function ScoreBar({ score }: { score: number }) {
         />
       </div>
       <span className="font-ui text-xs tabular-nums text-muted-foreground shrink-0">
-        {score}<span className="text-[10px]">/100</span>
+        {score}
+        <span className="text-[10px]">/100</span>
       </span>
     </div>
   )

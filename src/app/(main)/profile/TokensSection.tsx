@@ -26,7 +26,12 @@ export function TokensSection({ tokens: initialTokens }: Props) {
       const result = await createApiToken(newName.trim())
       setCreatedToken(result)
       setTokens((prev) => [
-        { id: result.id, name: newName.trim(), last_used_at: null, created_at: new Date().toISOString() },
+        {
+          id: result.id,
+          name: newName.trim(),
+          last_used_at: null,
+          created_at: new Date().toISOString(),
+        },
         ...prev,
       ])
       setNewName('')
@@ -42,7 +47,11 @@ export function TokensSection({ tokens: initialTokens }: Props) {
   }
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+    return new Date(iso).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
   }
 
   return (

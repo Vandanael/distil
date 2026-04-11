@@ -52,9 +52,15 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="/feed" className="hover:text-foreground transition-colors">Feed</Link>
-            <Link href="/search" className="hover:text-foreground transition-colors">Recherche</Link>
-            <Link href="/profile" className="hover:text-foreground transition-colors">Profil</Link>
+            <Link href="/feed" className="hover:text-foreground transition-colors">
+              Feed
+            </Link>
+            <Link href="/search" className="hover:text-foreground transition-colors">
+              Recherche
+            </Link>
+            <Link href="/profile" className="hover:text-foreground transition-colors">
+              Profil
+            </Link>
           </nav>
 
           <ThemeToggle />
@@ -62,9 +68,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Contenu principal avec padding-bottom pour la BottomNav mobile */}
-      <main className="flex-1 pb-14 md:pb-0">
-        {children}
-      </main>
+      <main className="flex-1 pb-14 md:pb-0">{children}</main>
 
       {/* Navigation mobile bas d'ecran */}
       <BottomNav />

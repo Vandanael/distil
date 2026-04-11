@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { generateEmbedding, generateEmbeddingBatch, EmbeddingError, EmbeddingRateLimitError } from './voyage'
+import {
+  generateEmbedding,
+  generateEmbeddingBatch,
+  EmbeddingError,
+  EmbeddingRateLimitError,
+} from './voyage'
 
 const FAKE_EMBEDDING = Array.from({ length: 1024 }, (_, i) => i * 0.001)
 

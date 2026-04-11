@@ -33,6 +33,16 @@ async function runScoring(urls: string[]): Promise<{ accepted: number; rejected:
   return res.json() as Promise<{ accepted: number; rejected: number }>
 }
 
+async function refreshFeed(): Promise<{
+  discovered: number
+  accepted: number
+  rejected: number
+}> {
+  const res = await fetch('/api/feed/refresh', { method: 'POST' })
+  if (!res.ok) throw new Error('Erreur serveur')
+  return res.json() as Promise<{ discovered: number; accepted: number; rejected: number }>
+}
+
 type ProfileData = {
   profile_text: string | null
   sector: string | null
@@ -58,6 +68,7 @@ export function ProfileForm({ profile }: Props) {
   const [showScoringPanel, setShowScoringPanel] = useState(false)
   const [scoringUrls, setScoringUrls] = useState('')
   const [isScoringPending, startScoringTransition] = useTransition()
+  const [isRefreshPending, startRefreshTransition] = useTransition()
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -221,7 +232,42 @@ export function ProfileForm({ profile }: Props) {
       <div className="border-t border-border pt-6 space-y-3">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <p className="font-ui text-sm font-medium text-foreground">Lancer le scoring</p>
+            <p className="font-ui text-sm font-medium text-foreground">Rafraîchir le feed</p>
+            <p className="font-body text-xs text-muted-foreground">
+              Distil cherche de nouveaux articles depuis vos sources et centres d&apos;intérêt.
+            </p>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            disabled={isRefreshPending}
+            data-testid="refresh-feed-btn"
+            onClick={() => {
+              startRefreshTransition(async () => {
+                const toastId = toast.loading('Recherche de nouveaux articles...')
+                try {
+                  const result = await refreshFeed()
+                  if (result.accepted > 0) {
+                    toast.success(
+                      `${result.accepted} nouvel article${result.accepted > 1 ? 's' : ''} dans votre feed`,
+                      { id: toastId }
+                    )
+                  } else {
+                    toast.info('Aucun nouvel article pertinent trouvé', { id: toastId })
+                  }
+                } catch {
+                  toast.error('Erreur lors du rafraîchissement', { id: toastId })
+                }
+              })
+            }}
+          >
+            {isRefreshPending ? 'Recherche...' : 'Rafraîchir'}
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <p className="font-ui text-sm font-medium text-foreground">Analyser des articles</p>
             <p className="font-body text-xs text-muted-foreground">
               Collez des URLs d&apos;articles, Distil les analyse et les score.
             </p>
@@ -233,7 +279,7 @@ export function ProfileForm({ profile }: Props) {
             onClick={() => setShowScoringPanel(!showScoringPanel)}
             data-testid="toggle-scoring-panel"
           >
-            {showScoringPanel ? 'Fermer' : 'Analyser des articles'}
+            {showScoringPanel ? 'Fermer' : 'Coller des URLs'}
           </Button>
         </div>
 
@@ -265,7 +311,9 @@ export function ProfileForm({ profile }: Props) {
                   return
                 }
                 startScoringTransition(async () => {
-                  const toastId = toast.loading(`Analyse de ${urls.length} article${urls.length > 1 ? 's' : ''}...`)
+                  const toastId = toast.loading(
+                    `Analyse de ${urls.length} article${urls.length > 1 ? 's' : ''}...`
+                  )
                   try {
                     const result = await runScoring(urls)
                     toast.success(

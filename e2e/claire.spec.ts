@@ -26,8 +26,14 @@ test.describe('Claire - recherche', () => {
     await expect(page).toHaveURL(/\/search\?q=intelligence/)
 
     // Soit des résultats, soit le message vide - dans les deux cas pas d'erreur
-    const hasResults = await page.getByTestId('search-results').isVisible().catch(() => false)
-    const hasEmpty = await page.getByText('Aucun resultat').isVisible().catch(() => false)
+    const hasResults = await page
+      .getByTestId('search-results')
+      .isVisible()
+      .catch(() => false)
+    const hasEmpty = await page
+      .getByText('Aucun resultat')
+      .isVisible()
+      .catch(() => false)
     expect(hasResults || hasEmpty).toBe(true)
   })
 

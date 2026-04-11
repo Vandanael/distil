@@ -35,7 +35,9 @@ export default async function FeedPage() {
 
       const { data } = await supabase
         .from('articles')
-        .select('id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin')
+        .select(
+          'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin'
+        )
         .eq('user_id', user.id)
         .in('status', ['accepted', 'read'])
         .order('scored_at', { ascending: false })
@@ -61,57 +63,57 @@ export default async function FeedPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
-        {/* En-tete */}
-        <div className="space-y-4 border-b border-border pb-8">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent capitalize">
-            {today}
-          </p>
-          <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">
-            Votre veille du jour
-          </h1>
-          <div className="flex items-center gap-6">
-            <span className="font-ui text-sm text-muted-foreground">
-              {articles.length} article{articles.length !== 1 ? 's' : ''}
-            </span>
-            {rejectedCount > 0 && (
-              <Link
-                href="/rejected"
-                className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
-                data-testid="link-rejected"
-              >
-                {rejectedCount} rejet{rejectedCount !== 1 ? 's' : ''} &rarr;
-              </Link>
-            )}
+      {/* En-tete */}
+      <div className="space-y-4 border-b border-border pb-8">
+        <p className="font-ui text-[10px] uppercase tracking-widest text-accent capitalize">
+          {today}
+        </p>
+        <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">
+          Votre veille du jour
+        </h1>
+        <div className="flex items-center gap-6">
+          <span className="font-ui text-sm text-muted-foreground">
+            {articles.length} article{articles.length !== 1 ? 's' : ''}
+          </span>
+          {rejectedCount > 0 && (
             <Link
-              href="/search"
+              href="/rejected"
               className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
-              data-testid="link-search"
+              data-testid="link-rejected"
             >
-              Rechercher &rarr;
+              {rejectedCount} rejet{rejectedCount !== 1 ? 's' : ''} &rarr;
             </Link>
-          </div>
-        </div>
-
-        {/* Articles */}
-        <div className="space-y-6" data-testid="feed-articles">
-          {articles.length === 0 ? (
-            <EmptyFeed />
-          ) : (
-            articles.map((a) => (
-              <ArticleCard
-                key={a.id}
-                id={a.id}
-                title={a.title}
-                siteName={a.site_name}
-                excerpt={a.excerpt}
-                readingTimeMinutes={a.reading_time_minutes}
-                score={showScores ? a.score : null}
-                isSerendipity={a.is_serendipity}
-                origin={a.origin}
-              />
-            ))
           )}
+          <Link
+            href="/search"
+            className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
+            data-testid="link-search"
+          >
+            Rechercher &rarr;
+          </Link>
         </div>
+      </div>
+
+      {/* Articles */}
+      <div className="space-y-6" data-testid="feed-articles">
+        {articles.length === 0 ? (
+          <EmptyFeed />
+        ) : (
+          articles.map((a) => (
+            <ArticleCard
+              key={a.id}
+              id={a.id}
+              title={a.title}
+              siteName={a.site_name}
+              excerpt={a.excerpt}
+              readingTimeMinutes={a.reading_time_minutes}
+              score={showScores ? a.score : null}
+              isSerendipity={a.is_serendipity}
+              origin={a.origin}
+            />
+          ))
+        )}
+      </div>
     </div>
   )
 }

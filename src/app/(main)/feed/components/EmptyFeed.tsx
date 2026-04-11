@@ -37,10 +37,7 @@ export function EmptyFeed() {
         </div>
       </div>
 
-      <Link
-        href="/profile"
-        className="inline-block font-ui text-sm text-accent hover:underline"
-      >
+      <Link href="/profile" className="inline-block font-ui text-sm text-accent hover:underline">
         Aller au profil &rarr;
       </Link>
     </div>

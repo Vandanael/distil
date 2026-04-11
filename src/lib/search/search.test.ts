@@ -21,7 +21,13 @@ import { generateEmbedding } from '@/lib/embeddings/voyage'
 
 const mockArticles = [
   { id: 'a1', title: 'Article IA', excerpt: 'Contenu sur l IA', site_name: 'Le Monde', score: 0.8 },
-  { id: 'a2', title: 'Article Data', excerpt: 'Contenu sur la data', site_name: 'Wired', score: 0.6 },
+  {
+    id: 'a2',
+    title: 'Article Data',
+    excerpt: 'Contenu sur la data',
+    site_name: 'Wired',
+    score: 0.6,
+  },
 ]
 
 function makeSupabaseMock(data: unknown, error: unknown = null) {
@@ -45,7 +51,9 @@ beforeEach(() => {
 describe('searchFullText', () => {
   it('retourne les articles correspondants', async () => {
     const mock = makeSupabaseMock(mockArticles)
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
 
     const results = await searchFullText('user-1', 'intelligence artificielle')
 
@@ -62,7 +70,9 @@ describe('searchFullText', () => {
 
   it('retourne un tableau vide si Supabase retourne null', async () => {
     const mock = makeSupabaseMock(null)
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
 
     const results = await searchFullText('user-1', 'test')
     expect(results).toEqual([])
@@ -70,7 +80,9 @@ describe('searchFullText', () => {
 
   it('lance une erreur si Supabase échoue', async () => {
     const mock = makeSupabaseMock(null, { message: 'connexion perdue' })
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
 
     await expect(searchFullText('user-1', 'test')).rejects.toThrow('Recherche full-text échouée')
   })
@@ -85,7 +97,9 @@ describe('searchSemantic', () => {
   it('retourne les résultats avec matchType semantic', async () => {
     const semanticData = mockArticles.map((a) => ({ ...a, similarity: 0.9 }))
     const mock = { rpc: vi.fn().mockResolvedValue({ data: semanticData, error: null }) }
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
     vi.mocked(generateEmbedding).mockResolvedValue(Array(1024).fill(0.1))
 
     const results = await searchSemantic('user-1', 'intelligence')
@@ -96,11 +110,15 @@ describe('searchSemantic', () => {
   })
 
   it('retombe sur full-text si Voyage lance EmbeddingError', async () => {
-    vi.mocked(generateEmbedding).mockRejectedValue(new EmbeddingError('VOYAGE_API_KEY non configurée'))
+    vi.mocked(generateEmbedding).mockRejectedValue(
+      new EmbeddingError('VOYAGE_API_KEY non configurée')
+    )
 
     // Le fallback appelle searchFullText, qui utilise .from()
     const mock = makeSupabaseMock(mockArticles)
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
 
     const results = await searchSemantic('user-1', 'test fallback')
 
@@ -113,7 +131,9 @@ describe('searchSemantic', () => {
 
     // Le fallback appelle searchFullText, qui utilise .from()
     const mock = makeSupabaseMock(mockArticles)
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
 
     const results = await searchSemantic('user-1', 'test rate limit')
 
@@ -129,7 +149,9 @@ describe('searchSemantic', () => {
       { ...mockArticles[1], similarity: 0.78 },
     ]
     const mock = { rpc: vi.fn().mockResolvedValue({ data: semanticData, error: null }) }
-    vi.mocked(createClient).mockResolvedValue(mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never)
+    vi.mocked(createClient).mockResolvedValue(
+      mock as unknown as ReturnType<typeof createClient> extends Promise<infer T> ? T : never
+    )
     vi.mocked(generateEmbedding).mockResolvedValue(Array(1024).fill(0.1))
 
     const results = await searchSemantic('user-1', 'ia')

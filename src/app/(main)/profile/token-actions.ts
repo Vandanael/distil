@@ -12,7 +12,9 @@ export type ApiTokenRow = {
 
 export async function listApiTokens(): Promise<ApiTokenRow[]> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) return []
 
   const { data } = await supabase
@@ -26,7 +28,9 @@ export async function listApiTokens(): Promise<ApiTokenRow[]> {
 
 export async function createApiToken(name: string): Promise<{ token: string; id: string }> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) throw new Error('Non authentifie')
 
   const token = generateToken()
@@ -45,12 +49,10 @@ export async function createApiToken(name: string): Promise<{ token: string; id:
 
 export async function deleteApiToken(tokenId: string): Promise<void> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) throw new Error('Non authentifie')
 
-  await supabase
-    .from('api_tokens')
-    .delete()
-    .eq('id', tokenId)
-    .eq('user_id', user.id)
+  await supabase.from('api_tokens').delete().eq('id', tokenId).eq('user_id', user.id)
 }

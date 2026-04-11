@@ -67,7 +67,10 @@ export async function POST(request: Request) {
   // Extraire l'URL du body
   const body: unknown = await request.json().catch(() => null)
   const url =
-    body && typeof body === 'object' && 'url' in body && typeof (body as Record<string, unknown>).url === 'string'
+    body &&
+    typeof body === 'object' &&
+    'url' in body &&
+    typeof (body as Record<string, unknown>).url === 'string'
       ? (body as { url: string }).url
       : null
 
@@ -107,7 +110,9 @@ export async function POST(request: Request) {
   // Charger le profil utilisateur
   const { data: profile } = await supabase
     .from('profiles')
-    .select('profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota')
+    .select(
+      'profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota'
+    )
     .eq('id', userId)
     .single()
 
@@ -145,10 +150,7 @@ export async function POST(request: Request) {
 
   const scored = result.scored[0]
   if (!scored) {
-    return NextResponse.json(
-      { error: 'Scoring echoue' },
-      { status: 500, headers: CORS_HEADERS }
-    )
+    return NextResponse.json({ error: 'Scoring echoue' }, { status: 500, headers: CORS_HEADERS })
   }
 
   // Persister

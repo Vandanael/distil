@@ -25,8 +25,6 @@ export async function hashToken(token: string): Promise<string> {
 
 export function validateTokenFormat(token: unknown): token is string {
   return (
-    typeof token === 'string' &&
-    token.startsWith(TOKEN_PREFIX) &&
-    token.length === TOKEN_LENGTH
+    typeof token === 'string' && token.startsWith(TOKEN_PREFIX) && token.length === TOKEN_LENGTH
   )
 }

@@ -101,13 +101,13 @@
   --primary-foreground: #1c3028;
   --secondary: #244030;
   --secondary-foreground: #fbf9f4;
-  --muted: #1a2e20;           /* vert tres fonce (correction : etait bleu #1a3a6b) */
+  --muted: #1a2e20; /* vert tres fonce (correction : etait bleu #1a3a6b) */
   --muted-foreground: #8aab94; /* vert-gris clair lisible */
   --accent: #e8693d;
   --accent-foreground: #fbf9f4;
   --destructive: #ef4444;
-  --border: #2a4a38;           /* vert-gris fonce (correction : etait bleu #1e3a5f) */
-  --input: #2a4a38;            /* idem */
+  --border: #2a4a38; /* vert-gris fonce (correction : etait bleu #1e3a5f) */
+  --input: #2a4a38; /* idem */
   --ring: #e8693d;
   --sidebar: #0d2018;
   --sidebar-foreground: #fbf9f4;
