@@ -44,3 +44,15 @@ test-results/
 
 # docs privees (notes de sprint, ADR, specs produit — hors repo)
 /docs/
+
+# assets Next.js par defaut non utilises
+/public/file.svg
+/public/globe.svg
+/public/next.svg
+/public/vercel.svg
+/public/window.svg
+
+# fichiers generes / exemples
+AGENTS.md
+.env.local.example
+supabase/.temp/

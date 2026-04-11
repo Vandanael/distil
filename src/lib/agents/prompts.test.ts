@@ -33,6 +33,19 @@ describe('buildSystemPrompt', () => {
   it('mentionne is_serendipity', () => {
     expect(buildSystemPrompt()).toContain('is_serendipity')
   })
+
+  it('definit la condition score < 55 pour la serendipite', () => {
+    expect(buildSystemPrompt()).toContain('55')
+  })
+
+  it('exige une justification avec element concret de l article', () => {
+    expect(buildSystemPrompt()).toContain('justification')
+    expect(buildSystemPrompt()).toContain('concret')
+  })
+
+  it('mentionne le fallback borderline pour atteindre le quota serendipite', () => {
+    expect(buildSystemPrompt()).toContain('borderline')
+  })
 })
 
 describe('buildUserPrompt', () => {

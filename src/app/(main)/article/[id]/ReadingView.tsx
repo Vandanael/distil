@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { markAsRead } from '../../actions'
 import { HighlightPopover } from './components/HighlightPopover'
 import { FloatingActionBar } from './components/FloatingActionBar'
+import { ScoringPanel } from './components/ScoringPanel'
 
 type Props = {
   id: string
@@ -15,6 +16,9 @@ type Props = {
   contentHtml: string
   readingTimeMinutes: number | null
   url: string
+  score: number | null
+  justification: string | null
+  isSerendipity: boolean
 }
 
 export function ReadingView({
@@ -26,6 +30,9 @@ export function ReadingView({
   contentHtml,
   readingTimeMinutes,
   url,
+  score,
+  justification,
+  isSerendipity,
 }: Props) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [pendingHighlight, setPendingHighlight] = useState<{ id: string; text: string } | null>(
@@ -91,6 +98,14 @@ export function ReadingView({
             >
               {url}
             </a>
+
+            {score !== null && (
+              <ScoringPanel
+                score={score}
+                justification={justification}
+                isSerendipity={isSerendipity}
+              />
+            )}
           </div>
 
           {/* Contenu selectionnable */}

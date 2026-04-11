@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Sans credentials Supabase (dev sans .env.local), on laisse passer
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.next({ request })
@@ -46,14 +46,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Utilisateur connecté sur /login -> renvoyer vers /feed
+  // Utilisateur connecte sur /login -> renvoyer vers /feed
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/feed'
     return NextResponse.redirect(url)
   }
 
-  // Onboarding accessible à tout utilisateur connecté
+  // Onboarding accessible a tout utilisateur connecte
   if (user && isOnboarding) {
     return supabaseResponse
   }

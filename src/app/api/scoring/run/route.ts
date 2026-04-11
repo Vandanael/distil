@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { parseUrl } from '@/lib/parsing/readability'
+import { generateEmbedding } from '@/lib/embeddings/voyage'
 import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
 
 export async function POST(request: Request) {
@@ -130,31 +131,48 @@ export async function POST(request: Request) {
         .map((r) => [r.value.url, r.value])
     )
 
-    await supabase.from('articles').insert(
-      result.scored.map((scored) => {
-        const parsed = parsedByUrl.get(scored.url)
-        return {
-          user_id: user.id,
-          url: scored.url,
-          title: parsed?.title ?? null,
-          author: parsed?.author ?? null,
-          site_name: parsed?.siteName ?? null,
-          published_at: parsed?.publishedAt ?? null,
-          content_html: parsed?.contentHtml ?? null,
-          content_text: parsed?.contentText ?? null,
-          excerpt: parsed?.excerpt ?? null,
-          word_count: parsed?.wordCount ?? null,
-          reading_time_minutes: parsed?.readingTimeMinutes ?? null,
-          score: scored.score,
-          justification: scored.justification,
-          is_serendipity: scored.isSerendipity,
-          rejection_reason: scored.rejectionReason,
-          accepted: undefined, // pas de colonne accepted, on utilise status
-          status: scored.accepted ? 'accepted' : 'rejected',
-          scored_at: new Date().toISOString(),
-        }
-      })
-    )
+    const { data: insertedArticles } = await supabase
+      .from('articles')
+      .insert(
+        result.scored.map((scored) => {
+          const parsed = parsedByUrl.get(scored.url)
+          return {
+            user_id: user.id,
+            url: scored.url,
+            title: parsed?.title ?? null,
+            author: parsed?.author ?? null,
+            site_name: parsed?.siteName ?? null,
+            published_at: parsed?.publishedAt ?? null,
+            content_html: parsed?.contentHtml ?? null,
+            content_text: parsed?.contentText ?? null,
+            excerpt: parsed?.excerpt ?? null,
+            word_count: parsed?.wordCount ?? null,
+            reading_time_minutes: parsed?.readingTimeMinutes ?? null,
+            score: scored.score,
+            justification: scored.justification,
+            is_serendipity: scored.isSerendipity,
+            rejection_reason: scored.rejectionReason,
+            status: scored.accepted ? 'accepted' : 'rejected',
+            scored_at: new Date().toISOString(),
+          }
+        })
+      )
+      .select('id, url, content_text, status')
+
+    // Générer les embeddings pour les articles acceptés (best-effort, non bloquant)
+    if (insertedArticles && process.env.VOYAGE_API_KEY) {
+      void Promise.allSettled(
+        insertedArticles
+          .filter((a) => a.status === 'accepted' && a.content_text)
+          .map(async (article) => {
+            const embedding = await generateEmbedding(article.content_text as string)
+            await supabase
+              .from('articles')
+              .update({ embedding })
+              .eq('id', article.id)
+          })
+      )
+    }
   }
 
   // Mettre a jour le scoring_run

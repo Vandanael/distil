@@ -27,13 +27,19 @@ export default async function ArticlePage({ params }: Props) {
   const { data: article } = await supabase
     .from('articles')
     .select(
-      'id, title, author, site_name, published_at, content_html, reading_time_minutes, url, status'
+      'id, title, author, site_name, published_at, content_html, reading_time_minutes, url, status, score, justification, is_serendipity'
     )
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
   if (!article) notFound()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('show_scores')
+    .eq('id', user.id)
+    .single()
 
   return (
     <ReadingView
@@ -45,6 +51,9 @@ export default async function ArticlePage({ params }: Props) {
       contentHtml={article.content_html ?? ''}
       readingTimeMinutes={article.reading_time_minutes}
       url={article.url}
+      score={profile?.show_scores !== false ? (article.score ?? null) : null}
+      justification={article.justification ?? null}
+      isSerendipity={article.is_serendipity ?? false}
     />
   )
 }

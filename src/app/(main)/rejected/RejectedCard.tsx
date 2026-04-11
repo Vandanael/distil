@@ -9,10 +9,11 @@ type Props = {
   title: string | null
   siteName: string | null
   rejectionReason: string | null
+  score: number | null
   url: string
 }
 
-export function RejectedCard({ id, title, siteName, rejectionReason, url }: Props) {
+export function RejectedCard({ id, title, siteName, rejectionReason, score, url }: Props) {
   const [isPending, startTransition] = useTransition()
 
   function handleKeep() {
@@ -36,11 +37,21 @@ export function RejectedCard({ id, title, siteName, rejectionReason, url }: Prop
           >
             {title ?? 'Sans titre'}
           </a>
-          {siteName && (
-            <span className="shrink-0 font-ui text-[11px] uppercase tracking-wider text-muted-foreground">
-              {siteName}
-            </span>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {siteName && (
+              <span className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground">
+                {siteName}
+              </span>
+            )}
+            {score !== null && (
+              <span
+                className="font-ui text-[11px] tabular-nums text-muted-foreground/60"
+                data-testid={`score-badge-${id}`}
+              >
+                {score}/100
+              </span>
+            )}
+          </div>
         </div>
         {rejectionReason && (
           <p

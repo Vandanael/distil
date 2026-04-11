@@ -11,6 +11,7 @@ const BASE_PROPS = {
   title: 'Article hors sujet',
   siteName: 'spam.io',
   rejectionReason: 'Sujet sans rapport avec le profil',
+  score: 22,
   url: 'https://spam.io/article',
 }
 
@@ -51,5 +52,15 @@ describe('RejectedCard', () => {
     render(<RejectedCard {...BASE_PROPS} />)
     const link = screen.getByText('Article hors sujet')
     expect(link.getAttribute('href')).toBe('https://spam.io/article')
+  })
+
+  it('affiche le score quand fourni', () => {
+    render(<RejectedCard {...BASE_PROPS} score={22} />)
+    expect(screen.getByTestId('score-badge-rej-001').textContent).toContain('22')
+  })
+
+  it('n affiche pas le score si null', () => {
+    render(<RejectedCard {...BASE_PROPS} score={null} />)
+    expect(screen.queryByTestId('score-badge-rej-001')).toBeNull()
   })
 })

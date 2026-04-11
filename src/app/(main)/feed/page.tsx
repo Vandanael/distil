@@ -82,6 +82,13 @@ export default async function FeedPage() {
                 {rejectedCount} rejet{rejectedCount !== 1 ? 's' : ''} &rarr;
               </Link>
             )}
+            <Link
+              href="/search"
+              className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
+              data-testid="link-search"
+            >
+              Rechercher &rarr;
+            </Link>
           </div>
         </div>
 

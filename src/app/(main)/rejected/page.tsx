@@ -8,6 +8,7 @@ export default async function RejectedPage() {
     title: string | null
     site_name: string | null
     rejection_reason: string | null
+    score: number | null
     url: string
   }> = []
 
@@ -20,7 +21,7 @@ export default async function RejectedPage() {
     if (user) {
       const { data } = await supabase
         .from('articles')
-        .select('id, title, site_name, rejection_reason, url')
+        .select('id, title, site_name, rejection_reason, score, url')
         .eq('user_id', user.id)
         .eq('status', 'rejected')
         .order('scored_at', { ascending: false })
@@ -66,6 +67,7 @@ export default async function RejectedPage() {
                 title={a.title}
                 siteName={a.site_name}
                 rejectionReason={a.rejection_reason}
+                score={a.score}
                 url={a.url}
               />
             ))
