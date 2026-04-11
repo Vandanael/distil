@@ -24,7 +24,7 @@ export function AppHeader() {
       <div className="max-w-3xl mx-auto px-4 h-12 flex items-center justify-between">
         <Link
           href="/feed"
-          className="font-logo text-xl tracking-tight text-foreground hover:text-accent transition-colors"
+          className="font-logo text-2xl tracking-tight text-foreground hover:text-accent transition-colors"
         >
           DISTIL
         </Link>
