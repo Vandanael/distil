@@ -19,6 +19,7 @@ const MOCK_ARTICLES = [
     score: 87,
     isSerendipity: false,
     origin: 'agent',
+    scoredAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'mock-2',
@@ -30,6 +31,7 @@ const MOCK_ARTICLES = [
     score: 61,
     isSerendipity: true,
     origin: 'agent',
+    scoredAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'mock-3',
@@ -40,6 +42,7 @@ const MOCK_ARTICLES = [
     score: 94,
     isSerendipity: false,
     origin: 'bookmarklet',
+    scoredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ]
 

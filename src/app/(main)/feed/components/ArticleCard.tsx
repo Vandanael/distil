@@ -12,6 +12,21 @@ type Props = {
   score: number | null
   isSerendipity: boolean
   origin: string
+  scoredAt: string | null
+}
+
+function formatRelativeDate(dateStr: string | null): string | null {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return null
+  const diffMs = Date.now() - date.getTime()
+  const diffH = Math.floor(diffMs / (1000 * 60 * 60))
+  if (diffH < 1) return "a l'instant"
+  if (diffH < 24) return `il y a ${diffH}h`
+  const diffD = Math.floor(diffH / 24)
+  if (diffD === 1) return 'hier'
+  if (diffD < 7) return `il y a ${diffD}j`
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
 export function ArticleCard({
@@ -23,8 +38,10 @@ export function ArticleCard({
   score,
   isSerendipity,
   origin,
+  scoredAt,
 }: Props) {
   const [hovered, setHovered] = useState(false)
+  const relativeDate = formatRelativeDate(scoredAt)
 
   return (
     <Link
@@ -76,6 +93,11 @@ export function ArticleCard({
             data-testid={`origin-badge-${id}`}
           >
             Sauvegardé
+          </span>
+        )}
+        {relativeDate && (
+          <span className="font-ui text-[11px] text-muted-foreground/60 ml-auto">
+            {relativeDate}
           </span>
         )}
       </div>

@@ -13,6 +13,7 @@ export default async function FeedPage() {
     score: number | null
     is_serendipity: boolean
     origin: string
+    scored_at: string | null
   }> = []
 
   let rejectedCount = 0
@@ -27,21 +28,22 @@ export default async function FeedPage() {
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('show_scores')
+        .select('show_scores, daily_cap')
         .eq('id', user.id)
         .single()
 
       showScores = profile?.show_scores ?? true
+      const dailyCap = profile?.daily_cap ?? 10
 
       const { data } = await supabase
         .from('articles')
         .select(
-          'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin'
+          'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin, scored_at'
         )
         .eq('user_id', user.id)
         .in('status', ['accepted', 'read'])
         .order('scored_at', { ascending: false })
-        .limit(50)
+        .limit(dailyCap)
 
       articles = data ?? []
 
@@ -110,6 +112,7 @@ export default async function FeedPage() {
               score={showScores ? a.score : null}
               isSerendipity={a.is_serendipity}
               origin={a.origin}
+              scoredAt={a.scored_at}
             />
           ))
         )}

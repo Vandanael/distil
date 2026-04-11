@@ -1,0 +1,244 @@
+/**
+ * POST /api/cron/refresh
+ * Declencheur cron : rafraichit le feed de tous les utilisateurs onboardes.
+ * Protege par CRON_SECRET transmis via Authorization: Bearer <secret>.
+ * Lance discovery -> parse -> score -> insert pour chaque profil.
+ */
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { runDiscoveryAgent } from '@/lib/agents/discovery-agent'
+import { runScoringAgent } from '@/lib/agents/scoring-agent'
+import { parseUrl } from '@/lib/parsing/readability'
+import { generateEmbedding } from '@/lib/embeddings/voyage'
+import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
+
+export async function POST(req: NextRequest) {
+  // Verifier le secret cron
+  const authHeader = req.headers.get('authorization')
+  const secret = process.env.CRON_SECRET
+
+  if (!secret || authHeader !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: 'Non autorise' }, { status: 401 })
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return NextResponse.json({ error: 'Supabase non configure' }, { status: 503 })
+  }
+
+  // Service role : bypass RLS pour lire tous les profils
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  // Charger tous les utilisateurs onboardes
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select(
+      'id, profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota'
+    )
+    .eq('onboarding_completed', true)
+
+  if (profilesError || !profiles) {
+    return NextResponse.json({ error: 'Impossible de charger les profils' }, { status: 500 })
+  }
+
+  const results: Array<{
+    userId: string
+    discovered: number
+    accepted: number
+    rejected: number
+    error: string | null
+  }> = []
+
+  // Traiter chaque utilisateur sequentiellement (evite de surcharger l'API Anthropic)
+  for (const profile of profiles) {
+    try {
+      const userProfile: UserProfile = {
+        profileText: profile.profile_text ?? null,
+        profileStructured: profile.profile_structured ?? null,
+        sector: profile.sector ?? null,
+        interests: profile.interests ?? [],
+        pinnedSources: profile.pinned_sources ?? [],
+        dailyCap: profile.daily_cap ?? 10,
+        serendipityQuota: profile.serendipity_quota ?? 0.15,
+      }
+
+      // URLs deja connues (7 derniers jours)
+      const { data: existingArticles } = await supabase
+        .from('articles')
+        .select('url')
+        .eq('user_id', profile.id)
+        .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+
+      const knownUrls = (existingArticles ?? []).map((a) => a.url)
+
+      // Creer le scoring_run
+      const { data: run, error: runError } = await supabase
+        .from('scoring_runs')
+        .insert({ user_id: profile.id, agent_type: 'messages' })
+        .select('id')
+        .single()
+
+      if (runError || !run) {
+        results.push({
+          userId: profile.id,
+          discovered: 0,
+          accepted: 0,
+          rejected: 0,
+          error: 'Impossible de creer le run',
+        })
+        continue
+      }
+
+      // Discovery
+      const discovery = await runDiscoveryAgent(userProfile, knownUrls)
+
+      if (discovery.urls.length === 0) {
+        await supabase
+          .from('scoring_runs')
+          .update({
+            completed_at: new Date().toISOString(),
+            error: discovery.error ?? 'Aucun article decouvert',
+          })
+          .eq('id', run.id)
+        results.push({
+          userId: profile.id,
+          discovered: 0,
+          accepted: 0,
+          rejected: 0,
+          error: discovery.error,
+        })
+        continue
+      }
+
+      // Parse
+      const parsedResults = await Promise.allSettled(discovery.urls.map((url) => parseUrl(url)))
+      const candidates: ArticleCandidate[] = parsedResults
+        .filter(
+          (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
+            r.status === 'fulfilled'
+        )
+        .map((r) => ({
+          url: r.value.url,
+          title: r.value.title,
+          excerpt: r.value.excerpt,
+          contentText: r.value.contentText,
+          siteName: r.value.siteName,
+        }))
+        .filter((c) => c.contentText.length > 200)
+
+      if (candidates.length === 0) {
+        await supabase
+          .from('scoring_runs')
+          .update({ completed_at: new Date().toISOString(), error: 'Aucun article parsable' })
+          .eq('id', run.id)
+        results.push({
+          userId: profile.id,
+          discovered: discovery.urls.length,
+          accepted: 0,
+          rejected: 0,
+          error: 'Aucun article parsable',
+        })
+        continue
+      }
+
+      // Score
+      const scoringResult = await runScoringAgent({
+        profile: userProfile,
+        candidates,
+        runId: run.id,
+      })
+
+      const accepted = scoringResult.scored.filter((a) => a.accepted)
+      const rejected = scoringResult.scored.filter((a) => !a.accepted)
+
+      // Persister
+      if (scoringResult.scored.length > 0) {
+        const parsedByUrl = new Map(
+          parsedResults
+            .filter(
+              (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
+                r.status === 'fulfilled'
+            )
+            .map((r) => [r.value.url, r.value])
+        )
+
+        const { data: insertedArticles } = await supabase
+          .from('articles')
+          .insert(
+            scoringResult.scored.map((scored) => {
+              const parsed = parsedByUrl.get(scored.url)
+              return {
+                user_id: profile.id,
+                url: scored.url,
+                title: parsed?.title ?? null,
+                author: parsed?.author ?? null,
+                site_name: parsed?.siteName ?? null,
+                published_at: parsed?.publishedAt ?? null,
+                content_html: parsed?.contentHtml ?? null,
+                content_text: parsed?.contentText ?? null,
+                excerpt: parsed?.excerpt ?? null,
+                word_count: parsed?.wordCount ?? null,
+                reading_time_minutes: parsed?.readingTimeMinutes ?? null,
+                score: scored.score,
+                justification: scored.justification,
+                is_serendipity: scored.isSerendipity,
+                rejection_reason: scored.rejectionReason,
+                status: scored.accepted ? 'accepted' : 'rejected',
+                origin: 'agent',
+                scored_at: new Date().toISOString(),
+              }
+            })
+          )
+          .select('id, url, content_text, status')
+
+        // Embeddings best-effort
+        if (insertedArticles && process.env.VOYAGE_API_KEY) {
+          void Promise.allSettled(
+            insertedArticles
+              .filter((a) => a.status === 'accepted' && a.content_text)
+              .map(async (article) => {
+                const embedding = await generateEmbedding(article.content_text as string)
+                await supabase.from('articles').update({ embedding }).eq('id', article.id)
+              })
+          )
+        }
+      }
+
+      await supabase
+        .from('scoring_runs')
+        .update({
+          completed_at: new Date().toISOString(),
+          articles_analyzed: scoringResult.scored.length,
+          articles_accepted: accepted.length,
+          articles_rejected: rejected.length,
+          agent_type: scoringResult.agentType,
+          error: scoringResult.error,
+          duration_ms: scoringResult.durationMs,
+        })
+        .eq('id', run.id)
+
+      results.push({
+        userId: profile.id,
+        discovered: discovery.urls.length,
+        accepted: accepted.length,
+        rejected: rejected.length,
+        error: scoringResult.error,
+      })
+    } catch (err) {
+      results.push({
+        userId: profile.id,
+        discovered: 0,
+        accepted: 0,
+        rejected: 0,
+        error: err instanceof Error ? err.message : String(err),
+      })
+    }
+  }
+
+  return NextResponse.json({
+    usersProcessed: profiles.length,
+    results,
+  })
+}

@@ -11,6 +11,7 @@ const BASE_PROPS = {
   score: 82,
   isSerendipity: false,
   origin: 'agent',
+  scoredAt: null,
 }
 
 describe('ArticleCard', () => {

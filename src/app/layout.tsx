@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   title: 'Distil',
   description: 'Veille intelligente. Moins de bruit, mieux lu.',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
