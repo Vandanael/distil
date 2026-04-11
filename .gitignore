@@ -56,3 +56,6 @@ test-results/
 AGENTS.md
 .env.local.example
 supabase/.temp/
+
+# Local Netlify folder
+.netlify
