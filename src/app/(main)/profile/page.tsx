@@ -1,10 +1,13 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from './ProfileForm'
 import { TokensSection } from './TokensSection'
 import { PushSubscribe } from '@/components/PushSubscribe'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { listApiTokens } from './token-actions'
 import { buildSearchQueries } from '@/lib/agents/discovery-agent'
+import { signOut } from './actions'
 
 export default async function ProfilePage() {
   if (
@@ -15,8 +18,8 @@ export default async function ProfilePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
         <div className="space-y-4 border-b border-border pb-8">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
-          <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">Preferences</h1>
+          <p className="font-ui text-xs text-accent">Profil</p>
+          <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Préférences</h1>
         </div>
         <TokensSection tokens={[]} />
       </div>
@@ -33,7 +36,7 @@ export default async function ProfilePage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'profile_text, sector, interests, pinned_sources, daily_cap, serendipity_quota, show_scores, profile_structured'
+      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, show_scores, profile_structured'
     )
     .eq('id', user.id)
     .single()
@@ -49,7 +52,7 @@ export default async function ProfilePage() {
   const searchQueries = buildSearchQueries({
     profileText: profile.profile_text ?? null,
     profileStructured: structured,
-    sector: profile.sector ?? null,
+    sector: null,
     interests: profile.interests ?? [],
     pinnedSources: profile.pinned_sources ?? [],
     dailyCap: profile.daily_cap ?? 10,
@@ -59,15 +62,15 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
       <div className="space-y-4 border-b border-border pb-8">
-        <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Profil</p>
-        <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">Preferences</h1>
+        <p className="font-ui text-xs text-accent">Profil</p>
+        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
         <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
 
       {/* Ce que Distil recherche */}
       {searchQueries.length > 0 && (
         <div className="border-t border-border pt-8 space-y-3">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
+          <p className="font-ui text-xs text-accent">
             Ce que Distil recherche
           </p>
           <p className="font-body text-xs text-muted-foreground">
@@ -86,11 +89,48 @@ export default async function ProfilePage() {
         </div>
       )}
 
-      <ProfileForm profile={{ ...profile, language }} />
+      <ProfileForm profile={{
+        profile_text: profile.profile_text,
+        interests: profile.interests ?? [],
+        pinned_sources: profile.pinned_sources ?? [],
+        daily_cap: profile.daily_cap ?? 10,
+        serendipity_quota: profile.serendipity_quota ?? 0.15,
+        show_scores: profile.show_scores ?? true,
+        language,
+      }} />
 
-      <div className="border-t border-border pt-8 space-y-8">
+      {/* Navigation secondaire */}
+      <div className="border-t border-border pt-8 space-y-3">
+        <Link href="/archive" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
+          Archives
+        </Link>
+        <Link href="/highlights" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
+          Highlights
+        </Link>
+        <Link href="/rejected" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
+          Articles rejetes
+        </Link>
+      </div>
+
+      {/* Reglages */}
+      <div className="border-t border-border pt-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <span className="font-ui text-sm text-foreground">Theme</span>
+          <ThemeToggle />
+        </div>
         <PushSubscribe />
         <TokensSection tokens={tokens} />
+      </div>
+
+      <div className="border-t border-border pt-8">
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="font-ui text-sm text-muted-foreground hover:text-destructive transition-colors"
+          >
+            Se deconnecter
+          </button>
+        </form>
       </div>
     </div>
   )

@@ -58,9 +58,9 @@ describe('ArticleCard', () => {
     expect(link.getAttribute('href')).toBe('/article/abc-123')
   })
 
-  it('affiche le badge Paywall si wordCount null', () => {
+  it('ne pas afficher le badge Paywall si wordCount null (non parse)', () => {
     render(<ArticleCard {...BASE_PROPS} wordCount={null} />)
-    expect(screen.getByTestId('paywall-badge-abc-123')).toBeTruthy()
+    expect(screen.queryByTestId('paywall-badge-abc-123')).toBeNull()
   })
 
   it('affiche le badge Paywall si wordCount zero', () => {

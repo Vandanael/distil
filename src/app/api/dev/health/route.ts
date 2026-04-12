@@ -22,7 +22,12 @@ const REQUIRED_VARS = [
   'VAPID_EMAIL',
 ] as const
 
-export async function GET() {
+export async function GET(request: Request) {
+  const authHeader = request.headers.get('authorization')
+  const secret = process.env.CRON_SECRET
+  if (!secret || authHeader !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: 'Non autorise' }, { status: 401 })
+  }
 
   const results = REQUIRED_VARS.map((name) => {
     const value = process.env[name]

@@ -8,75 +8,163 @@ import type { UserProfile } from './types'
 const MAX_URLS_PER_RUN = 30
 
 export const RSS_MAP: Record<string, string> = {
-  // Tech généraliste
-  'wired.com':                    'https://www.wired.com/feed/rss',
-  'technologyreview.com':         'https://www.technologyreview.com/feed/',
-  'theverge.com':                 'https://www.theverge.com/rss/index.xml',
-  'arstechnica.com':              'https://feeds.arstechnica.com/arstechnica/index',
-  'techcrunch.com':               'https://techcrunch.com/feed/',
-  'hackernoon.com':               'https://hackernoon.com/feed',
-  'spectrum.ieee.org':            'https://spectrum.ieee.org/feeds/feed.rss',
 
-  // Dev / engineering
-  'hacker news':                  'https://news.ycombinator.com/rss',
-  'hn':                           'https://news.ycombinator.com/rss',
-  'lobste.rs':                    'https://lobste.rs/rss',
-  'dev.to':                       'https://dev.to/feed',
-  'github.blog':                  'https://github.blog/feed/',
-  'infoq.com':                    'https://feed.infoq.com/',
-  'martinfowler.com':             'https://martinfowler.com/feed.atom',
-  'simonwillison.net':            'https://simonwillison.net/atom/everything/',
-  'danluu.com':                   'https://danluu.com/atom.xml',
-  'jvns.ca':                      'https://jvns.ca/atom.xml',
-  'overreacted.io':               'https://overreacted.io/rss.xml',
-  'lethain.com':                  'https://lethain.com/feeds/',
+  // === TECH GÉNÉRALISTE ===
+  'wired.com':                      'https://www.wired.com/feed/rss',
+  'technologyreview.com':           'https://www.technologyreview.com/feed/',
+  'theverge.com':                   'https://www.theverge.com/rss/index.xml',
+  'arstechnica.com':                'https://feeds.arstechnica.com/arstechnica/index',
+  'techcrunch.com':                 'https://techcrunch.com/feed/',
+  'hackernoon.com':                 'https://hackernoon.com/feed',
+  'spectrum.ieee.org':              'https://spectrum.ieee.org/feeds/feed.rss',
+  'zdnet.com':                      'https://www.zdnet.com/news/rss.xml',
+  'venturebeat.com':                'https://venturebeat.com/feed/',
 
-  // Produit / stratégie
-  'stratechery.com':              'https://stratechery.com/feed/',
-  'ben-evans.com':                'https://www.ben-evans.com/benedictevans/rss.xml',
-  'pragmaticengineer.com':        'https://newsletter.pragmaticengineer.com/feed',
-  'hbr.org':                      'https://feeds.hbr.org/harvardbusiness',
+  // === DEV / ENGINEERING ===
+  'hacker news':                    'https://news.ycombinator.com/rss',
+  'hn':                             'https://news.ycombinator.com/rss',
+  'lobste.rs':                      'https://lobste.rs/rss',
+  'dev.to':                         'https://dev.to/feed',
+  'github.blog':                    'https://github.blog/feed/',
+  'infoq.com':                      'https://feed.infoq.com/',
+  'martinfowler.com':               'https://martinfowler.com/feed.atom',
+  'simonwillison.net':              'https://simonwillison.net/atom/everything/',
+  'danluu.com':                     'https://danluu.com/atom.xml',
+  'jvns.ca':                        'https://jvns.ca/atom.xml',
+  'overreacted.io':                 'https://overreacted.io/rss.xml',
+  'lethain.com':                    'https://lethain.com/feeds/',
+  'css-tricks.com':                 'https://css-tricks.com/feed/',
+  'smashingmagazine.com':           'https://www.smashingmagazine.com/feed/',
 
-  // IA / recherche
-  'anthropic.com':                'https://www.anthropic.com/rss.xml',
-  'openai.com':                   'https://openai.com/news/rss.xml',
-  'deepmind.com':                 'https://deepmind.google/blog/rss.xml',
-  'blog.google':                  'https://blog.google/rss/',
-  'research.ibm.com':             'https://research.ibm.com/blog/rss',
-  'arxiv.org/cs.AI':              'https://arxiv.org/rss/cs.AI',
-  'arxiv.org/cs.LG':              'https://arxiv.org/rss/cs.LG',
+  // === PRODUIT / STRATÉGIE ===
+  'stratechery.com':                'https://stratechery.com/feed/',
+  'ben-evans.com':                  'https://www.ben-evans.com/benedictevans/rss.xml',
+  'pragmaticengineer.com':          'https://newsletter.pragmaticengineer.com/feed',
+  'hbr.org':                        'https://feeds.hbr.org/harvardbusiness',
+  'firstround.com':                 'https://review.firstround.com/feed.xml',
+  'a16z.com':                       'https://a16z.com/feed/',
+  'inc.com':                        'https://www.inc.com/rss/',
+  'fastcompany.com':                'https://www.fastcompany.com/latest/rss',
 
-  // Engineering à grande échelle
-  'netflixtechblog.com':          'https://netflixtechblog.com/feed',
-  'engineering.fb.com':           'https://engineering.fb.com/feed/',
-  'engineering.atspotify.com':    'https://engineering.atspotify.com/feed/',
-  'eng.uber.com':                 'https://www.uber.com/en-US/blog/engineering/rss/',
-  'queue.acm.org':                'https://queue.acm.org/rss/feeds/queuecontent.xml',
+  // === IA / RECHERCHE ===
+  'anthropic.com':                  'https://www.anthropic.com/rss.xml',
+  'openai.com':                     'https://openai.com/news/rss.xml',
+  'deepmind.com':                   'https://deepmind.google/blog/rss.xml',
+  'blog.google':                    'https://blog.google/rss/',
+  'research.ibm.com':               'https://research.ibm.com/blog/rss',
+  'arxiv.org/cs.AI':                'https://arxiv.org/rss/cs.AI',
+  'arxiv.org/cs.LG':                'https://arxiv.org/rss/cs.LG',
+  'arxiv.org/cs.CV':                'https://arxiv.org/rss/cs.CV',
+  'huggingface.co':                 'https://huggingface.co/blog/feed.xml',
+  'ai.googleblog.com':              'https://blog.research.google/feeds/posts/default',
 
-  // Science / society
-  'quantamagazine.org':           'https://www.quantamagazine.org/feed/',
-  'newscientist.com':             'https://www.newscientist.com/feed/home/',
-  'nature.com':                   'https://www.nature.com/news.rss',
-  'mit.edu':                      'https://news.mit.edu/rss/research',
-  'brookings.edu':                'https://www.brookings.edu/feed/',
-  'foreignaffairs.com':           'https://www.foreignaffairs.com/rss.xml',
-  'theatlantic.com':              'https://www.theatlantic.com/feed/all/',
-  'nytimes.com':                  'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
-  'economist.com':                'https://www.economist.com/finance-and-economics/rss.xml',
+  // === ENGINEERING À GRANDE ÉCHELLE ===
+  'netflixtechblog.com':            'https://netflixtechblog.com/feed',
+  'engineering.fb.com':             'https://engineering.fb.com/feed/',
+  'engineering.atspotify.com':      'https://engineering.atspotify.com/feed/',
+  'eng.uber.com':                   'https://www.uber.com/en-US/blog/engineering/rss/',
+  'queue.acm.org':                  'https://queue.acm.org/rss/feeds/queuecontent.xml',
+  'dropbox.tech':                   'https://dropbox.tech/feed',
+  'slack.engineering':              'https://slack.engineering/feed/',
 
-  // Essais / long reads
-  'astralcodexten.com':           'https://www.astralcodexten.com/feed',
-  '80000hours.org':               'https://80000hours.org/feed/',
-  'lesswrong.com':                'https://www.lesswrong.com/feed.xml',
-  'paulgraham.com':               'http://www.paulgraham.com/rss.html',
-  'waitbutwhy.com':               'https://waitbutwhy.com/feed',
+  // === SCIENCE & RECHERCHE ===
+  'quantamagazine.org':             'https://www.quantamagazine.org/feed/',
+  'newscientist.com':               'https://www.newscientist.com/feed/home/',
+  'nature.com':                     'https://www.nature.com/news.rss',
+  'mit.edu':                        'https://news.mit.edu/rss/research',
+  'scientificamerican.com':         'https://rss.sciam.com/ScientificAmerican-Global',
+  'sciencedaily.com':               'https://www.sciencedaily.com/rss/top/science.xml',
+  'phys.org':                       'https://phys.org/rss-feed/',
+  'pourlascience.fr':               'https://www.pourlascience.fr/flux-rss/',
+  'arxiv.org/q-bio':                'https://arxiv.org/rss/q-bio',
+  'pnas.org':                       'https://www.pnas.org/action/showFeed?type=etoc&feed=rss&jc=pnas',
+  'health.harvard.edu':             'https://www.health.harvard.edu/blog/feed',
 
-  // FR (garde les meilleures)
-  'lemonde.fr':                   'https://www.lemonde.fr/rss/une.xml',
-  'theconversation.com':          'https://theconversation.com/fr/articles.atom',
-  'usbeketrica.com':              'https://usbeketrica.com/feed',
-  'liberation.fr':                'https://www.liberation.fr/arc/outboundfeeds/rss/?outputType=xml',
-  'numerama.com':                 'https://www.numerama.com/feed/',
+  // === POLITIQUE & MONDE ===
+  'reuters.com':                    'https://feeds.reuters.com/reuters/topNews',
+  'theguardian.com':                'https://www.theguardian.com/world/rss',
+  'foreignpolicy.com':              'https://foreignpolicy.com/feed/',
+  'foreignaffairs.com':             'https://www.foreignaffairs.com/rss.xml',
+  'politico.eu':                    'https://www.politico.eu/feed/',
+  'politico.com':                   'https://www.politico.com/rss/politics08.xml',
+  'euractiv.com':                   'https://www.euractiv.com/feed/',
+  'brookings.edu':                  'https://www.brookings.edu/feed/',
+  'bbc.com':                        'https://feeds.bbci.co.uk/news/world/rss.xml',
+  'aljazeera.com':                  'https://www.aljazeera.com/xml/rss/all.xml',
+  'lemonde.fr':                     'https://www.lemonde.fr/rss/une.xml',
+  'courrier-international.com':     'https://www.courrierinternational.com/feed/all/rss.xml',
+  'monde-diplomatique.fr':          'https://www.monde-diplomatique.fr/rss/',
+  'slate.fr':                       'https://www.slate.fr/rss.xml',
+  'rfi.fr':                         'https://www.rfi.fr/fr/rss',
+  'lefigaro.fr':                    'https://www.lefigaro.fr/rss/figaro_actualites.xml',
+  'mediapart.fr':                   'https://www.mediapart.fr/articles/feed',
+  'theatlantic.com':                'https://www.theatlantic.com/feed/all/',
+  'nytimes.com':                    'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',
+  'nytimes.com/tech':               'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+  'nytimes.com/science':            'https://rss.nytimes.com/services/xml/rss/nyt/Science.xml',
+  'nytimes.com/arts':               'https://rss.nytimes.com/services/xml/rss/nyt/Arts.xml',
+  'nytimes.com/sports':             'https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml',
+  'economist.com':                  'https://www.economist.com/finance-and-economics/rss.xml',
+  'liberation.fr':                  'https://www.liberation.fr/arc/outboundfeeds/rss/?outputType=xml',
+
+  // === ÉCONOMIE & BUSINESS ===
+  'lesechos.fr':                    'https://www.lesechos.fr/rss/rss_une.xml',
+  'alternatives-economiques.fr':    'https://www.alternatives-economiques.fr/feed',
+  'ft.com':                         'https://www.ft.com/rss/home',
+
+  // === CUISINE & GASTRONOMIE ===
+  'seriouseats.com':                'https://www.seriouseats.com/feeds/all',
+  'eater.com':                      'https://www.eater.com/rss/index.xml',
+  'bonappetit.com':                 'https://www.bonappetit.com/feed/rss',
+  'food52.com':                     'https://food52.com/blog.rss',
+  'davidlebovitz.com':              'https://www.davidlebovitz.com/feed/',
+  '101cookbooks.com':               'https://www.101cookbooks.com/feed',
+  'smittenkitchen.com':             'https://smittenkitchen.com/feed/',
+  'thekitchn.com':                  'https://www.thekitchn.com/main/feed',
+  'finedininglovers.com':           'https://www.finedininglovers.com/rss',
+  'epicurious.com':                 'https://www.epicurious.com/feed/recipes-and-cooking',
+
+  // === SPORT & BIEN-ÊTRE ===
+  'lequipe.fr':                     'https://www.lequipe.fr/rss/actu_rss.xml',
+  'runnersworld.com':               'https://www.runnersworld.com/feed/all',
+  'outsideonline.com':              'https://www.outsideonline.com/feed/',
+  'bicycling.com':                  'https://www.bicycling.com/feed/all',
+  'menshealth.com':                 'https://www.menshealth.com/feed/all',
+  'womenshealthmag.com':            'https://www.womenshealthmag.com/feed/all',
+  'mindful.org':                    'https://www.mindful.org/feed/',
+  'psychologytoday.com':            'https://www.psychologytoday.com/us/front-page/feed',
+
+  // === CULTURE & SOCIÉTÉ ===
+  'newyorker.com':                  'https://www.newyorker.com/feed/everything',
+  'pitchfork.com':                  'https://pitchfork.com/rss/news/',
+  'rollingstone.com':               'https://www.rollingstone.com/feed/',
+  'telerama.fr':                    'https://www.telerama.fr/rss.xml',
+  'konbini.com':                    'https://www.konbini.com/feed/',
+  'dezeen.com':                     'https://www.dezeen.com/feed/',
+  'resident-advisor.net':           'https://ra.co/xml/news.xml',
+  'mixmag.net':                     'https://mixmag.net/feed',
+  'artforum.com':                   'https://www.artforum.com/feed/',
+  'theconversation.com':            'https://theconversation.com/fr/articles.atom',
+  'usbeketrica.com':                'https://usbeketrica.com/feed',
+  'numerama.com':                   'https://www.numerama.com/feed/',
+
+  // === DESIGN & CRÉATIVITÉ ===
+  'uxdesign.cc':                    'https://uxdesign.cc/feed',
+  'creativebloq.com':               'https://www.creativebloq.com/feeds/all',
+  'designboom.com':                 'https://www.designboom.com/feed/',
+  'abduzeedo.com':                  'https://abduzeedo.com/feed/',
+
+  // === ESSAIS / LONG READS ===
+  'astralcodexten.com':             'https://www.astralcodexten.com/feed',
+  '80000hours.org':                 'https://80000hours.org/feed/',
+  'lesswrong.com':                  'https://www.lesswrong.com/feed.xml',
+  'paulgraham.com':                 'http://www.paulgraham.com/rss.html',
+  'waitbutwhy.com':                 'https://waitbutwhy.com/feed',
+  'aeon.co':                        'https://aeon.co/feed.rss',
+  'nautil.us':                      'https://nautil.us/feed/',
+  'longreads.com':                  'https://longreads.com/feed/',
+  'themarkup.org':                  'https://themarkup.org/feeds/rss.xml',
+  'propublica.org':                 'https://feeds.propublica.org/propublica/main',
 }
 
 const DEFAULT_SOURCES_EN = [
@@ -84,7 +172,9 @@ const DEFAULT_SOURCES_EN = [
   'wired.com',
   'technologyreview.com',
   'simonwillison.net',
-  'theverge.com',
+  'theguardian.com',
+  'newyorker.com',
+  'theatlantic.com',
 ]
 
 const DEFAULT_SOURCES_FR = [
@@ -92,15 +182,19 @@ const DEFAULT_SOURCES_FR = [
   'theconversation.com',
   'usbeketrica.com',
   'numerama.com',
-  'hacker news',
+  'slate.fr',
+  'liberation.fr',
+  'courrier-international.com',
 ]
 
 const DEFAULT_SOURCES_BOTH = [
   'hacker news',
-  'wired.com',
-  'theconversation.com',
-  'technologyreview.com',
   'lemonde.fr',
+  'theconversation.com',
+  'wired.com',
+  'newyorker.com',
+  'theatlantic.com',
+  'courrier-international.com',
 ]
 
 type DiscoveryResult = {

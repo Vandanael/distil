@@ -1,101 +1,224 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
 
 type FeaturedArticle = {
   title: string | null
+  url: string | null
   site_name: string | null
   excerpt: string | null
   score: number | null
   is_serendipity: boolean
 }
 
-function MiniScoreBar({ score }: { score: number }) {
-  const color = score >= 70 ? 'bg-emerald-500' : score >= 40 ? 'bg-amber-400' : 'bg-red-400'
-  return (
-    <div className="h-1 w-10 bg-border overflow-hidden shrink-0" title={`Score ${score}/100`}>
-      <div className={`h-full ${color}`} style={{ width: `${score}%` }} />
-    </div>
-  )
+const PERSONA_EXAMPLES = [
+  {
+    slug: 'pm',
+    label: { fr: 'Politique & Monde', en: 'Politics & World' },
+    description: { fr: 'Géopolitique, démocratie, actualité internationale', en: 'Geopolitics, democracy, international news' },
+  },
+  {
+    slug: 'consultant',
+    label: { fr: 'Cuisine & Gastronomie', en: 'Food & Gastronomy' },
+    description: { fr: 'Techniques, chefs, restaurants, recettes', en: 'Techniques, chefs, restaurants, recipes' },
+  },
+  {
+    slug: 'dev',
+    label: { fr: 'Tech & Numérique', en: 'Tech & Digital' },
+    description: { fr: 'Actualité tech, outils, open source', en: 'Tech news, tools, open source' },
+  },
+  {
+    slug: 'chercheur',
+    label: { fr: 'Sport & Bien-être', en: 'Sport & Wellness' },
+    description: { fr: 'Running, mental, nutrition, performance', en: 'Running, mindset, nutrition, performance' },
+  },
+  {
+    slug: 'ml',
+    label: { fr: 'Culture & Société', en: 'Culture & Society' },
+    description: { fr: 'Cinéma, musique, littérature, idées', en: 'Cinema, music, literature, ideas' },
+  },
+]
+
+const COPY = {
+  fr: {
+    tagline: 'Votre veille quotidienne, sans le bruit.',
+    body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
+    format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
+    cta: "Commencer - c'est gratuit",
+    noSpam: 'Sans engagement.',
+    examplesTitle: 'Exemples de veille',
+    examplesSubtitle: 'Cliquez sur un thème pour voir à quoi ressemble votre sélection du jour.',
+    feedTitle: 'Dans le flux ce matin',
+    feedSub: 'Extrait de veilles actives',
+    serendipity: 'Découverte',
+    relevance: 'Pertinence',
+    noTitle: 'Sans titre',
+  },
+  en: {
+    tagline: 'Your daily briefing, without the noise.',
+    body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
+    format: 'One page to check each morning. Nothing in your inbox.',
+    cta: 'Get started - it\'s free',
+    noSpam: 'No commitment.',
+    examplesTitle: 'Feed examples',
+    examplesSubtitle: 'Click a topic to see what your daily selection looks like.',
+    feedTitle: 'In the feed this morning',
+    feedSub: 'From active feeds',
+    serendipity: 'Discovery',
+    relevance: 'Relevance',
+    noTitle: 'No title',
+  },
 }
 
-function ArticlePreview({ article }: { article: FeaturedArticle }) {
-  return (
-    <div className="space-y-2 border-b border-border pb-6 last:border-0">
-      <div className="flex items-start justify-between gap-4">
-        <p className="font-ui text-sm font-semibold text-foreground leading-snug">
-          {article.title ?? 'Sans titre'}
-        </p>
-        {article.score !== null && <MiniScoreBar score={article.score} />}
-      </div>
-      <div className="flex items-center gap-3">
-        {article.site_name && (
-          <span className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground">
-            {article.site_name}
-          </span>
-        )}
-        {article.is_serendipity && (
-          <span className="font-ui text-[11px] uppercase tracking-wider text-accent">
-            Decouverte
-          </span>
-        )}
-      </div>
+function ArticlePreview({ article, lang }: { article: FeaturedArticle; lang: 'fr' | 'en' }) {
+  const t = COPY[lang]
+  const inner = (
+    <div>
+      {article.site_name && (
+        <div className="mb-1.5">
+          <span className="font-ui text-[13px] text-muted-foreground">{article.site_name}</span>
+        </div>
+      )}
+      <h3 className="font-ui text-xl font-bold leading-snug text-foreground group-hover:text-accent transition-colors duration-150">
+        {article.title ?? t.noTitle}
+      </h3>
       {article.excerpt && (
-        <p className="font-body text-xs text-muted-foreground line-clamp-2">{article.excerpt}</p>
+        <p className="font-body text-[15px] text-muted-foreground line-clamp-2 leading-relaxed mt-1">
+          {article.excerpt}
+        </p>
+      )}
+      {article.score !== null && (
+        <p className="font-ui text-[13px] text-muted-foreground mt-2">
+          {article.is_serendipity && <span className="text-accent mr-2">{t.serendipity}</span>}
+          {t.relevance} <span className="font-semibold tabular-nums">{Math.round(article.score)}%</span>
+        </p>
+      )}
+    </div>
+  )
+
+  return (
+    <div className="py-5 border-b border-border last:border-0">
+      {article.url ? (
+        <a href={article.url} target="_blank" rel="noopener noreferrer" className="group block">
+          {inner}
+        </a>
+      ) : (
+        <div>{inner}</div>
       )}
     </div>
   )
 }
 
 export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
+  const [lang, setLang] = useState<'fr' | 'en'>('fr')
+  const t = COPY[lang]
+
+  const today = new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+
   return (
     <main className="min-h-full flex flex-col items-center justify-center px-4 py-16 bg-background">
-      <div className="w-full max-w-sm space-y-12">
-        {/* Masthead */}
-        <div className="space-y-5">
-          <div className="space-y-4">
-            <h1 className="font-logo text-5xl md:text-7xl uppercase tracking-tight text-foreground">
-              Distil
-            </h1>
-            <div className="h-0.5 w-10 bg-accent" />
+      <div className="w-full max-w-2xl">
+        {/* Bandeau éditorial */}
+        <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
+          <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setLang('fr')}
+              className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'fr' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
+            >
+              FR
+            </button>
+            <span className="text-muted-foreground/30 text-xs">|</span>
+            <button
+              onClick={() => setLang('en')}
+              className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'en' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
+            >
+              EN
+            </button>
           </div>
-          <p className="font-body text-lg leading-relaxed text-muted-foreground">
-            Votre veille quotidienne, sans le bruit.
-          </p>
-          <p className="font-body text-sm text-muted-foreground/70">
-            Chaque jour, Distil lit le web pour vous et ne garde que l&apos;essentiel.
-          </p>
         </div>
 
-        {/* Articles du dernier cron */}
-        <div className="space-y-4">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-muted-foreground/60">
-            Articles selectionnes ce matin
+        {/* Hero */}
+        <div className="space-y-6 mb-14">
+          <h1 className="font-ui text-7xl md:text-9xl font-bold tracking-tight text-accent leading-none">
+            Distil
+          </h1>
+          <p className="font-ui text-xl font-bold text-accent leading-snug">
+            {t.tagline}
           </p>
-          {articles.length > 0 ? (
-            <div className="space-y-6">
+          <p className="font-body text-base text-muted-foreground leading-relaxed">
+            {t.body}
+          </p>
+          <p className="font-ui text-sm text-muted-foreground/70">
+            {t.format}
+          </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
+            <Link
+              href="/login"
+              className="font-ui text-sm bg-foreground text-background px-6 py-3 hover:bg-accent hover:text-background transition-colors"
+            >
+              {t.cta}
+            </Link>
+            <p className="font-ui text-xs text-muted-foreground/60">
+              {t.noSpam}
+            </p>
+          </div>
+        </div>
+
+        {/* Exemples de veille */}
+        <div className="mb-14">
+          <div className="border-t border-border pt-6 mb-6">
+            <p className="font-ui text-[13px] text-foreground font-medium">
+              {t.examplesTitle}
+            </p>
+            <p className="font-body text-[13px] text-muted-foreground mt-0.5">
+              {t.examplesSubtitle}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            {PERSONA_EXAMPLES.map((p) => (
+              <Link
+                key={p.slug}
+                href={`/demo/${p.slug}`}
+                className="group border border-border p-3 space-y-1 hover:border-accent/60 transition-colors block"
+              >
+                <p className="font-ui text-sm font-medium text-foreground leading-snug group-hover:text-accent transition-colors">
+                  {p.label[lang]}
+                </p>
+                <p className="font-body text-xs text-muted-foreground leading-snug">
+                  {p.description[lang]}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Aperçu du flux */}
+        {articles.length > 0 && (
+          <div>
+            <div className="border-t-2 border-foreground pt-3 mb-0">
+              <div className="flex items-baseline justify-between">
+                <p className="font-ui text-[13px] text-foreground font-medium">
+                  {t.feedTitle}
+                </p>
+                <p className="font-ui text-[11px] text-muted-foreground/60">
+                  {t.feedSub}
+                </p>
+              </div>
+            </div>
+            <div>
               {articles.map((article, i) => (
-                <ArticlePreview key={i} article={article} />
+                <ArticlePreview key={article.url ?? String(i)} article={article} lang={lang} />
               ))}
             </div>
-          ) : (
-            <p className="font-body text-sm text-muted-foreground italic">
-              Distil analyse le web en ce moment meme. Revenez dans quelques minutes pour
-              decouvrir votre premiere selection.
-            </p>
-          )}
-        </div>
-
-        {/* CTA */}
-        <div className="space-y-3">
-          <Link
-            href="/login"
-            className="block w-full text-center font-ui text-sm bg-foreground text-background px-4 py-3 hover:bg-accent hover:text-background transition-colors"
-          >
-            Commencer — c&apos;est gratuit
-          </Link>
-          <p className="font-ui text-xs text-center text-muted-foreground/60">
-            Pas de newsletter, pas de spam. Un lien magique suffit.
-          </p>
-        </div>
+          </div>
+        )}
       </div>
     </main>
   )

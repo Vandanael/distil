@@ -29,9 +29,10 @@ export default async function RootPage() {
     redirect(profile?.onboarding_completed ? '/feed' : '/onboarding')
   }
 
-  // Non-connecte : fetch 3 articles haute qualite via service role
+  // Non-connecte : 1 article par persona (diversite des themes)
   let featuredArticles: Array<{
     title: string | null
+    url: string | null
     site_name: string | null
     excerpt: string | null
     score: number | null
@@ -42,30 +43,33 @@ export default async function RootPage() {
   if (serviceKey) {
     const serviceClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
 
-    // Essai : articles des dernieres 24h avec bon score
-    const since = new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toISOString()
-    const { data: recent } = await serviceClient
-      .from('articles')
-      .select('title, site_name, excerpt, score, is_serendipity')
-      .eq('status', 'accepted')
-      .not('score', 'is', null)
-      .gte('scored_at', since)
-      .order('score', { ascending: false })
-      .limit(3)
+// IDs stables des comptes démo (créés par create-test-accounts.mjs)
+    const DEMO_USER_IDS = [
+      '795c2637-7e43-4b74-82b1-560899cf62d7', // test-pm (Politique & Monde)
+      '17e9ac27-5bc3-403c-94e4-cb2d6db1e38c', // test-consultant (Cuisine)
+      'a615fba9-490a-4dd9-a161-45f8c9b54943', // test-dev (Tech)
+    ]
 
-    if (recent && recent.length >= 3) {
-      featuredArticles = recent
-    } else {
-      // Fallback : tous les articles acceptes
-      const { data: fallback } = await serviceClient
-        .from('articles')
-        .select('title, site_name, excerpt, score, is_serendipity')
-        .eq('status', 'accepted')
-        .not('score', 'is', null)
-        .order('score', { ascending: false })
-        .limit(3)
+    if (DEMO_USER_IDS.length > 0) {
+      // Meilleur article de chacun des 3 premiers users demo
+      const picks = await Promise.all(
+        DEMO_USER_IDS.map((uid) =>
+          serviceClient
+            .from('articles')
+            .select('title, url, site_name, excerpt, score, is_serendipity')
+            .eq('user_id', uid)
+            .eq('status', 'accepted')
+            .eq('is_serendipity', false)
+            .not('score', 'is', null)
+            .order('score', { ascending: false })
+            .limit(1)
+            .single()
+        )
+      )
 
-      featuredArticles = fallback ?? []
+      featuredArticles = picks
+        .filter((r) => r.data !== null)
+        .map((r) => r.data!)
     }
   }
 

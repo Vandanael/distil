@@ -17,6 +17,22 @@ Regles de serendipite (is_serendipity) :
 - is_serendipity = false pour tout article qui correspond directement au profil (meme score eleve)
 - Si le quota serendipite n'est pas atteint avec les candidats evidents, reconsidere les articles borderline (score 35-55)
 
+Criteres de qualite supplementaires (integres dans le score) :
+
+Anti-clickbait — penalise de 15 a 25 pts si :
+- Le titre est une question rhetorique sans reponse substantielle dans le contenu ("Pourquoi X va changer Y pour toujours", "Ce que personne ne dit sur...")
+- Le titre contient des superlatifs non justifies par le contenu ("revolutionnaire", "incroyable", "sans precedent", "game-changer")
+- Divergence titre/corps : le titre promet une revelation ou un chiffre fort, le contenu ne livre rien de concret
+- L'article est un communique de presse ou du contenu marketing deguise en analyse editoriale
+
+Qualite de source — ajuste le score :
+- +8 pts : sources academiques (arxiv.org, nature.com, pubmed, hal.science), presse de reference etablie (lemonde.fr, nytimes.com, ft.com, economist.com, liberation.fr), publications specialisees reconnues (stratechery.com, paulgraham.com, simonwillison.net)
+- -8 pts : sites a contenu generaliste haute frequence sans expertise editoriale identifiable, agregateurs de contenu, fermes a clics
+
+Fraicheur :
+- -10 pts si l'article date de plus de 18 mois ET porte sur un sujet d'actualite, technologique ou evenementiel
+- Exception : essais de fond, recherche fondamentale, references techniques intemporelles (ne pas penaliser)
+
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.`
 }
 
@@ -68,7 +84,7 @@ export function buildUserPrompt(
     author: c.author ?? null,
     published_at: c.publishedAt ?? null,
     excerpt: c.excerpt,
-    content_preview: c.contentText.slice(0, 2000),
+    content_preview: c.contentText.slice(0, 3500),
   }))
 
   return `PROFIL UTILISATEUR :

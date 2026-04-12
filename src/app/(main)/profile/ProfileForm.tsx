@@ -8,21 +8,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { updateProfile } from './actions'
 
-const SECTORS = [
-  'Consulting',
-  'Design',
-  'Developpement',
-  'Finance',
-  'Ingenierie',
-  'Journalisme',
-  'Marketing',
-  'Medecine',
-  'Produit',
-  'Recherche',
-  'Droit',
-  'Autre',
-]
-
 async function runScoring(urls: string[]): Promise<{ accepted: number; rejected: number }> {
   const res = await fetch('/api/scoring/run', {
     method: 'POST',
@@ -45,7 +30,6 @@ async function refreshFeed(): Promise<{
 
 type ProfileData = {
   profile_text: string | null
-  sector: string | null
   interests: string[]
   pinned_sources: string[]
   daily_cap: number
@@ -58,7 +42,6 @@ type Props = { profile: ProfileData }
 
 export function ProfileForm({ profile }: Props) {
   const [profileText, setProfileText] = useState(profile.profile_text ?? '')
-  const [sector, setSector] = useState(profile.sector ?? '')
   const [interests, setInterests] = useState(profile.interests.join(', '))
   const [sources, setSources] = useState(profile.pinned_sources.join(', '))
   const [language, setLanguage] = useState<'fr' | 'en' | 'both'>(profile.language ?? 'both')
@@ -85,7 +68,6 @@ export function ProfileForm({ profile }: Props) {
     startTransition(async () => {
       await updateProfile({
         profile_text: profileText || undefined,
-        sector: sector || undefined,
         interests: interests
           .split(',')
           .map((s) => s.trim())
@@ -104,7 +86,7 @@ export function ProfileForm({ profile }: Props) {
   const selectClass =
     'h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
 
-  const labelClass = 'font-ui text-[10px] uppercase tracking-wider text-muted-foreground'
+  const labelClass = 'font-ui text-[13px] text-muted-foreground'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -121,27 +103,6 @@ export function ProfileForm({ profile }: Props) {
           disabled={isPending}
           data-testid="profile-text"
         />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="sector" className={labelClass}>
-          Secteur
-        </Label>
-        <select
-          id="sector"
-          value={sector}
-          onChange={(e) => setSector(e.target.value)}
-          disabled={isPending}
-          data-testid="sector-select"
-          className={selectClass}
-        >
-          <option value="">-- Selectionnez --</option>
-          {SECTORS.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="space-y-2">
@@ -320,7 +281,7 @@ export function ProfileForm({ profile }: Props) {
 
         {showScoringPanel && (
           <div className="space-y-3 border border-border p-4">
-            <Label className="font-ui text-[10px] uppercase tracking-wider text-muted-foreground">
+            <Label className="font-ui text-[13px] text-muted-foreground">
               URLs a analyser (une par ligne)
             </Label>
             <Textarea

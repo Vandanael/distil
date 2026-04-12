@@ -58,6 +58,20 @@ export async function POST(request: Request) {
 
   const { user_id: userId, id: tokenId } = tokenRow
 
+  // Rate limit : 5 sauvegardes par minute par user
+  const { count: recentCount } = await supabase
+    .from('articles')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', new Date(Date.now() - 60_000).toISOString())
+
+  if ((recentCount ?? 0) >= 5) {
+    return NextResponse.json(
+      { error: 'Trop de requetes. Max 5 sauvegardes par minute.' },
+      { status: 429, headers: { ...CORS_HEADERS, 'Retry-After': '60' } }
+    )
+  }
+
   // Mise a jour last_used_at (best-effort, non bloquant)
   void supabase
     .from('api_tokens')
