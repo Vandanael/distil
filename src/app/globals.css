@@ -104,6 +104,10 @@
   html {
     @apply font-ui;
   }
+  /* Focus visible global : ring accent pour tout element focusable */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
 }
 
 /* EmptyFeed : barre de progression indeterminee */

@@ -58,7 +58,7 @@ export default async function HighlightsPage() {
             Selectionnez du texte pendant la lecture pour surligner un passage.
           </p>
           <Link href="/feed" className="font-ui text-sm text-accent hover:underline">
-            &larr; Retour au feed
+            &larr; Feed
           </Link>
         </div>
       ) : (

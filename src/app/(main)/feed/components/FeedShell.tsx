@@ -59,6 +59,10 @@ export function FeedShell({ className, children }: Props) {
   return (
     <div className={className} data-testid="feed-articles">
       {children}
+      {/* Hint clavier discret, desktop only */}
+      <p className="hidden md:block font-ui text-[11px] text-muted-foreground/40 pt-6 select-none">
+        j/k naviguer · Enter ouvrir · d rejeter
+      </p>
     </div>
   )
 }

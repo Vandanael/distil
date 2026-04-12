@@ -35,7 +35,7 @@ export function ArchiveList({ articles }: Props) {
           Archivez un article depuis la vue lecture pour le retrouver ici.
         </p>
         <Link href="/feed" className="font-ui text-sm text-accent hover:underline">
-          &larr; Retour au feed
+          &larr; Feed
         </Link>
       </div>
     )

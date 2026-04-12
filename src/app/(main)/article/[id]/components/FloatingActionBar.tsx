@@ -98,6 +98,7 @@ export function FloatingActionBar({
             }}
             className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
             data-testid="action-note"
+            aria-label="Ajouter une note"
           >
             Note
           </button>
@@ -109,6 +110,7 @@ export function FloatingActionBar({
             }}
             className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
             data-testid="action-tag"
+            aria-label="Ajouter un tag"
           >
             Tag
           </button>
@@ -132,6 +134,7 @@ export function FloatingActionBar({
           disabled={isPending}
           className="font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
           data-testid="action-archive"
+          aria-label="Archiver cet article"
         >
           {isPending ? '...' : 'Archiver'}
         </button>

@@ -64,7 +64,7 @@ export function ReadingView({
     <>
       <ReadingProgress />
       {/* Layout desktop : contenu decale a droite avec marge editoriale */}
-      <div className="w-full max-w-4xl mx-auto px-4 py-8 pb-40 md:py-12 md:pb-32">
+      <div className="w-full max-w-4xl mx-auto px-4 py-8 pb-32 md:py-12 md:pb-32">
         <div className="md:grid md:grid-cols-[1fr_minmax(0,640px)] md:gap-0">
           {/* Colonne gauche desktop : navigation sticky */}
           <div className="hidden md:block pt-1">
@@ -186,21 +186,11 @@ export function ReadingView({
                 href="/feed"
                 className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
               >
-                &larr; Retour au feed
+                &larr; Feed
               </Link>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Retour au feed sticky mobile */}
-      <div className="md:hidden fixed bottom-16 left-0 right-0 z-20 px-4 pb-3 pointer-events-none">
-        <Link
-          href="/feed"
-          className="pointer-events-auto block w-full text-center font-ui text-sm font-medium bg-foreground text-background py-3 hover:bg-accent transition-colors"
-        >
-          &larr; Retour au feed
-        </Link>
       </div>
 
       <HighlightPopover

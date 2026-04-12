@@ -49,6 +49,22 @@ export async function updateProfile(input: ProfileUpdate) {
   revalidatePath('/profile')
 }
 
+export async function toggleDigestEmail(enabled: boolean) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Non authentifie')
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ digest_email: enabled })
+    .eq('id', user.id)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/profile')
+}
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()

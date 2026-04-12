@@ -46,6 +46,8 @@ export function SearchBar() {
         <button
           type="button"
           onClick={() => setMode('fulltext')}
+          aria-pressed={mode === 'fulltext'}
+          title="Recherche par mots exacts"
           className={[
             'px-3 py-1 border transition-colors',
             mode === 'fulltext'
@@ -58,6 +60,8 @@ export function SearchBar() {
         <button
           type="button"
           onClick={() => setMode('semantic')}
+          aria-pressed={mode === 'semantic'}
+          title="Recherche par sens et intention"
           className={[
             'px-3 py-1 border transition-colors',
             mode === 'semantic'
