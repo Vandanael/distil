@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   compress: true,
   experimental: {
     viewTransition: true,
-    optimizePackageImports: ['sonner', 'isomorphic-dompurify', '@supabase/ssr', '@supabase/supabase-js'],
+    optimizePackageImports: ['sonner'],
   },
   images: {
     remotePatterns: [
