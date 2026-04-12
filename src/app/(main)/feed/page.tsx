@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ArticleCard } from './components/ArticleCard'
 import { EmptyFeed } from './components/EmptyFeed'
+import { FeedShell } from './components/FeedShell'
 
 export default async function FeedPage() {
   let articles: Array<{
@@ -110,7 +111,7 @@ export default async function FeedPage() {
       </div>
 
       {/* Articles */}
-      <div className="space-y-8" data-testid="feed-articles">
+      <FeedShell className="space-y-8">
         {articles.length === 0 ? (
           <EmptyFeed />
         ) : (
@@ -134,7 +135,7 @@ export default async function FeedPage() {
             />
           ))
         )}
-      </div>
+      </FeedShell>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { dismissArticle } from '../../article/[id]/actions'
+import { useSwipeToDismiss } from '@/lib/hooks/useSwipeToDismiss'
 
 type Props = {
   id: string
@@ -83,6 +84,11 @@ export function ArticleCard({
     return () => document.removeEventListener('mousedown', onOutside)
   }, [showScorePopover])
 
+  const { handlers: swipeHandlers, style: swipeStyle } = useSwipeToDismiss({
+    onDismiss: () => handleDismiss(),
+    enabled: !dismissed,
+  })
+
   if (dismissed) return null
 
   function handleDismiss() {
@@ -127,7 +133,9 @@ export function ArticleCard({
       className="group relative block py-5 -mx-3 px-3 transition-colors hover:bg-muted/40"
       data-testid={`article-card-${id}`}
       data-article-card
-      style={{ '--stagger': staggerIndex } as React.CSSProperties}
+      data-article-id={id}
+      style={{ '--stagger': staggerIndex, ...swipeStyle } as React.CSSProperties}
+      {...swipeHandlers}
     >
       {/* Ligne meta : source · date · duree */}
       <div className="flex items-center gap-1.5 mb-1.5 text-[13px] text-muted-foreground">

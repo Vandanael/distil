@@ -120,6 +120,9 @@ export default async function ProfilePage() {
         </div>
         <PushSubscribe />
         <TokensSection tokens={tokens} />
+        <p className="font-ui text-xs text-muted-foreground">
+          Raccourcis clavier : j/k naviguer, Enter ouvrir, d rejeter, Esc retour
+        </p>
       </div>
 
       <div className="border-t border-border pt-8">

@@ -128,6 +128,13 @@
 [data-article-card] {
   animation: fadeSlideIn 0.25s ease both;
   animation-delay: calc(var(--stagger, 0) * 55ms);
+  touch-action: pan-y;
+}
+
+/* Sprint 26 : keyboard navigation focus */
+[data-article-card][data-keyboard-focus] {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
