@@ -52,8 +52,7 @@ export default function LoginPage() {
       <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
         <div className="w-full max-w-sm space-y-6">
           <div className="space-y-4">
-            <h1 className="font-logo uppercase text-6xl tracking-tight text-foreground">Distil</h1>
-            <div className="h-0.5 w-10 bg-accent" />
+            <h1 className="font-ui text-6xl font-bold tracking-tight text-accent">Distil</h1>
           </div>
           <div className="space-y-2">
             <p className="font-body text-lg text-foreground">Lien envoyé.</p>
@@ -72,10 +71,9 @@ export default function LoginPage() {
         {/* Masthead */}
         <div className="space-y-5">
           <div className="space-y-4">
-            <h1 className="font-logo uppercase text-5xl md:text-7xl tracking-tight text-foreground">
+            <h1 className="font-ui text-5xl md:text-7xl font-bold tracking-tight text-accent">
               Distil
             </h1>
-            <div className="h-0.5 w-10 bg-accent" />
           </div>
           <p className="font-body text-lg leading-relaxed text-muted-foreground">
             Votre veille quotidienne, sans le bruit.

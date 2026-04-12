@@ -63,8 +63,7 @@ export default function WelcomePage() {
       <div className="w-full max-w-sm space-y-10">
         {/* Logo */}
         <div className="space-y-4">
-          <h1 className="font-logo text-5xl uppercase tracking-tight text-foreground">Distil</h1>
-          <div className="h-0.5 w-10 bg-accent" />
+          <h1 className="font-ui text-5xl font-bold tracking-tight text-accent">Distil</h1>
         </div>
 
         {/* Message */}

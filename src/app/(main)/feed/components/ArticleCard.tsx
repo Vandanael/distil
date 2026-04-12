@@ -6,20 +6,6 @@ import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { dismissArticle } from '../../article/[id]/actions'
 
-function MiniScoreBar({ score, onClick }: { score: number; onClick: (e: React.MouseEvent) => void }) {
-  const color = score >= 70 ? 'bg-emerald-500' : score >= 40 ? 'bg-amber-400' : 'bg-red-400'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={`Score de pertinence : ${score}/100. Cliquer pour details.`}
-      className="h-1 w-10 bg-border overflow-hidden shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
-    >
-      <div className={`h-full ${color}`} style={{ width: `${score}%` }} />
-    </button>
-  )
-}
-
 type Props = {
   id: string
   title: string | null
@@ -33,6 +19,7 @@ type Props = {
   scoredAt: string | null
   wordCount: number | null
   ogImageUrl: string | null
+  isRead?: boolean
   staggerIndex?: number
 }
 
@@ -63,36 +50,27 @@ export function ArticleCard({
   scoredAt,
   wordCount,
   ogImageUrl,
+  isRead = false,
   staggerIndex = 0,
 }: Props) {
   const [dismissed, setDismissed] = useState(false)
-  const [showFeedback, setShowFeedback] = useState(false)
   const [showScorePopover, setShowScorePopover] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
-  const feedbackRef = useRef<HTMLDivElement>(null)
   const scorePopoverRef = useRef<HTMLDivElement>(null)
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
   const relativeDate = formatRelativeDate(scoredAt)
-  const isPaywall = wordCount === null || wordCount === 0
+  const isPaywall = wordCount === 0
+  // Les 3 premieres cartes sont potentiellement above-the-fold
+  const isAboveFold = staggerIndex < 3
 
   useEffect(() => {
     return () => {
       if (undoRef.current) clearTimeout(undoRef.current)
     }
   }, [])
-
-  useEffect(() => {
-    if (!showFeedback) return
-    function onOutside(e: MouseEvent) {
-      if (feedbackRef.current && !feedbackRef.current.contains(e.target as Node)) {
-        setShowFeedback(false)
-      }
-    }
-    document.addEventListener('mousedown', onOutside)
-    return () => document.removeEventListener('mousedown', onOutside)
-  }, [showFeedback])
 
   useEffect(() => {
     if (!showScorePopover) return
@@ -107,14 +85,13 @@ export function ArticleCard({
 
   if (dismissed) return null
 
-  function handleDismiss(reason: 'off_topic' | 'already_read') {
-    setShowFeedback(false)
+  function handleDismiss() {
+    const reason = isRead ? 'already_read' : 'off_topic'
     setDismissed(true)
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
-    const label = reason === 'off_topic' ? 'Article masque - signal envoye' : 'Article masque'
-    toast.success(label, {
+    toast.success('Article masque', {
       action: {
         label: 'Annuler',
         onClick: () => {
@@ -147,136 +124,84 @@ export function ArticleCard({
   return (
     <Link
       href={`/article/${id}`}
-      className="group relative block space-y-2 border-b border-border pb-6 last:border-0"
+      className="group relative block py-5 -mx-3 px-3 transition-colors hover:bg-muted/40"
       data-testid={`article-card-${id}`}
       data-article-card
       style={{ '--stagger': staggerIndex } as React.CSSProperties}
     >
-      <div className="flex items-start justify-between gap-4">
-        <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent group-hover:translate-x-0.5 transition-all duration-150">
-          {title ?? 'Sans titre'}
-        </h2>
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Score popover */}
-          {score !== null && (
-            <div className="relative" ref={scorePopoverRef}>
-              <span data-testid={`score-${id}`}>
-                <MiniScoreBar
-                  score={score}
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    setShowScorePopover((v) => !v)
-                    setShowFeedback(false)
-                  }}
-                />
-              </span>
-              {showScorePopover && (
-                <div
-                  className="absolute right-0 top-5 z-20 border border-border bg-background shadow-sm w-64 p-3 space-y-2"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-ui text-xs font-semibold text-foreground">
-                      Score
-                    </span>
-                    <span className="font-ui text-xl font-semibold tabular-nums text-foreground">
-                      {Math.round(score)}<span className="text-xs text-muted-foreground font-normal">/100</span>
-                    </span>
-                  </div>
-                  {justification && (
-                    <p className="font-body text-xs text-muted-foreground leading-relaxed">
-                      {justification}
-                    </p>
-                  )}
-                  {isSerendipity && (
-                    <p className="font-ui text-[11px] text-accent">
-                      Decouverte - article hors de vos sources habituelles.
-                    </p>
-                  )}
-                  <Link
-                    href="/rejected"
-                    className="block font-ui text-[11px] text-muted-foreground hover:text-accent transition-colors pt-1 border-t border-border"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Voir les articles rejetes &rarr;
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Bouton plus comme ca */}
-          <button
-            type="button"
-            onClick={handlePositiveSignal}
-            disabled={positiveSignalSent}
-            aria-label="Plus comme ca"
-            data-testid={`signal-${id}`}
-            className="font-ui text-sm leading-none transition-colors p-1 disabled:opacity-30 text-muted-foreground/30 hover:text-accent"
-            title="Plus comme ca"
+      {/* Ligne meta : source · date · duree */}
+      <div className="flex items-center gap-1.5 mb-1.5 text-[13px] text-muted-foreground">
+        {origin === 'bookmarklet' && (
+          <span
+            className="text-accent shrink-0"
+            data-testid={`origin-badge-${id}`}
+            title="Sauvegarde par vous"
           >
-            +
-          </button>
-
-          {/* Bouton dismiss */}
-          <div className="relative" ref={feedbackRef}>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setShowFeedback((v) => !v)
-                setShowScorePopover(false)
-              }}
-              disabled={isDismissing}
-              aria-label="Masquer cet article"
-              data-testid={`dismiss-${id}`}
-              className="font-ui text-base leading-none text-muted-foreground/40 transition-colors hover:text-muted-foreground/70 disabled:opacity-20 p-1 -mr-1"
-            >
-              ×
-            </button>
-            {showFeedback && (
-              <div
-                className="absolute right-0 top-6 z-20 flex flex-col gap-0 border border-border bg-background shadow-sm min-w-[130px]"
-                onClick={(e) => e.preventDefault()}
-              >
-                <button
-                  type="button"
-                  onClick={() => handleDismiss('off_topic')}
-                  className="px-3 py-2 text-left font-ui text-xs text-foreground hover:bg-muted transition-colors"
-                  data-testid={`feedback-off-topic-${id}`}
-                >
-                  Hors sujet
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDismiss('already_read')}
-                  className="px-3 py-2 text-left font-ui text-xs text-foreground hover:bg-muted transition-colors border-t border-border"
-                  data-testid={`feedback-already-read-${id}`}
-                >
-                  Deja lu ailleurs
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        {siteName && (
-          <span className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground">
-            {siteName}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           </span>
+        )}
+        {siteName && (
+          <span className="font-ui">{siteName}</span>
+        )}
+        {siteName && relativeDate && <span>·</span>}
+        {relativeDate && (
+          <span className="font-ui">{relativeDate}</span>
         )}
         {readingTimeMinutes && (
-          <span className="font-ui text-[11px] text-muted-foreground">
-            {readingTimeMinutes} min
-          </span>
+          <>
+            <span>·</span>
+            <span className="font-ui">{readingTimeMinutes} min</span>
+          </>
         )}
+        {isPaywall && (
+          <>
+            <span>·</span>
+            <span
+              className="text-destructive/70"
+              data-testid={`paywall-badge-${id}`}
+              title="Contenu non accessible - article probablement derriere un paywall"
+            >
+              Paywall
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* Ligne 3-4 : titre + thumbnail */}
+      <div className="flex items-start gap-5">
+        <div className="flex-1 min-w-0">
+          <h2 className={`font-ui text-xl font-bold leading-snug group-hover:text-accent transition-colors duration-150${isPaywall ? ' line-through decoration-muted-foreground/40' : ''}${isRead ? ' text-muted-foreground' : ' text-foreground'}`}>
+            {title ?? 'Sans titre'}
+          </h2>
+          {excerpt && !isPaywall && (
+            <p className="font-body text-[15px] text-muted-foreground line-clamp-2 leading-relaxed mt-1">
+              {excerpt}
+            </p>
+          )}
+        </div>
+
+        {ogImageUrl && !imageError && (
+          <div className="relative shrink-0 w-28 h-20 sm:w-32 sm:h-24 overflow-hidden bg-muted">
+            <Image
+              src={ogImageUrl}
+              alt=""
+              fill
+              sizes="128px"
+              className="object-cover"
+              loading={isAboveFold ? 'eager' : 'lazy'}
+              priority={isAboveFold}
+              onError={() => setImageError(true)}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Ligne 5 : tags + score + actions */}
+      <div className="flex items-center gap-3 mt-2">
+        {/* Tags Distil */}
         {isSerendipity && (
           <span
-            className="font-ui text-[11px] uppercase tracking-wider text-accent cursor-help"
+            className="font-ui text-[13px] text-accent cursor-help"
             data-testid={`serendipity-badge-${id}`}
             title="Article hors de vos sources habituelles - introduit pour elargir votre veille"
             onClick={(e) => {
@@ -285,48 +210,90 @@ export function ArticleCard({
               toast.info('Article hors de vos sources habituelles - introduit pour elargir votre veille.')
             }}
           >
-            Découverte
+            Decouverte
           </span>
         )}
-        {isPaywall && (
-          <span
-            className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground/50"
-            data-testid={`paywall-badge-${id}`}
-            title="Contenu non accessible - article probablement derriere un paywall"
-          >
-            Paywall
-          </span>
-        )}
-        {origin === 'bookmarklet' && (
-          <span
-            className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground/60"
-            data-testid={`origin-badge-${id}`}
-          >
-            Sauvegardé
-          </span>
-        )}
-        {relativeDate && (
-          <span className="font-ui text-[11px] text-muted-foreground/60 ml-auto">
-            {relativeDate}
-          </span>
-        )}
-      </div>
 
-      {ogImageUrl && (
-        <div className="relative w-full aspect-[2/1] overflow-hidden mt-1">
-          <Image
-            src={ogImageUrl}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 672px"
-            className="object-cover"
-            onError={(e) => {
-              ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+        {/* Score : label + nombre cliquable */}
+        {score !== null && (
+          <div className="relative" ref={scorePopoverRef}>
+            <button
+              type="button"
+              data-testid={`score-${id}`}
+              aria-label={`Pertinence : ${Math.round(score)}/100. Cliquer pour details.`}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setShowScorePopover((v) => !v)
+              }}
+              className="font-ui text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pertinence <span className="font-semibold tabular-nums">{Math.round(score)}%</span>
+            </button>
+            {showScorePopover && (
+              <div
+                role="dialog"
+                aria-label="Detail du score"
+                className="absolute left-0 bottom-7 z-20 border border-border bg-background shadow-sm w-64 p-3 space-y-2 animate-in fade-in slide-in-from-bottom-1 duration-150"
+                onClick={(e) => e.preventDefault()}
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="font-ui text-[13px] font-semibold text-foreground">
+                    Pertinence
+                  </span>
+                  <span className="font-ui text-xl font-semibold tabular-nums text-foreground">
+                    {Math.round(score)}<span className="text-[13px] text-muted-foreground font-normal">%</span>
+                  </span>
+                </div>
+                {justification && (
+                  <p className="font-body text-[13px] text-muted-foreground leading-relaxed">
+                    {justification}
+                  </p>
+                )}
+                {isSerendipity && (
+                  <p className="font-ui text-[13px] text-accent">
+                    Decouverte - article hors de vos sources habituelles.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Actions a droite */}
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            type="button"
+            onClick={handlePositiveSignal}
+            disabled={positiveSignalSent}
+            aria-label="Plus comme ca"
+            data-testid={`signal-${id}`}
+            className="font-ui text-[13px] text-muted-foreground/60 transition-colors p-1.5 hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
+            title="Plus comme ca"
+          >
+            {positiveSignalSent ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleDismiss()
             }}
-          />
+            disabled={isDismissing}
+            aria-label="Masquer cet article"
+            data-testid={`dismiss-${id}`}
+            className="font-ui text-muted-foreground/60 transition-colors p-1.5 hover:text-destructive hover:bg-muted disabled:opacity-20"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+          </button>
         </div>
-      )}
-      {excerpt && <p className="font-body text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
+      </div>
     </Link>
   )
 }

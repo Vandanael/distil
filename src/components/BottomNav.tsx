@@ -80,8 +80,8 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-widest transition-colors ${
-                active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+              className={`flex flex-1 flex-col items-center justify-center gap-1 text-[11px] tracking-wide transition-colors ${
+                active ? 'text-foreground bg-muted' : 'text-muted-foreground hover:text-foreground'
               }`}
               aria-current={active ? 'page' : undefined}
             >

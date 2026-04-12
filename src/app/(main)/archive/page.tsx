@@ -43,7 +43,7 @@ export default async function ArchivePage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
       <div className="space-y-4 border-b border-border pb-8">
-        <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">Archives</h1>
+        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Archives</h1>
         <div className="flex items-center gap-6">
           <span className="font-ui text-sm text-muted-foreground">
             {articles.length} article{articles.length !== 1 ? 's' : ''}

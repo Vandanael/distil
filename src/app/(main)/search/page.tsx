@@ -46,7 +46,7 @@ function SearchShell({
 }) {
   return (
     <main className="max-w-2xl mx-auto px-4 py-10 space-y-8">
-      <h1 className="font-display text-2xl text-foreground">Rechercher</h1>
+      <h1 className="font-ui text-3xl font-bold text-foreground">Rechercher</h1>
 
       <Suspense>
         <SearchBar />

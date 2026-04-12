@@ -1,21 +1,16 @@
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Quintessential, Geist } from 'next/font/google'
+import { Playfair_Display, Geist } from 'next/font/google'
+// Playfair Display : titres d'articles en lecture (font-heading)
+// Geist : tout le reste — UI, body, titres cartes, labels, logo
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
-/* Logo : Playfair Display — exclusivement pour le mot "DISTIL" */
+/* Titres d'articles en lecture : Playfair Display */
 const playfair = Playfair_Display({
   variable: '--font-playfair',
   subsets: ['latin'],
-  weight: ['400', '700'],
-})
-
-/* Titres display : Quintessential */
-const quintessential = Quintessential({
-  variable: '--font-quintessential',
-  subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '600', '700'],
 })
 
 /* Corps + UI : Geist sans-serif */
@@ -51,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${playfair.variable} ${quintessential.variable} ${geist.variable} h-full antialiased`}
+      className={`${playfair.variable} ${geist.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

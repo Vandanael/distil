@@ -41,7 +41,7 @@ export function RejectedCard({ id, title, siteName, rejectionReason, score, url 
           </a>
           <div className="flex items-center gap-2 shrink-0">
             {siteName && (
-              <span className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span className="font-ui text-[13px] text-muted-foreground">
                 {siteName}
               </span>
             )}

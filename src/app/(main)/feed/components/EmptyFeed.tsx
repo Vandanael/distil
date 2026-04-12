@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -40,21 +41,19 @@ export function EmptyFeed() {
 
   if (phase === 'searching') {
     return (
-      <div className="space-y-4 py-12">
-        <p className="font-ui text-sm text-foreground font-medium">
-          Distil cherche vos premiers articles...
-        </p>
-        <p className="font-body text-sm text-muted-foreground leading-relaxed">
-          L&apos;analyse prend quelques instants. La page se mettra a jour automatiquement.
-        </p>
-        <div className="flex gap-1 pt-2">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="inline-block h-1 w-6 bg-accent/40 animate-pulse rounded-none"
-              style={{ animationDelay: `${i * 200}ms` }}
-            />
-          ))}
+      <div className="py-12 space-y-6">
+        <div className="space-y-1">
+          <div className="h-px w-full bg-border overflow-hidden">
+            <div className="h-px bg-accent animate-[progress_2s_ease-in-out_infinite]" style={{ width: '40%' }} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <p className="font-ui text-sm text-foreground font-medium">
+            Distil cherche vos premiers articles...
+          </p>
+          <p className="font-body text-sm text-muted-foreground leading-relaxed">
+            L&apos;analyse prend quelques instants. La page se mettra a jour automatiquement.
+          </p>
         </div>
       </div>
     )
@@ -68,9 +67,9 @@ export function EmptyFeed() {
         </p>
         <p className="font-body text-sm text-muted-foreground">
           Verifiez votre connexion et reessayez depuis votre{' '}
-          <a href="/profile" className="text-accent hover:underline">
+          <Link href="/profile" className="text-accent hover:underline">
             profil
-          </a>
+          </Link>
           .
         </p>
       </div>
@@ -86,9 +85,9 @@ export function EmptyFeed() {
       <p className="font-body text-sm text-muted-foreground leading-relaxed">
         Distil n&apos;a pas trouve d&apos;articles correspondant a votre profil lors de cette
         recherche. Enrichissez vos{' '}
-        <a href="/profile" className="text-accent hover:underline">
+        <Link href="/profile" className="text-accent hover:underline">
           centres d&apos;interet
-        </a>{' '}
+        </Link>{' '}
         ou ajoutez des sources pour ameliorer les resultats.
       </p>
     </div>

@@ -75,9 +75,46 @@ export function FloatingActionBar({
       )}
 
       <div
-        className="fixed bottom-0 left-0 right-0 z-30 flex flex-wrap items-center justify-center gap-4 border-t border-border bg-background px-4 py-4"
+        className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between border-t border-border bg-background px-6 py-3"
         data-testid="floating-action-bar"
       >
+        {/* Actions secondaires a gauche */}
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => void handleShare()}
+            className="text-muted-foreground transition-colors hover:text-foreground p-1"
+            data-testid="action-share"
+            aria-label="Partager"
+            title="Partager"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowNote(true)
+              setShowTag(false)
+            }}
+            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
+            data-testid="action-note"
+          >
+            Note
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowTag(true)
+              setShowNote(false)
+            }}
+            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
+            data-testid="action-tag"
+          >
+            Tag
+          </button>
+        </div>
+
+        {/* Tags affiches */}
         {tags.length > 0 && (
           <div className="flex gap-1">
             {tags.map((t) => (
@@ -87,41 +124,13 @@ export function FloatingActionBar({
             ))}
           </div>
         )}
-        <button
-          type="button"
-          onClick={() => void handleShare()}
-          className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
-          data-testid="action-share"
-        >
-          Partager
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setShowTag(true)
-            setShowNote(false)
-          }}
-          className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
-          data-testid="action-tag"
-        >
-          Tag
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setShowNote(true)
-            setShowTag(false)
-          }}
-          className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
-          data-testid="action-note"
-        >
-          Note
-        </button>
+
+        {/* Action primaire a droite */}
         <button
           type="button"
           onClick={handleArchive}
           disabled={isPending}
-          className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          className="font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
           data-testid="action-archive"
         >
           {isPending ? '...' : 'Archiver'}

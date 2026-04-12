@@ -9,18 +9,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist);
-  --font-logo: var(--font-playfair);
-  --font-heading: var(--font-quintessential);
+  --font-heading: var(--font-playfair);
   --font-body: var(--font-geist);
   --font-ui: var(--font-geist);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -78,15 +69,6 @@
   --ring: #d94e1f; /* focus ring = orange */
   --radius: 0rem; /* coins francs */
 
-  /* sidebar non utilise MVP */
-  --sidebar: #f0ede6;
-  --sidebar-foreground: #1c3028;
-  --sidebar-primary: #1c3028;
-  --sidebar-primary-foreground: #fbf9f4;
-  --sidebar-accent: #f0ede6;
-  --sidebar-accent-foreground: #1c3028;
-  --sidebar-border: #d4cfc5;
-  --sidebar-ring: #d94e1f;
 }
 
 .dark {
@@ -109,14 +91,6 @@
   --border: #2a4a38; /* vert-gris fonce (correction : etait bleu #1e3a5f) */
   --input: #2a4a38; /* idem */
   --ring: #e8693d;
-  --sidebar: #0d2018;
-  --sidebar-foreground: #fbf9f4;
-  --sidebar-primary: #fbf9f4;
-  --sidebar-primary-foreground: #0d2018;
-  --sidebar-accent: #1a2e20;
-  --sidebar-accent-foreground: #fbf9f4;
-  --sidebar-border: #2a4a38;
-  --sidebar-ring: #e8693d;
 }
 
 @layer base {
@@ -130,6 +104,13 @@
   html {
     @apply font-ui;
   }
+}
+
+/* EmptyFeed : barre de progression indeterminee */
+@keyframes progress {
+  0%   { transform: translateX(-100%); }
+  60%  { transform: translateX(200%); }
+  100% { transform: translateX(200%); }
 }
 
 /* Sprint 20 : animation d'entree des cartes feed */
@@ -177,3 +158,21 @@
     animation: none;
   }
 }
+
+/* Styles prose article — definis ici pour eviter les arbitrary selectors Tailwind inline */
+.article-prose { @apply text-[17px] leading-[1.75]; }
+.article-prose h2 { @apply font-ui text-2xl font-bold mt-10 mb-4; }
+.article-prose h3 { @apply font-ui text-xl font-bold mt-8 mb-3; }
+.article-prose p  { @apply mb-5; }
+.article-prose a  { @apply text-accent no-underline; }
+.article-prose a:hover { @apply underline; }
+.article-prose strong { @apply text-foreground font-semibold; }
+.article-prose blockquote {
+  @apply border-l-2 border-accent pl-5 italic text-muted-foreground my-8;
+}
+.article-prose ul { @apply list-disc pl-6 mb-5 space-y-1.5; }
+.article-prose ol { @apply list-decimal pl-6 mb-5 space-y-1.5; }
+.article-prose li { /* inherits article-prose line-height */ }
+.article-prose hr { @apply border-border my-10; }
+.article-prose figcaption { @apply text-center text-sm text-muted-foreground mt-3; }
+.article-prose img { @apply max-w-full h-auto; }

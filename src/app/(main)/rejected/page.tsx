@@ -42,8 +42,7 @@ export default async function RejectedPage() {
         >
           &larr; Feed
         </Link>
-        <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Filtres</p>
-        <h1 className="font-ui text-4xl font-semibold text-foreground">Articles rejet&eacute;s</h1>
+        <h1 className="font-ui text-3xl font-bold text-foreground">Articles rejetés</h1>
         <p className="font-body text-sm text-muted-foreground">
           {articles.length} article{articles.length !== 1 ? 's' : ''} filtr
           {articles.length !== 1 ? 'és' : 'é'} par l&apos;agent.

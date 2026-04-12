@@ -42,7 +42,7 @@ export default async function HighlightsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
       <div className="space-y-4 border-b border-border pb-8">
-        <h1 className="font-ui text-4xl font-semibold leading-tight text-foreground">Highlights</h1>
+        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Highlights</h1>
         <span className="font-ui text-sm text-muted-foreground">
           {highlights.length} passage{highlights.length !== 1 ? 's' : ''} surligne
           {highlights.length !== 1 ? 's' : ''}
@@ -71,7 +71,7 @@ export default async function HighlightsPage() {
               {h.article && (
                 <Link
                   href={`/article/${h.article.id}`}
-                  className="font-ui text-[11px] uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
+                  className="font-ui text-[13px] text-muted-foreground hover:text-accent transition-colors"
                 >
                   {h.article.site_name ?? h.article.title ?? 'Article'} &rarr;
                 </Link>
