@@ -13,6 +13,7 @@ import { wizardReducer, INITIAL_STATE, TOTAL_STEPS } from './reducer'
 export default function WizardPage() {
   const [state, dispatch] = useReducer(wizardReducer, INITIAL_STATE)
   const [isPending, startTransition] = useTransition()
+  const [isNavigating, startNavTransition] = useTransition()
 
   function handleSubmit() {
     startTransition(async () => {
@@ -34,7 +35,7 @@ export default function WizardPage() {
         {/* Indicateur de progression */}
         <div className="space-y-3">
           <div className="flex items-baseline justify-between">
-            <p className="font-ui text-[10px] uppercase tracking-widest text-accent">Wizard</p>
+            <p className="font-ui text-xs uppercase tracking-wider text-accent">Wizard</p>
             <span className="font-ui text-xs tabular-nums text-muted-foreground">
               {state.step} / {TOTAL_STEPS}
             </span>
@@ -89,19 +90,19 @@ export default function WizardPage() {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => dispatch({ type: 'PREV' })}
-              disabled={isPending}
+              onClick={() => startNavTransition(() => dispatch({ type: 'PREV' }))}
+              disabled={isPending || isNavigating}
               className="flex-1"
               data-testid="wizard-prev"
             >
-              Precedent
+              Précédent
             </Button>
           )}
           {!isLastStep ? (
             <Button
               type="button"
-              onClick={() => dispatch({ type: 'NEXT' })}
-              disabled={isPending}
+              onClick={() => startNavTransition(() => dispatch({ type: 'NEXT' }))}
+              disabled={isPending || isNavigating}
               className="flex-1"
               data-testid="wizard-next"
             >
@@ -115,7 +116,7 @@ export default function WizardPage() {
               className="flex-1"
               data-testid="wizard-submit"
             >
-              {isPending ? 'Creation du profil...' : 'Demarrer Distil'}
+              {isPending ? 'Création du profil...' : 'Démarrer Distil'}
             </Button>
           )}
         </div>

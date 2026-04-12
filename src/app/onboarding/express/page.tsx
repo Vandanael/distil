@@ -26,6 +26,7 @@ export default function ExpressPage() {
   const [profileText, setProfileText] = useState('')
   const [sector, setSector] = useState('')
   const [isPending, startTransition] = useTransition()
+  const canSubmit = profileText.trim().length > 0 || sector !== ''
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -43,7 +44,7 @@ export default function ExpressPage() {
       <div className="w-full max-w-md space-y-10">
         {/* En-tete */}
         <div className="space-y-4">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
+          <p className="font-ui text-xs uppercase tracking-wider text-accent">
             Methode rapide
           </p>
           <h1 className="font-heading text-4xl font-semibold text-foreground">En quelques mots</h1>
@@ -101,7 +102,7 @@ export default function ExpressPage() {
             <Button
               type="submit"
               className="w-full h-11"
-              disabled={isPending}
+              disabled={isPending || !canSubmit}
               data-testid="submit-express"
             >
               {isPending ? 'Creation du profil...' : 'Demarrer Distil'}

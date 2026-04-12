@@ -49,6 +49,7 @@ export function ProfileForm({ profile }: Props) {
   const [serendipityQuota, setSerendipityQuota] = useState(profile.serendipity_quota)
   const [showScores, setShowScores] = useState(profile.show_scores)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [sourcesSavedHint, setSourcesSavedHint] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [showScoringPanel, setShowScoringPanel] = useState(false)
@@ -59,6 +60,7 @@ export function ProfileForm({ profile }: Props) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSaved(false)
+    setSaveError(null)
     setSourcesSavedHint(false)
     const newSources = sources
       .split(',')
@@ -66,20 +68,24 @@ export function ProfileForm({ profile }: Props) {
       .filter(Boolean)
     const sourcesChanged = newSources.join(',') !== profile.pinned_sources.join(',')
     startTransition(async () => {
-      await updateProfile({
-        profile_text: profileText || undefined,
-        interests: interests
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
-        pinned_sources: newSources,
-        daily_cap: dailyCap,
-        serendipity_quota: serendipityQuota,
-        show_scores: showScores,
-        language,
-      })
-      setSaved(true)
-      if (sourcesChanged) setSourcesSavedHint(true)
+      try {
+        await updateProfile({
+          profile_text: profileText || undefined,
+          interests: interests
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean),
+          pinned_sources: newSources,
+          daily_cap: dailyCap,
+          serendipity_quota: serendipityQuota,
+          show_scores: showScores,
+          language,
+        })
+        setSaved(true)
+        if (sourcesChanged) setSourcesSavedHint(true)
+      } catch (err) {
+        setSaveError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde.')
+      }
     })
   }
 
@@ -132,8 +138,8 @@ export function ProfileForm({ profile }: Props) {
           data-testid="sources-input"
         />
         {sourcesSavedHint && (
-          <p className="font-ui text-[10px] text-muted-foreground/70">
-            Ces sources seront incluses lors du prochain rafraichissement.
+          <p className="font-ui text-xs text-muted-foreground">
+            Ces sources seront incluses lors du prochain rafraîchissement.
           </p>
         )}
       </div>
@@ -217,7 +223,10 @@ export function ProfileForm({ profile }: Props) {
         <Button type="submit" disabled={isPending} data-testid="save-profile">
           {isPending ? 'Enregistrement...' : 'Enregistrer'}
         </Button>
-        {saved && <span className="font-ui text-sm text-muted-foreground">Profil mis a jour.</span>}
+        {saved && <span className="font-ui text-sm text-muted-foreground">Profil mis à jour.</span>}
+        {saveError && (
+          <p role="alert" className="font-ui text-sm text-destructive">{saveError}</p>
+        )}
       </div>
 
       {/* Declencheur de scoring manuel */}
@@ -228,8 +237,8 @@ export function ProfileForm({ profile }: Props) {
             <p className="font-body text-xs text-muted-foreground">
               Distil cherche de nouveaux articles depuis vos sources et centres d&apos;intérêt.
             </p>
-            <p className="font-ui text-[10px] text-muted-foreground/60">
-              Actualisation automatique chaque matin a 6h30.
+            <p className="font-ui text-xs text-muted-foreground">
+              Actualisation automatique chaque matin à 6h30.
             </p>
           </div>
           <Button

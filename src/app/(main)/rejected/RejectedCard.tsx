@@ -47,7 +47,7 @@ export function RejectedCard({ id, title, siteName, rejectionReason, score, url 
             )}
             {score !== null && (
               <span
-                className="font-ui text-[11px] tabular-nums text-muted-foreground/60"
+                className="font-ui text-xs tabular-nums text-muted-foreground"
                 data-testid={`score-badge-${id}`}
               >
                 {score}/100

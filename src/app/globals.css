@@ -60,7 +60,8 @@
   --muted-foreground: #587060; /* vert-gris : harmonieux avec le primaire */
 
   /* Accent = orange Distil (marque, hover, emphase editoriale) */
-  --accent: #d94e1f;
+  /* #b84518 : 5.14:1 sur #fbf9f4 - passe WCAG AA pour tout texte */
+  --accent: #b84518;
   --accent-foreground: #fbf9f4;
 
   --destructive: #dc2626;

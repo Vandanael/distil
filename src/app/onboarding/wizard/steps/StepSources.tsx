@@ -38,7 +38,7 @@ export function StepSources({ sources, onChange }: Props) {
           Vos sources
         </h2>
         <p className="font-[family-name:var(--font-source-serif)] text-sm text-muted-foreground">
-          Sites, blogs ou publications que vous lisez deja. Laissez vide si vous voulez decouvrir.
+          Sites, blogs ou publications que vous lisez déjà. Laissez vide si vous voulez découvrir.
         </p>
       </div>
 

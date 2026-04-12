@@ -35,16 +35,16 @@ export function StepInterests({ interests, onChange }: Props) {
     <div className="space-y-4">
       <div className="space-y-1">
         <h2 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold text-foreground">
-          Vos interets
+          Vos intérêts
         </h2>
         <p className="font-[family-name:var(--font-source-serif)] text-sm text-muted-foreground">
-          Ajoutez des themes, domaines ou mots-cles. Appuyez Entree pour valider.
+          Ajoutez des thèmes, domaines ou mots-clés. Appuyez Entrée pour valider.
         </p>
       </div>
 
       <div className="flex gap-2">
         <Input
-          placeholder="Ex: machine learning, geopolitique..."
+          placeholder="Ex: machine learning, géopolitique..."
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={handleKeyDown}

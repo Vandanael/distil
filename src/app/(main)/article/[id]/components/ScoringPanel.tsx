@@ -17,7 +17,7 @@ function ScoreBar({ score }: { score: number }) {
       </div>
       <span className="font-ui text-xs tabular-nums text-muted-foreground shrink-0">
         {score}
-        <span className="text-[10px]">/100</span>
+        <span className="text-xs">/100</span>
       </span>
     </div>
   )

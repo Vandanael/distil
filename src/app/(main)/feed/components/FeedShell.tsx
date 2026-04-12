@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useFeedKeyboard } from '@/lib/hooks/useFeedKeyboard'
 import { dismissArticle } from '../../article/[id]/actions'
+import { useLocale } from '@/lib/i18n/context'
+import { useDismissContext } from './DismissContext'
 
 type Props = {
   className?: string
@@ -13,38 +15,34 @@ type Props = {
 
 export function FeedShell({ className, children }: Props) {
   const router = useRouter()
-  const cancelledRef = useRef<Record<string, boolean>>({})
+  const { t } = useLocale()
+  const { dismissById, undoById } = useDismissContext()
   const timerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const handleDismiss = useCallback(
     (articleId: string) => {
-      // Masquer visuellement la carte (via ArticleCard interne)
-      // On ne peut pas piloter le state interne de ArticleCard depuis ici,
-      // donc on appelle directement le server action apres le delai undo
-      cancelledRef.current[articleId] = false
+      dismissById(articleId)
 
       if (timerRef.current[articleId]) clearTimeout(timerRef.current[articleId])
 
-      toast.success('Article masque', {
+      toast.success(t.article.dismissed, {
         action: {
-          label: 'Annuler',
+          label: t.article.undo,
           onClick: () => {
-            cancelledRef.current[articleId] = true
+            undoById(articleId)
             if (timerRef.current[articleId]) clearTimeout(timerRef.current[articleId])
+            delete timerRef.current[articleId]
           },
         },
         duration: 4000,
       })
 
       timerRef.current[articleId] = setTimeout(async () => {
-        if (!cancelledRef.current[articleId]) {
-          await dismissArticle(articleId)
-        }
-        delete cancelledRef.current[articleId]
+        await dismissArticle(articleId)
         delete timerRef.current[articleId]
       }, 4000)
     },
-    []
+    [dismissById, undoById, t]
   )
 
   const handleNavigate = useCallback(
@@ -60,7 +58,7 @@ export function FeedShell({ className, children }: Props) {
     <div className={className} data-testid="feed-articles">
       {children}
       {/* Hint clavier discret, desktop only */}
-      <p className="hidden md:block font-ui text-[11px] text-muted-foreground/40 pt-6 select-none">
+      <p className="hidden md:block font-ui text-xs text-muted-foreground/40 pt-6 select-none">
         j/k naviguer · Enter ouvrir · d rejeter
       </p>
     </div>

@@ -130,13 +130,17 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setLang('fr')}
+              aria-pressed={lang === 'fr'}
+              aria-label="Français"
               className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'fr' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
             >
               FR
             </button>
-            <span className="text-muted-foreground/30 text-xs">|</span>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">|</span>
             <button
               onClick={() => setLang('en')}
+              aria-pressed={lang === 'en'}
+              aria-label="English"
               className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'en' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
             >
               EN
@@ -207,7 +211,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
                 <p className="font-ui text-[13px] text-foreground font-medium">
                   {t.feedTitle}
                 </p>
-                <p className="font-ui text-[11px] text-muted-foreground/60">
+                <p className="font-ui text-xs text-muted-foreground/60">
                   {t.feedSub}
                 </p>
               </div>

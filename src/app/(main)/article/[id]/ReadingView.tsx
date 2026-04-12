@@ -71,6 +71,7 @@ export function ReadingView({
             <div className="sticky top-20">
               <Link
                 href="/feed"
+                aria-label="Retour au feed"
                 className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
                 data-testid="back-to-feed"
               >
@@ -184,6 +185,7 @@ export function ReadingView({
             <div className="hidden md:block border-t border-border pt-8">
               <Link
                 href="/feed"
+                aria-label="Retour au feed"
                 className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
               >
                 &larr; Feed

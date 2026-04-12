@@ -199,7 +199,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
             </p>
             <Link
               href="/"
-              className="font-ui text-[11px] text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
+              className="font-ui text-xs text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
             >
               ← Accueil
             </Link>

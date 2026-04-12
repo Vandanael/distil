@@ -108,7 +108,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
             <li key={token.id} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="min-w-0">
                 <p className="font-ui text-sm text-foreground truncate">{token.name}</p>
-                <p className="font-ui text-[11px] text-muted-foreground">
+                <p className="font-ui text-xs text-muted-foreground">
                   Cree le {formatDate(token.created_at)}
                   {token.last_used_at && ` - Utilise le ${formatDate(token.last_used_at)}`}
                 </p>

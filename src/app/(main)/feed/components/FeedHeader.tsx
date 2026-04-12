@@ -42,7 +42,7 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
         </h1>
         <Link
           href="/profile"
-          className="font-ui text-[11px] text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
+          className="font-ui text-xs text-muted-foreground/70 hover:text-accent transition-colors shrink-0"
         >
           {t.feed.configure}
         </Link>

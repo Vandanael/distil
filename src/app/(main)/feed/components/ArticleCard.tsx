@@ -6,6 +6,8 @@ import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
 import { dismissArticle } from '../../article/[id]/actions'
 import { useSwipeToDismiss } from '@/lib/hooks/useSwipeToDismiss'
+import { useLocale } from '@/lib/i18n/context'
+import { useDismissContext } from './DismissContext'
 
 type Props = {
   id: string
@@ -24,18 +26,19 @@ type Props = {
   staggerIndex?: number
 }
 
-function formatRelativeDate(dateStr: string | null): string | null {
+function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
   if (!dateStr) return null
   const date = new Date(dateStr)
   if (isNaN(date.getTime())) return null
   const diffMs = Date.now() - date.getTime()
   const diffH = Math.floor(diffMs / (1000 * 60 * 60))
-  if (diffH < 1) return "a l'instant"
-  if (diffH < 24) return `il y a ${diffH}h`
+  const isFr = locale === 'fr'
+  if (diffH < 1) return isFr ? "à l'instant" : 'just now'
+  if (diffH < 24) return isFr ? `il y a ${diffH}h` : `${diffH}h ago`
   const diffD = Math.floor(diffH / 24)
-  if (diffD === 1) return 'hier'
-  if (diffD < 7) return `il y a ${diffD}j`
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+  if (diffD === 1) return isFr ? 'hier' : 'yesterday'
+  if (diffD < 7) return isFr ? `il y a ${diffD}j` : `${diffD}d ago`
+  return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' })
 }
 
 export function ArticleCard({
@@ -54,6 +57,8 @@ export function ArticleCard({
   isRead = false,
   staggerIndex = 0,
 }: Props) {
+  const { locale, t } = useLocale()
+  const { dismissedIds } = useDismissContext()
   const [dismissed, setDismissed] = useState(false)
   const [showScorePopover, setShowScorePopover] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
@@ -62,7 +67,7 @@ export function ArticleCard({
   const scorePopoverRef = useRef<HTMLDivElement>(null)
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
-  const relativeDate = formatRelativeDate(scoredAt)
+  const relativeDate = formatRelativeDate(scoredAt, locale)
   const isPaywall = wordCount === 0
   // Les 3 premieres cartes sont potentiellement above-the-fold
   const isAboveFold = staggerIndex < 3
@@ -75,21 +80,48 @@ export function ArticleCard({
 
   useEffect(() => {
     if (!showScorePopover) return
+    const popover = scorePopoverRef.current
+    if (!popover) return
+
+    const focusable = popover.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    first?.focus()
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setShowScorePopover(false); return }
+      if (e.key !== 'Tab') return
+      if (focusable.length === 0) { e.preventDefault(); return }
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus() }
+      }
+    }
+
     function onOutside(e: MouseEvent) {
-      if (scorePopoverRef.current && !scorePopoverRef.current.contains(e.target as Node)) {
+      if (popover && !popover.contains(e.target as Node)) {
         setShowScorePopover(false)
       }
     }
+
+    document.addEventListener('keydown', onKeyDown)
     document.addEventListener('mousedown', onOutside)
-    return () => document.removeEventListener('mousedown', onOutside)
-  }, [showScorePopover])
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('mousedown', onOutside)
+      ;(document.querySelector(`[data-testid="score-${id}"]`) as HTMLElement | null)?.focus()
+    }
+  }, [showScorePopover, id])
 
   const { handlers: swipeHandlers, style: swipeStyle } = useSwipeToDismiss({
     onDismiss: () => handleDismiss(),
     enabled: !dismissed,
   })
 
-  if (dismissed) return null
+  if (dismissed || dismissedIds.has(id)) return null
 
   function handleDismiss() {
     const reason = isRead ? 'already_read' : 'off_topic'
@@ -97,9 +129,9 @@ export function ArticleCard({
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
-    toast.success('Article masque', {
+    toast.success(t.article.dismissed, {
       action: {
-        label: 'Annuler',
+        label: t.article.undo,
         onClick: () => {
           cancelledRef.current = true
           if (undoRef.current) clearTimeout(undoRef.current)
@@ -123,8 +155,14 @@ export function ArticleCard({
     e.stopPropagation()
     if (positiveSignalSent) return
     setPositiveSignalSent(true)
-    toast.success('Signal envoye - plus comme ca')
-    await fetch(`/api/articles/${id}/signal`, { method: 'PATCH' })
+    try {
+      const res = await fetch(`/api/articles/${id}/signal`, { method: 'PATCH' })
+      if (!res.ok) throw new Error()
+      toast.success(t.article.positiveSent)
+    } catch {
+      setPositiveSignalSent(false)
+      toast.error(locale === 'fr' ? 'Erreur lors de l\'envoi du signal.' : 'Error sending signal.')
+    }
   }
 
   return (
@@ -211,14 +249,14 @@ export function ArticleCard({
           <span
             className="font-ui text-[13px] text-accent cursor-help"
             data-testid={`serendipity-badge-${id}`}
-            title="Article hors de vos sources habituelles - introduit pour elargir votre veille"
+            title={t.article.serendipityTitle}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              toast.info('Article hors de vos sources habituelles - introduit pour elargir votre veille.')
+              toast.info(t.article.serendipityTitle)
             }}
           >
-            Decouverte
+            {t.article.serendipity}
           </span>
         )}
 
@@ -241,7 +279,8 @@ export function ArticleCard({
             {showScorePopover && (
               <div
                 role="dialog"
-                aria-label="Detail du score"
+                aria-label="Détail du score"
+                aria-modal="true"
                 className="absolute left-0 bottom-7 z-20 border border-border bg-background shadow-sm w-64 p-3 space-y-2 animate-in fade-in slide-in-from-bottom-1 duration-150"
                 onClick={(e) => e.preventDefault()}
               >
@@ -260,7 +299,7 @@ export function ArticleCard({
                 )}
                 {isSerendipity && (
                   <p className="font-ui text-[13px] text-accent">
-                    Decouverte - article hors de vos sources habituelles.
+                    {t.article.serendipityDetail}
                   </p>
                 )}
               </div>

@@ -120,6 +120,7 @@ export default function LoginPage() {
         {/* Formulaire magic link */}
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input
+            id="login-email"
             type="email"
             placeholder="vous@exemple.com"
             value={email}
@@ -128,9 +129,14 @@ export default function LoginPage() {
             autoFocus
             disabled={loading}
             className="h-11 text-base"
+            aria-describedby={error ? 'login-error' : undefined}
           />
 
-          {error && <p className="font-ui text-xs text-destructive">{error}</p>}
+          {error && (
+            <p id="login-error" role="alert" className="font-ui text-xs text-destructive">
+              {error}
+            </p>
+          )}
 
           <Button type="submit" className="w-full h-11" disabled={loading || !email}>
             {loading ? 'Envoi en cours...' : 'Recevoir un lien magique'}

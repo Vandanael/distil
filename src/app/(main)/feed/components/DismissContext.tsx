@@ -1,0 +1,39 @@
+'use client'
+
+import { createContext, useContext, useState, useCallback } from 'react'
+
+type DismissContextValue = {
+  dismissedIds: Set<string>
+  dismissById: (id: string) => void
+  undoById: (id: string) => void
+}
+
+const DismissContext = createContext<DismissContextValue | null>(null)
+
+export function DismissProvider({ children }: { children: React.ReactNode }) {
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set())
+
+  const dismissById = useCallback((id: string) => {
+    setDismissedIds((prev) => new Set(prev).add(id))
+  }, [])
+
+  const undoById = useCallback((id: string) => {
+    setDismissedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+  }, [])
+
+  return (
+    <DismissContext.Provider value={{ dismissedIds, dismissById, undoById }}>
+      {children}
+    </DismissContext.Provider>
+  )
+}
+
+export function useDismissContext(): DismissContextValue {
+  const ctx = useContext(DismissContext)
+  if (!ctx) throw new Error('useDismissContext doit être utilisé dans un DismissProvider')
+  return ctx
+}

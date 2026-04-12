@@ -3,6 +3,7 @@ import { ArticleCard } from './components/ArticleCard'
 import { EmptyFeed } from './components/EmptyFeed'
 import { FeedShell } from './components/FeedShell'
 import { FeedHeader } from './components/FeedHeader'
+import { DismissProvider } from './components/DismissContext'
 
 export default async function FeedPage() {
   let articles: Array<{
@@ -77,31 +78,33 @@ export default async function FeedPage() {
       <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
 
       {/* Articles */}
-      <FeedShell className="space-y-8">
-        {articles.length === 0 ? (
-          <EmptyFeed />
-        ) : (
-          articles.map((a, i) => (
-            <ArticleCard
-              key={a.id}
-              id={a.id}
-              staggerIndex={i}
-              title={a.title}
-              siteName={a.site_name}
-              excerpt={a.excerpt}
-              readingTimeMinutes={a.reading_time_minutes}
-              score={showScores ? a.score : null}
-              justification={showScores ? a.justification : null}
-              isSerendipity={a.is_serendipity}
-              origin={a.origin}
-              scoredAt={a.scored_at}
-              wordCount={a.word_count}
-              ogImageUrl={a.og_image_url}
-              isRead={a.status === 'read'}
-            />
-          ))
-        )}
-      </FeedShell>
+      <DismissProvider>
+        <FeedShell className="space-y-8">
+          {articles.length === 0 ? (
+            <EmptyFeed />
+          ) : (
+            articles.map((a, i) => (
+              <ArticleCard
+                key={a.id}
+                id={a.id}
+                staggerIndex={i}
+                title={a.title}
+                siteName={a.site_name}
+                excerpt={a.excerpt}
+                readingTimeMinutes={a.reading_time_minutes}
+                score={showScores ? a.score : null}
+                justification={showScores ? a.justification : null}
+                isSerendipity={a.is_serendipity}
+                origin={a.origin}
+                scoredAt={a.scored_at}
+                wordCount={a.word_count}
+                ogImageUrl={a.og_image_url}
+                isRead={a.status === 'read'}
+              />
+            ))
+          )}
+        </FeedShell>
+      </DismissProvider>
     </div>
   )
 }

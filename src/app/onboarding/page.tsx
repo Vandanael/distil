@@ -6,7 +6,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg space-y-12">
         {/* En-tete */}
         <div className="space-y-5">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
+          <p className="font-ui text-xs uppercase tracking-wider text-accent">
             Personnalisation
           </p>
           <h1 className="font-heading text-5xl leading-tight text-foreground">

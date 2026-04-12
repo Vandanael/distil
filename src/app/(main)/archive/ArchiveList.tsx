@@ -60,12 +60,12 @@ export function ArchiveList({ articles }: Props) {
               </span>
             )}
             {a.reading_time_minutes && (
-              <span className="font-ui text-[11px] text-muted-foreground">
+              <span className="font-ui text-xs text-muted-foreground">
                 {a.reading_time_minutes} min
               </span>
             )}
             {a.archived_at && (
-              <span className="font-ui text-[11px] text-muted-foreground/60 ml-auto">
+              <span className="font-ui text-xs text-muted-foreground/60 ml-auto">
                 {formatArchivedDate(a.archived_at)}
               </span>
             )}
