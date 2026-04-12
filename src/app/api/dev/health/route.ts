@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+// Force Node.js runtime (pas Edge) pour avoir acces aux env vars
+export const runtime = 'nodejs'
+
 const REQUIRED_VARS = [
   // Supabase
   'NEXT_PUBLIC_SUPABASE_URL',
