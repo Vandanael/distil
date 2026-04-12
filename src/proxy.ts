@@ -1,13 +1,19 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Variables lues au runtime (pas inlinees par Next.js)
-const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
-const supabaseAnonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']
+function getEnv(key: string): string | undefined {
+  try {
+    return process.env[key]
+  } catch {
+    return undefined
+  }
+}
 
 export async function proxy(request: NextRequest) {
-  // Bypass auth en dev local (DEV_BYPASS_AUTH=true dans .env.local)
-  if (process.env.DEV_BYPASS_AUTH === 'true') {
+  const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL')
+  const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+
+  // Bypass auth en dev local
+  if (getEnv('DEV_BYPASS_AUTH') === 'true') {
     return NextResponse.next({ request })
   }
 
@@ -15,6 +21,9 @@ export async function proxy(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next({ request })
   }
+
+  // Import dynamique pour eviter le crash si les vars sont absentes
+  const { createServerClient } = await import('@supabase/ssr')
 
   let supabaseResponse = NextResponse.next({ request })
 
