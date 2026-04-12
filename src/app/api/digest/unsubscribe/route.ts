@@ -1,0 +1,70 @@
+/**
+ * GET /api/digest/unsubscribe?token=...
+ * Desactive le digest email en un clic depuis le lien email.
+ * Token = user_id encode en base64url (MVP solo, pas de signature).
+ */
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+export async function GET(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get('token')
+  if (!token) {
+    return new NextResponse(page('Lien invalide', 'Token manquant.'), {
+      status: 400,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    })
+  }
+
+  let userId: string
+  try {
+    userId = Buffer.from(token, 'base64url').toString('utf-8')
+  } catch {
+    return new NextResponse(page('Lien invalide', 'Token invalide.'), {
+      status: 400,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    })
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return new NextResponse(page('Erreur', 'Service indisponible.'), {
+      status: 503,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    })
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ digest_email: false })
+    .eq('id', userId)
+
+  if (error) {
+    return new NextResponse(page('Erreur', 'Impossible de mettre a jour vos preferences.'), {
+      status: 500,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    })
+  }
+
+  return new NextResponse(
+    page('Desabonne', 'Vous ne recevrez plus le digest Distil. Vous pouvez le reactiver dans vos preferences.'),
+    { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+  )
+}
+
+function page(title: string, message: string): string {
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} - Distil</title></head>
+<body style="margin:0;padding:40px 20px;background:#fbf9f4;font-family:-apple-system,system-ui,sans-serif;color:#1c3028;">
+  <div style="max-width:400px;margin:0 auto;text-align:center;">
+    <p style="font-size:20px;font-weight:700;color:#d94e1f;">Distil</p>
+    <h1 style="font-size:24px;margin:24px 0 8px;">${title}</h1>
+    <p style="font-size:14px;color:#587060;">${message}</p>
+  </div>
+</body>
+</html>`
+}
