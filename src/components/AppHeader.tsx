@@ -3,10 +3,21 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { NAV_ITEMS } from '@/lib/nav'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { LanguageToggle } from '@/components/LanguageToggle'
+import { useLocale } from '@/lib/i18n/context'
+
+const NAV_KEYS: Record<string, keyof ReturnType<typeof useLocale>['t']['nav']> = {
+  '/feed': 'feed',
+  '/archive': 'archive',
+  '/search': 'search',
+  '/profile': 'profile',
+}
 
 export function AppHeader() {
   const pathname = usePathname()
   const isArticle = pathname.startsWith('/article/')
+  const { t } = useLocale()
 
   return (
     <header
@@ -26,8 +37,9 @@ export function AppHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6" aria-label="Navigation principale">
-          {NAV_ITEMS.map(({ href, label }) => {
+          {NAV_ITEMS.map(({ href }) => {
             const active = pathname === href || (href !== '/feed' && pathname.startsWith(href + '/'))
+            const labelKey = NAV_KEYS[href]
             return (
               <Link
                 key={href}
@@ -39,11 +51,16 @@ export function AppHeader() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {label}
+                {labelKey ? t.nav[labelKey] : href}
               </Link>
             )
           })}
         </nav>
+
+        <div className="flex items-center gap-1">
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   )

@@ -4,6 +4,9 @@ import { Playfair_Display, Geist } from 'next/font/google'
 // Geist : tout le reste — UI, body, titres cartes, labels, logo
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
+import { cookies } from 'next/headers'
+import { LocaleProvider } from '@/lib/i18n/context'
+import type { Locale } from '@/lib/i18n/translations'
 import './globals.css'
 
 /* Titres d'articles en lecture : Playfair Display */
@@ -38,14 +41,18 @@ export const viewport: Viewport = {
   themeColor: '#1c3028',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const cookieStore = await cookies()
+  const localeCookie = cookieStore.get('locale')?.value
+  const initialLocale: Locale = localeCookie === 'en' ? 'en' : 'fr'
+
   return (
     <html
-      lang="fr"
+      lang={initialLocale}
       className={`${playfair.variable} ${geist.variable} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -57,8 +64,10 @@ export default function RootLayout({
           Passer au contenu
         </a>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          <Toaster position="bottom-center" />
+          <LocaleProvider initialLocale={initialLocale}>
+            {children}
+            <Toaster position="bottom-center" />
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

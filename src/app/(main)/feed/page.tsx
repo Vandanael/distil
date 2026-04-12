@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ArticleCard } from './components/ArticleCard'
 import { EmptyFeed } from './components/EmptyFeed'
 import { FeedShell } from './components/FeedShell'
+import { FeedHeader } from './components/FeedHeader'
 
 export default async function FeedPage() {
   let articles: Array<{
@@ -68,47 +68,13 @@ export default async function FeedPage() {
     }
   }
 
-  const today = new Date().toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  })
-
-  // Affiche les 3 premiers centres d'intérêt comme contexte
+  // Passe une date ISO pour que FeedHeader formate selon la locale client
+  const todayIso = new Date().toISOString()
   const topInterests = interests.slice(0, 3)
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 md:py-10 w-full">
-      {/* En-tête éditoriale */}
-      <div className="border-t-2 border-foreground mb-8 pt-3 space-y-1">
-        <div className="flex items-center justify-between">
-          <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
-          {lastRefreshAt && (
-            <span className="font-ui text-xs text-muted-foreground">
-              {new Date(lastRefreshAt).toLocaleTimeString('fr-FR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
-          )}
-        </div>
-        <div className="flex items-baseline justify-between gap-4">
-          <h1 className="font-ui text-[13px] text-foreground">
-            Votre veille du jour
-            {topInterests.length > 0 && (
-              <span className="text-muted-foreground">
-                {' '}— {topInterests.join(', ')}
-              </span>
-            )}
-          </h1>
-          <Link
-            href="/profile"
-            className="font-ui text-[11px] text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
-          >
-            Configurer
-          </Link>
-        </div>
-      </div>
+      <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
 
       {/* Articles */}
       <FeedShell className="space-y-8">

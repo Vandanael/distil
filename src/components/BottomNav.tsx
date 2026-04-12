@@ -3,6 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { NAV_ITEMS } from '@/lib/nav'
+import { useLocale } from '@/lib/i18n/context'
+
+const NAV_KEYS: Record<string, keyof ReturnType<typeof useLocale>['t']['nav']> = {
+  '/feed': 'feed',
+  '/archive': 'archive',
+  '/search': 'search',
+  '/profile': 'profile',
+}
 
 const ICONS: Record<string, (active: boolean) => React.ReactNode> = {
   '/feed': (active) => (
@@ -36,6 +44,7 @@ const ICONS: Record<string, (active: boolean) => React.ReactNode> = {
 
 export function BottomNav() {
   const pathname = usePathname()
+  const { t } = useLocale()
 
   // Masque sur les pages article (lecture immersive)
   if (pathname.startsWith('/article/')) return null
@@ -46,9 +55,10 @@ export function BottomNav() {
       aria-label="Navigation principale"
     >
       <div className="flex items-stretch h-14">
-        {NAV_ITEMS.map(({ href, label }) => {
+        {NAV_ITEMS.map(({ href }) => {
           const active = pathname === href || pathname.startsWith(href + '/')
           const icon = ICONS[href]
+          const labelKey = NAV_KEYS[href]
           return (
             <Link
               key={href}
@@ -59,7 +69,7 @@ export function BottomNav() {
               aria-current={active ? 'page' : undefined}
             >
               {icon?.(active)}
-              {label}
+              {labelKey ? t.nav[labelKey] : href}
             </Link>
           )
         })}

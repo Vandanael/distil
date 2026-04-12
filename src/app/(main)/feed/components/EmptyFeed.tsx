@@ -3,11 +3,13 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLocale } from '@/lib/i18n/context'
 
 type Phase = 'searching' | 'none' | 'error'
 
 export function EmptyFeed() {
   const router = useRouter()
+  const { t } = useLocale()
   const [phase, setPhase] = useState<Phase>('searching')
 
   useEffect(() => {
@@ -42,18 +44,12 @@ export function EmptyFeed() {
   if (phase === 'searching') {
     return (
       <div className="py-12 space-y-6">
-        <div className="space-y-1">
-          <div className="h-px w-full bg-border overflow-hidden">
-            <div className="h-px bg-accent animate-[progress_2s_ease-in-out_infinite]" style={{ width: '40%' }} />
-          </div>
+        <div className="h-px w-full bg-border overflow-hidden">
+          <div className="h-px bg-accent animate-[progress_2s_ease-in-out_infinite]" style={{ width: '40%' }} />
         </div>
         <div className="space-y-2">
-          <p className="font-ui text-sm text-foreground font-medium">
-            Distil cherche vos premiers articles...
-          </p>
-          <p className="font-body text-sm text-muted-foreground leading-relaxed">
-            L&apos;analyse prend quelques instants. La page se mettra a jour automatiquement.
-          </p>
+          <p className="font-ui text-sm text-foreground font-medium">{t.feed.searching}</p>
+          <p className="font-body text-sm text-muted-foreground leading-relaxed">{t.feed.searchingDetail}</p>
         </div>
       </div>
     )
@@ -62,33 +58,22 @@ export function EmptyFeed() {
   if (phase === 'error') {
     return (
       <div className="space-y-4 py-12">
-        <p className="font-ui text-sm text-foreground font-medium">
-          Impossible de charger les articles pour l&apos;instant.
-        </p>
+        <p className="font-ui text-sm text-foreground font-medium">{t.feed.errorTitle}</p>
         <p className="font-body text-sm text-muted-foreground">
-          Verifiez votre connexion et reessayez depuis votre{' '}
-          <Link href="/profile" className="text-accent hover:underline">
-            profil
-          </Link>
-          .
+          {t.feed.errorDetail}{' '}
+          <Link href="/profile" className="text-accent hover:underline">{t.feed.errorLink}</Link>.
         </p>
       </div>
     )
   }
 
-  // phase === 'none' : refresh OK mais 0 articles acceptes
   return (
     <div className="space-y-4 py-12">
-      <p className="font-ui text-sm text-foreground font-medium">
-        Aucun article pertinent trouve cette fois.
-      </p>
+      <p className="font-ui text-sm text-foreground font-medium">{t.feed.noneTitle}</p>
       <p className="font-body text-sm text-muted-foreground leading-relaxed">
-        Distil n&apos;a pas trouve d&apos;articles correspondant a votre profil lors de cette
-        recherche. Enrichissez vos{' '}
-        <Link href="/profile" className="text-accent hover:underline">
-          centres d&apos;interet
-        </Link>{' '}
-        ou ajoutez des sources pour ameliorer les resultats.
+        {t.feed.noneDetail}{' '}
+        <Link href="/profile" className="text-accent hover:underline">{t.feed.noneLink}</Link>{' '}
+        {t.feed.noneEnd}
       </p>
     </div>
   )

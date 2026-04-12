@@ -1,0 +1,19 @@
+'use client'
+
+import { useLocale } from '@/lib/i18n/context'
+
+export function LanguageToggle() {
+  const { locale, setLocale } = useLocale()
+
+  return (
+    <button
+      type="button"
+      onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
+      aria-label={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+      className="font-ui text-[11px] font-medium tracking-widest text-muted-foreground hover:text-foreground transition-colors px-1.5 py-0.5 border border-transparent hover:border-border"
+      data-testid="language-toggle"
+    >
+      {locale === 'fr' ? 'EN' : 'FR'}
+    </button>
+  )
+}
