@@ -125,8 +125,9 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      // Parse
-      const parsedResults = await Promise.allSettled(discovery.urls.map((url) => parseUrl(url)))
+      // Parse — plafond 20 URLs pour limiter les appels IA downstream
+      const urlsToProcess = discovery.urls.slice(0, 20)
+      const parsedResults = await Promise.allSettled(urlsToProcess.map((url) => parseUrl(url)))
       const candidates: ArticleCandidate[] = parsedResults
         .filter(
           (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>

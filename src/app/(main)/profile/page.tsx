@@ -64,12 +64,10 @@ export default async function ProfilePage() {
         <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
 
-      <ProfileForm profile={{ ...profile, language }} />
-
       {/* Ce que Distil recherche */}
       {searchQueries.length > 0 && (
         <div className="border-t border-border pt-8 space-y-3">
-          <p className="font-ui text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
             Ce que Distil recherche
           </p>
           <p className="font-body text-xs text-muted-foreground">
@@ -87,6 +85,8 @@ export default async function ProfilePage() {
           </ul>
         </div>
       )}
+
+      <ProfileForm profile={{ ...profile, language }} />
 
       <div className="border-t border-border pt-8 space-y-8">
         <PushSubscribe />

@@ -11,6 +11,7 @@ export default async function FeedPage() {
     excerpt: string | null
     reading_time_minutes: number | null
     score: number | null
+    justification: string | null
     is_serendipity: boolean
     origin: string
     scored_at: string | null
@@ -34,7 +35,7 @@ export default async function FeedPage() {
         supabase
           .from('articles')
           .select(
-            'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin, scored_at, word_count, og_image_url'
+            'id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, scored_at, word_count, og_image_url'
           )
           .eq('user_id', user.id)
           .in('status', ['accepted', 'read'])
@@ -65,7 +66,7 @@ export default async function FeedPage() {
         const { data } = await supabase
           .from('articles')
           .select(
-            'id, title, site_name, excerpt, reading_time_minutes, score, is_serendipity, origin, scored_at, word_count, og_image_url'
+            'id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, scored_at, word_count, og_image_url'
           )
           .eq('user_id', user.id)
           .in('status', ['accepted', 'read'])
@@ -152,6 +153,7 @@ export default async function FeedPage() {
               excerpt={a.excerpt}
               readingTimeMinutes={a.reading_time_minutes}
               score={showScores ? a.score : null}
+              justification={showScores ? a.justification : null}
               isSerendipity={a.is_serendipity}
               origin={a.origin}
               scoredAt={a.scored_at}

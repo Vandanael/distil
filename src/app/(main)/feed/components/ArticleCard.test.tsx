@@ -13,6 +13,7 @@ const BASE_PROPS = {
   excerpt: 'Un extrait court.',
   readingTimeMinutes: 4,
   score: 82,
+  justification: null,
   isSerendipity: false,
   origin: 'agent',
   scoredAt: null,

@@ -17,6 +17,7 @@ const MOCK_ARTICLES = [
       'Educated people are not necessarily better at reasoning — they may just be better at rationalising their preconceptions.',
     readingTimeMinutes: 8,
     score: 87,
+    justification: 'Correspond a vos interets en epistemologie et sciences cognitives. Densite editoriale elevee.',
     isSerendipity: false,
     origin: 'agent',
     scoredAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -31,10 +32,11 @@ const MOCK_ARTICLES = [
       'The relentless optimisation de time has made us more efficient and less human. A case for slowness.',
     readingTimeMinutes: 12,
     score: 61,
+    justification: null,
     isSerendipity: true,
     origin: 'agent',
     scoredAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
-    wordCount: null, // paywall demo
+    wordCount: null,
     ogImageUrl: null,
   },
   {
@@ -44,6 +46,7 @@ const MOCK_ARTICLES = [
     excerpt: 'Transformers, attention, tokenization — what matters for practitioners.',
     readingTimeMinutes: 5,
     score: 94,
+    justification: 'Source primaire, forte densite technique. Correspond a votre profil ML.',
     isSerendipity: false,
     origin: 'bookmarklet',
     scoredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
@@ -371,7 +374,7 @@ export function DevDashboard() {
 
           <div className="space-y-6 border border-border p-6">
             {MOCK_ARTICLES.map((a) => (
-              <ArticleCard key={a.id} {...a} score={showScores ? a.score : null} />
+              <ArticleCard key={a.id} {...a} score={showScores ? a.score : null} justification={showScores ? a.justification : null} />
             ))}
           </div>
         </section>

@@ -1,6 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ArticleCandidate, ScoredArticle, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
+import { scoreWithGroq } from './groq-api'
+import { scoreWithGemini } from './gemini-api'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 
@@ -21,6 +23,17 @@ export async function scoreWithMessagesApi(
   archivedTags: string[] = [],
   negativeExamples: string[] = []
 ): Promise<ScoredArticle[]> {
+  // Groq (gratuit, 14k req/jour, Llama 3.1 70B)
+  if (process.env.GROQ_API_KEY) {
+    return scoreWithGroq(profile, candidates, archivedTags, negativeExamples)
+  }
+
+  // Gemini Flash (gratuit avec billing activé)
+  if (process.env.GOOGLE_AI_API_KEY) {
+    return scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
+  }
+
+  // Fallback : Anthropic Haiku
   const client = new Anthropic()
 
   const message = await client.messages.create({
@@ -36,12 +49,8 @@ export async function scoreWithMessagesApi(
   })
 
   const text = message.content.find((b) => b.type === 'text')?.text ?? ''
-
-  // Extrait le JSON meme si le modele a ajoute du texte autour
   const match = text.match(/\{[\s\S]*\}/)
-  if (!match) {
-    throw new Error('Messages API: aucun JSON dans la reponse')
-  }
+  if (!match) throw new Error('Messages API: aucun JSON dans la reponse')
 
   const parsed: ApiResponse = JSON.parse(match[0])
 
