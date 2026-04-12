@@ -37,6 +37,9 @@ export function TagInput({ articleId, existingTags, onTagAdded, onClose }: Props
 
   return (
     <div
+      role="dialog"
+      aria-label="Ajouter un tag"
+      aria-modal="true"
       className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 border border-border bg-background px-3 py-2"
       data-testid="tag-input-container"
     >

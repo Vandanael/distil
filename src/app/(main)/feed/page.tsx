@@ -93,14 +93,14 @@ export default async function FeedPage() {
           )}
         </div>
         <div className="flex items-baseline justify-between gap-4">
-          <p className="font-ui text-[13px] text-foreground">
+          <h1 className="font-ui text-[13px] text-foreground">
             Votre veille du jour
             {topInterests.length > 0 && (
               <span className="text-muted-foreground">
                 {' '}— {topInterests.join(', ')}
               </span>
             )}
-          </p>
+          </h1>
           <Link
             href="/profile"
             className="font-ui text-[11px] text-muted-foreground/60 hover:text-accent transition-colors shrink-0"

@@ -1,9 +1,33 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { ReadingView } from './ReadingView'
 
 type Props = {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return { title: 'Article - Distil' }
+  }
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { title: 'Article - Distil' }
+
+  const { data } = await supabase
+    .from('articles')
+    .select('title, site_name, excerpt')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!data) return { title: 'Article - Distil' }
+  return {
+    title: data.title ? `${data.title} - Distil` : 'Article - Distil',
+    description: data.excerpt ?? (data.site_name ? `Lu sur ${data.site_name}` : undefined),
+  }
 }
 
 export default async function ArticlePage({ params }: Props) {

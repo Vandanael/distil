@@ -117,6 +117,13 @@
   100% { transform: translateX(200%); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[progress"] {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
 /* Sprint 20 : animation d'entree des cartes feed */
 @keyframes fadeSlideIn {
   from {
