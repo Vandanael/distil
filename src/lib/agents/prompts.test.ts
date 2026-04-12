@@ -21,6 +21,7 @@ const CANDIDATES: ArticleCandidate[] = [
     siteName: 'example.com',
     author: null,
     publishedAt: null,
+    wordCount: 8,
   },
 ]
 

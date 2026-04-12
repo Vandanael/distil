@@ -1,6 +1,20 @@
 import { Readability } from '@mozilla/readability'
 import { JSDOM } from 'jsdom'
+import DOMPurify from 'isomorphic-dompurify'
 import { fetchHtml } from './fetcher'
+
+const ALLOWED_TAGS = [
+  'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'a', 'img', 'ul', 'ol', 'li', 'blockquote',
+  'pre', 'code', 'em', 'strong', 'br', 'hr',
+  'figure', 'figcaption', 'picture', 'source',
+  'table', 'thead', 'tbody', 'tr', 'td', 'th',
+  'span', 'div', 'section', 'article',
+  'sup', 'sub', 'abbr', 'cite', 'mark', 'del', 'ins',
+  'dl', 'dt', 'dd', 'details', 'summary',
+]
+
+const ALLOWED_ATTR = ['href', 'src', 'alt', 'title', 'class', 'id', 'srcset', 'sizes', 'type', 'media']
 
 export type ParsedArticle = {
   url: string
@@ -54,7 +68,10 @@ export function parseHtml(html: string, url: string): ParsedArticle {
     author: article.byline ?? null,
     siteName: article.siteName ?? null,
     publishedAt: article.publishedTime ?? null,
-    contentHtml: article.content ?? '',
+    contentHtml: DOMPurify.sanitize(article.content ?? '', {
+      ALLOWED_TAGS,
+      ALLOWED_ATTR,
+    }),
     contentText,
     excerpt: article.excerpt ?? null,
     wordCount,

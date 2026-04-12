@@ -1,10 +1,11 @@
 /**
  * GET /api/digest/unsubscribe?token=...
  * Desactive le digest email en un clic depuis le lien email.
- * Token = user_id encode en base64url (MVP solo, pas de signature).
+ * Token = user_id encode en base64url + signature HMAC.
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { verifyUnsubscribeToken } from '@/lib/email/token'
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')
@@ -15,10 +16,8 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  let userId: string
-  try {
-    userId = Buffer.from(token, 'base64url').toString('utf-8')
-  } catch {
+  const userId = verifyUnsubscribeToken(token)
+  if (!userId) {
     return new NextResponse(page('Lien invalide', 'Token invalide.'), {
       status: 400,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },

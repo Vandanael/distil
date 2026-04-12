@@ -2,7 +2,7 @@ import Groq from 'groq-sdk'
 import type { ArticleCandidate, ScoredArticle, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
 
-const MODEL = 'llama-3.1-70b-versatile'
+const MODEL = 'llama-3.3-70b-versatile'
 
 type ApiResponse = {
   scored: Array<{
@@ -37,7 +37,12 @@ export async function scoreWithGroq(
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Groq: aucun JSON dans la reponse')
 
-  const parsed: ApiResponse = JSON.parse(match[0])
+  let parsed: ApiResponse
+  try {
+    parsed = JSON.parse(match[0])
+  } catch {
+    throw new Error(`Groq: JSON invalide: ${match[0].slice(0, 100)}`)
+  }
 
   return parsed.scored.map((item) => ({
     url: item.url,

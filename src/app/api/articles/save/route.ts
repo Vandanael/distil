@@ -155,6 +155,7 @@ export async function POST(request: Request) {
     siteName: parsed.siteName,
     author: parsed.author ?? null,
     publishedAt: parsed.publishedAt ?? null,
+    wordCount: parsed.wordCount,
   }
 
   // Scorer l'article

@@ -192,6 +192,7 @@ async function populateForUser(email: string) {
     siteName: p.siteName,
     author: p.author ?? null,
     publishedAt: p.publishedAt ?? null,
+    wordCount: p.wordCount,
   }))
 
   const scored = candidates.map((c) => {

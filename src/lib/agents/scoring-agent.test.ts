@@ -28,6 +28,7 @@ const CANDIDATES = [
     siteName: null,
     author: null,
     publishedAt: null,
+    wordCount: 2,
   },
   {
     url: 'https://example.com/2',
@@ -37,6 +38,7 @@ const CANDIDATES = [
     siteName: null,
     author: null,
     publishedAt: null,
+    wordCount: 2,
   },
 ]
 

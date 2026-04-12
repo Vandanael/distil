@@ -16,6 +16,7 @@ export type ArticleCandidate = {
   siteName: string | null
   author: string | null
   publishedAt: string | null
+  wordCount: number
 }
 
 export type ScoredArticle = {

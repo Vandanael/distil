@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendEmail } from '@/lib/email/send'
 import { buildDigestHtml, buildDigestText } from '@/lib/email/digest-template'
+import { signUnsubscribeToken } from '@/lib/email/token'
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Token de desabonnement = user id encode en base64 (suffisant pour MVP solo)
-      const unsubToken = Buffer.from(profile.id).toString('base64url')
+      const unsubToken = signUnsubscribeToken(profile.id)
       const unsubscribeUrl = `${appUrl}/api/digest/unsubscribe?token=${unsubToken}`
 
       const html = buildDigestHtml({ articles, appUrl, unsubscribeUrl, date })

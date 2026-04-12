@@ -58,18 +58,41 @@ export async function POST(request: Request) {
 
   const urls: string[] = (body as { urls: string[] }).urls.slice(0, 20)
 
-  // Charger le profil
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select(
-      'profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota'
-    )
-    .eq('id', user.id)
-    .single()
+  // Charger le profil + signaux feedback en parallele
+  const [profileResult, archivedResult, dismissedResult] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('articles')
+      .select('title, site_name')
+      .eq('user_id', user.id)
+      .eq('status', 'accepted')
+      .gte('updated_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
+      .limit(20),
+    supabase
+      .from('articles')
+      .select('title, site_name')
+      .eq('user_id', user.id)
+      .eq('rejection_reason', 'off_topic')
+      .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+      .limit(15),
+  ])
 
+  const profile = profileResult.data
   if (!profile) {
     return NextResponse.json({ error: 'Profil introuvable' }, { status: 404 })
   }
+
+  const archivedTags = (archivedResult.data ?? [])
+    .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+    .filter(Boolean)
+
+  const negativeExamples = (dismissedResult.data ?? [])
+    .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+    .filter(Boolean)
 
   const userProfile: UserProfile = {
     profileText: profile.profile_text ?? null,
@@ -92,23 +115,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Impossible de creer le run' }, { status: 500 })
   }
 
-  // Parser les URLs en parallele (echecs ignores individuellement)
-  const candidates: ArticleCandidate[] = (
-    await Promise.allSettled(urls.map((url) => parseUrl(url)))
+  // Parser les URLs en parallele — on conserve les resultats pour eviter un double-parse
+  const parseResults = await Promise.allSettled(urls.map((url) => parseUrl(url)))
+  const parsedByUrl = new Map(
+    parseResults
+      .filter(
+        (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
+          r.status === 'fulfilled'
+      )
+      .map((r) => [r.value.url, r.value])
   )
-    .filter(
-      (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
-        r.status === 'fulfilled'
-    )
-    .map((r) => ({
-      url: r.value.url,
-      title: r.value.title,
-      excerpt: r.value.excerpt,
-      contentText: r.value.contentText,
-      siteName: r.value.siteName,
-      author: r.value.author ?? null,
-      publishedAt: r.value.publishedAt ?? null,
-    }))
+
+  const candidates: ArticleCandidate[] = Array.from(parsedByUrl.values()).map((r) => ({
+    url: r.url,
+    title: r.title,
+    excerpt: r.excerpt,
+    contentText: r.contentText,
+    siteName: r.siteName,
+    author: r.author ?? null,
+    publishedAt: r.publishedAt ?? null,
+    wordCount: r.wordCount,
+  }))
 
   if (candidates.length === 0) {
     await supabase
@@ -124,23 +151,20 @@ export async function POST(request: Request) {
     })
   }
 
-  // Lancer le scoring
-  const result = await runScoringAgent({ profile: userProfile, candidates, runId: run.id })
+  // Lancer le scoring avec les signaux feedback
+  const result = await runScoringAgent({
+    profile: userProfile,
+    candidates,
+    runId: run.id,
+    archivedTags,
+    negativeExamples,
+  })
 
   // Persister les articles scores
   const accepted = result.scored.filter((a) => a.accepted)
   const rejected = result.scored.filter((a) => !a.accepted)
 
   if (result.scored.length > 0) {
-    // Trouver les articles parsés pour enrichir les données
-    const parsedByUrl = new Map(
-      (await Promise.allSettled(urls.map((url) => parseUrl(url))))
-        .filter(
-          (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
-            r.status === 'fulfilled'
-        )
-        .map((r) => [r.value.url, r.value])
-    )
 
     const { data: insertedArticles } = await supabase
       .from('articles')

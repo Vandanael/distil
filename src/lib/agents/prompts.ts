@@ -33,6 +33,10 @@ Fraicheur :
 - -10 pts si l'article date de plus de 18 mois ET porte sur un sujet d'actualite, technologique ou evenementiel
 - Exception : essais de fond, recherche fondamentale, references techniques intemporelles (ne pas penaliser)
 
+Longueur :
+- -15 pts si word_count < 250 : trop court pour etre substantiel (sauf format legitime : changelog, note de blog courte, poeme, fil de recherche)
+- +5 pts si word_count > 1500 : indice d'analyse en profondeur (ne pas surcorriger si le contenu reste creux)
+
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.`
 }
 
@@ -76,16 +80,26 @@ export function buildUserPrompt(
     `Serendipite : ${serendipityCount} articles hors-profil souhaites (quota ${Math.round(profile.serendipityQuota * 100)}%)`
   )
 
-  const candidatesJson = candidates.map((c, i) => ({
-    index: i,
-    url: c.url,
-    title: c.title,
-    site_name: c.siteName,
-    author: c.author ?? null,
-    published_at: c.publishedAt ?? null,
-    excerpt: c.excerpt,
-    content_preview: c.contentText.slice(0, 3500),
-  }))
+  const candidatesJson = candidates.map((c, i) => {
+    const text = c.contentText
+    // Pour les longs articles : debut + fin plutot que seulement le debut
+    const preview =
+      text.length <= 3500
+        ? text
+        : text.slice(0, 2500) + '\n[...]\n' + text.slice(-800)
+
+    return {
+      index: i,
+      url: c.url,
+      title: c.title,
+      site_name: c.siteName,
+      author: c.author ?? null,
+      published_at: c.publishedAt ?? null,
+      word_count: c.wordCount,
+      excerpt: c.excerpt,
+      content_preview: preview,
+    }
+  })
 
   return `PROFIL UTILISATEUR :
 ${profileLines.join('\n')}

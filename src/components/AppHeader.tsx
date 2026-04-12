@@ -2,13 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-const NAV_LINKS = [
-  { href: '/feed', label: 'Feed' },
-  { href: '/archive', label: 'Archives' },
-  { href: '/search', label: 'Recherche' },
-  { href: '/profile', label: 'Profil' },
-]
+import { NAV_ITEMS } from '@/lib/nav'
 
 export function AppHeader() {
   const pathname = usePathname()
@@ -32,7 +26,7 @@ export function AppHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6" aria-label="Navigation principale">
-          {NAV_LINKS.map(({ href, label }) => {
+          {NAV_ITEMS.map(({ href, label }) => {
             const active = pathname === href || (href !== '/feed' && pathname.startsWith(href + '/'))
             return (
               <Link

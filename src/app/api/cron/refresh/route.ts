@@ -65,13 +65,20 @@ export async function POST(req: NextRequest) {
         serendipityQuota: profile.serendipity_quota ?? 0.15,
       }
 
-      // URLs deja connues (7 derniers jours) + signaux negatifs
-      const [existingResult, dismissedResult] = await Promise.all([
+      // URLs deja connues (7 derniers jours) + signaux positifs + signaux negatifs
+      const [existingResult, archivedResult, dismissedResult] = await Promise.all([
         supabase
           .from('articles')
           .select('url')
           .eq('user_id', profile.id)
           .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+        supabase
+          .from('articles')
+          .select('title, site_name')
+          .eq('user_id', profile.id)
+          .eq('status', 'accepted')
+          .gte('updated_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
+          .limit(20),
         supabase
           .from('articles')
           .select('title, site_name')
@@ -82,6 +89,9 @@ export async function POST(req: NextRequest) {
       ])
 
       const knownUrls = (existingResult.data ?? []).map((a) => a.url)
+      const archivedTags = (archivedResult.data ?? [])
+        .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+        .filter(Boolean)
       const negativeExamples = (dismissedResult.data ?? [])
         .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
         .filter(Boolean)
@@ -141,6 +151,7 @@ export async function POST(req: NextRequest) {
           siteName: r.value.siteName,
           author: r.value.author ?? null,
           publishedAt: r.value.publishedAt ?? null,
+          wordCount: r.value.wordCount,
         }))
         .filter((c) => c.contentText.length > 200)
 
@@ -159,11 +170,12 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      // Score (avec signaux negatifs)
+      // Score (avec signaux positifs + negatifs)
       const scoringResult = await runScoringAgent({
         profile: userProfile,
         candidates,
         runId: run.id,
+        archivedTags,
         negativeExamples,
       })
 

@@ -45,7 +45,12 @@ export async function scoreWithGemini(
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Gemini: aucun JSON dans la reponse')
 
-  const parsed: ApiResponse = JSON.parse(match[0])
+  let parsed: ApiResponse
+  try {
+    parsed = JSON.parse(match[0])
+  } catch {
+    throw new Error(`Gemini: JSON invalide: ${match[0].slice(0, 100)}`)
+  }
 
   return parsed.scored.map((item) => ({
     url: item.url,

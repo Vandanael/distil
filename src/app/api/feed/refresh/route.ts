@@ -142,6 +142,7 @@ export async function POST() {
       siteName: r.value.siteName,
       author: r.value.author ?? null,
       publishedAt: r.value.publishedAt ?? null,
+      wordCount: r.value.wordCount,
     }))
     .filter((c) => c.contentText.length > 200) // filtre les pages sans contenu
 
