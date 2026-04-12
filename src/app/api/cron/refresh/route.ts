@@ -12,13 +12,10 @@ import { parseUrl } from '@/lib/parsing/readability'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
 import { sendPushNotification } from '@/lib/push/send'
 import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
+import { verifyCronSecret } from '@/lib/auth/cron'
 
 export async function POST(req: NextRequest) {
-  // Verifier le secret cron
-  const authHeader = req.headers.get('authorization')
-  const secret = process.env.CRON_SECRET
-
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (!verifyCronSecret(req.headers.get('authorization'))) {
     return NextResponse.json({ error: 'Non autorise' }, { status: 401 })
   }
 

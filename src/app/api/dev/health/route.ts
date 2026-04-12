@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { verifyCronSecret } from '@/lib/auth/cron'
 
 // Force Node.js runtime (pas Edge) pour avoir acces aux env vars
 export const runtime = 'nodejs'
@@ -23,9 +24,7 @@ const REQUIRED_VARS = [
 ] as const
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization')
-  const secret = process.env.CRON_SECRET
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (!verifyCronSecret(request.headers.get('authorization'))) {
     return NextResponse.json({ error: 'Non autorise' }, { status: 401 })
   }
 

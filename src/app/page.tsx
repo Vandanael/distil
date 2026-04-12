@@ -4,9 +4,9 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { StartScreen } from './StartScreen'
 
 export default async function RootPage() {
-  // Dev : bypass auth
+  // Dev : bypass auth (uniquement en developpement local)
   if (
-    process.env.DEV_BYPASS_AUTH === 'true' ||
+    (process.env.NODE_ENV === 'development' && process.env.DEV_BYPASS_AUTH === 'true') ||
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {

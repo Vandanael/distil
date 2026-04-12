@@ -8,12 +8,10 @@ import { createClient } from '@supabase/supabase-js'
 import { sendEmail } from '@/lib/email/send'
 import { buildDigestHtml, buildDigestText } from '@/lib/email/digest-template'
 import { signUnsubscribeToken } from '@/lib/email/token'
+import { verifyCronSecret } from '@/lib/auth/cron'
 
 export async function POST(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  const secret = process.env.CRON_SECRET
-
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (!verifyCronSecret(req.headers.get('authorization'))) {
     return NextResponse.json({ error: 'Non autorise' }, { status: 401 })
   }
 

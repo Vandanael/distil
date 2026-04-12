@@ -110,6 +110,21 @@ export async function POST(request: Request) {
     )
   }
 
+  // Valider l'URL : HTTPS uniquement, pas d'IPs privees (SSRF)
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'https:') throw new Error()
+    const h = parsed.hostname
+    if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h) || h === '::1') {
+      throw new Error()
+    }
+  } catch {
+    return NextResponse.json(
+      { error: 'URL invalide : HTTPS public uniquement' },
+      { status: 400, headers: CORS_HEADERS }
+    )
+  }
+
   // Parser l'URL
   let parsed: Awaited<ReturnType<typeof parseUrl>>
   try {

@@ -12,9 +12,10 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const runId = searchParams.get('runId')
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-  if (!runId) {
-    return NextResponse.json({ error: 'runId requis' }, { status: 400 })
+  if (!runId || !UUID_RE.test(runId)) {
+    return NextResponse.json({ error: 'runId invalide' }, { status: 400 })
   }
 
   const cookieStore = await cookies()

@@ -4,8 +4,8 @@ import { AppHeader } from '@/components/AppHeader'
 import { BottomNav } from '@/components/BottomNav'
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  // Bypass auth en dev local
-  if (process.env.DEV_BYPASS_AUTH === 'true') {
+  // Bypass auth en dev local uniquement
+  if (process.env.NODE_ENV === 'development' && process.env.DEV_BYPASS_AUTH === 'true') {
     return <AppShell>{children}</AppShell>
   }
 

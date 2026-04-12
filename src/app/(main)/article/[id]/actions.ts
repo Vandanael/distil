@@ -93,7 +93,8 @@ export async function addTag(articleId: string, tagName: string): Promise<void> 
   if (!user) return
 
   const normalized = tagName.trim().toLowerCase()
-  if (!normalized) return
+  if (!normalized || normalized.length > 50) return
+  if (!/^[\p{L}\p{N}\s\-_]+$/u.test(normalized)) return
 
   // Upsert tag
   const { data: tag } = await supabase
