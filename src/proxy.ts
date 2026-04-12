@@ -1,22 +1,26 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Variables lues au runtime (pas inlinees par Next.js)
+const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+const supabaseAnonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']
+
 export async function proxy(request: NextRequest) {
   // Bypass auth en dev local (DEV_BYPASS_AUTH=true dans .env.local)
   if (process.env.DEV_BYPASS_AUTH === 'true') {
     return NextResponse.next({ request })
   }
 
-  // Sans credentials Supabase (dev sans .env.local), on laisse passer
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  // Sans credentials Supabase, on laisse passer
+  if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next({ request })
   }
 
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
