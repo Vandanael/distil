@@ -32,6 +32,7 @@ export function LocaleProvider({
     if (!initialLocale) {
       const match = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/)
       const stored = match?.[1]
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (stored === 'fr' || stored === 'en') setLocaleState(stored)
     }
   }, [initialLocale])

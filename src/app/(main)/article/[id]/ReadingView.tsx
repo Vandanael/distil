@@ -7,6 +7,8 @@ import { HighlightPopover } from './components/HighlightPopover'
 import { FloatingActionBar } from './components/FloatingActionBar'
 import { ScoringPanel } from './components/ScoringPanel'
 import { ReadingProgress } from './components/ReadingProgress'
+import { SaveOfflineButton } from './components/SaveOfflineButton'
+import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
 
 type Props = {
   id: string
@@ -47,10 +49,25 @@ export function ReadingView({
   const [pendingHighlight, setPendingHighlight] = useState<{ id: string; text: string } | null>(
     null
   )
+  const isOnline = useOnlineStatus()
 
   useEffect(() => {
     markAsRead(id)
   }, [id])
+
+  // Raccourci clavier h : focus sur le contenu pour faciliter la selection et le highlight
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const tag = (document.activeElement?.tagName ?? '').toLowerCase()
+      if (tag === 'input' || tag === 'textarea' || document.activeElement?.hasAttribute('contenteditable')) return
+      if (e.key === 'h') {
+        e.preventDefault()
+        contentRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   const publishedDate = publishedAt
     ? new Date(publishedAt).toLocaleDateString('fr-FR', {
@@ -63,20 +80,30 @@ export function ReadingView({
   return (
     <>
       <ReadingProgress />
+      {!isOnline && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed top-0 left-0 right-0 z-50 bg-muted border-b border-border py-1.5 text-center font-ui text-xs text-muted-foreground"
+        >
+          Vous etes hors-ligne - certaines actions sont desactivees
+        </div>
+      )}
       {/* Layout desktop : contenu decale a droite avec marge editoriale */}
       <div className="w-full max-w-4xl mx-auto px-4 py-8 pb-32 md:py-12 md:pb-32">
         <div className="md:grid md:grid-cols-[1fr_minmax(0,640px)] md:gap-0">
           {/* Colonne gauche desktop : navigation sticky */}
           <div className="hidden md:block pt-1">
-            <div className="sticky top-20">
+            <div className="sticky top-20 space-y-3">
               <Link
                 href="/feed"
                 aria-label="Retour au feed"
-                className="font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
+                className="block font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
                 data-testid="back-to-feed"
               >
                 &larr; Feed
               </Link>
+              <SaveOfflineButton articleId={id} />
             </div>
           </div>
 
@@ -132,6 +159,7 @@ export function ReadingView({
                 ref={contentRef}
                 className="prose max-w-none font-body text-foreground article-prose"
                 data-testid="article-content"
+                tabIndex={-1}
                 dangerouslySetInnerHTML={{ __html: contentHtml }}
               />
             ) : (

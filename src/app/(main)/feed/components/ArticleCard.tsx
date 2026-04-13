@@ -313,7 +313,7 @@ export function ArticleCard({
             type="button"
             onClick={handlePositiveSignal}
             disabled={positiveSignalSent}
-            aria-label="Plus comme ca"
+            aria-label="Plus comme ça"
             data-testid={`signal-${id}`}
             className="font-ui text-[13px] text-muted-foreground/60 transition-colors p-1.5 hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
             title="Plus comme ca"

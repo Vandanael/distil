@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     // Netlify generated files
     '.netlify/**',
+    // Git worktrees Claude Code
+    '.claude/**',
   ]),
 ])
 

@@ -51,6 +51,7 @@ const COPY = {
     examplesSubtitle: 'Cliquez sur un thème pour voir à quoi ressemble votre sélection du jour.',
     feedTitle: 'Dans le flux ce matin',
     feedSub: 'Extrait de veilles actives',
+    feedEmpty: 'Distil analyse le web en ce moment. Revenez dans quelques minutes.',
     serendipity: 'Découverte',
     relevance: 'Pertinence',
     noTitle: 'Sans titre',
@@ -65,6 +66,7 @@ const COPY = {
     examplesSubtitle: 'Click a topic to see what your daily selection looks like.',
     feedTitle: 'In the feed this morning',
     feedSub: 'From active feeds',
+    feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',
     serendipity: 'Discovery',
     relevance: 'Relevance',
     noTitle: 'No title',
@@ -204,25 +206,31 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
         </div>
 
         {/* Aperçu du flux */}
-        {articles.length > 0 && (
-          <div>
-            <div className="border-t-2 border-foreground pt-3 mb-0">
-              <div className="flex items-baseline justify-between">
-                <p className="font-ui text-[13px] text-foreground font-medium">
-                  {t.feedTitle}
-                </p>
+        <div>
+          <div className="border-t-2 border-foreground pt-3 mb-0">
+            <div className="flex items-baseline justify-between">
+              <p className="font-ui text-[13px] text-foreground font-medium">
+                {t.feedTitle}
+              </p>
+              {articles.length > 0 && (
                 <p className="font-ui text-xs text-muted-foreground/60">
                   {t.feedSub}
                 </p>
-              </div>
+              )}
             </div>
+          </div>
+          {articles.length > 0 ? (
             <div>
               {articles.map((article, i) => (
                 <ArticlePreview key={article.url ?? String(i)} article={article} lang={lang} />
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="font-body text-[13px] text-muted-foreground italic py-4">
+              {t.feedEmpty}
+            </p>
+          )}
+        </div>
       </div>
     </main>
   )

@@ -65,6 +65,32 @@ export async function toggleDigestEmail(enabled: boolean) {
   revalidatePath('/profile')
 }
 
+export async function updatePinnedSources(urls: string[]): Promise<{ added: number; total: number }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Non authentifie')
+
+  const { data: current } = await supabase
+    .from('profiles')
+    .select('pinned_sources')
+    .eq('id', user.id)
+    .single()
+
+  const existing: string[] = current?.pinned_sources ?? []
+  const merged = Array.from(new Set([...existing, ...urls])).slice(0, 50)
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ pinned_sources: merged })
+    .eq('id', user.id)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/profile')
+  return { added: merged.length - existing.length, total: merged.length }
+}
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()

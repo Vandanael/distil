@@ -9,6 +9,7 @@ import { listApiTokens } from './token-actions'
 import { buildSearchQueries } from '@/lib/agents/discovery-agent'
 import { signOut } from './actions'
 import { DigestToggle } from './DigestToggle'
+import { OPMLImport } from './OPMLImport'
 
 export default async function ProfilePage() {
   if (
@@ -100,6 +101,12 @@ export default async function ProfilePage() {
         language,
       }} />
 
+      {/* Import OPML */}
+      <div className="border-t border-border pt-8 space-y-4">
+        <p className="font-ui text-xs text-accent">Sources RSS</p>
+        <OPMLImport />
+      </div>
+
       {/* Navigation secondaire */}
       <div className="border-t border-border pt-8 space-y-3">
         <Link href="/archive" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
@@ -123,7 +130,7 @@ export default async function ProfilePage() {
         <DigestToggle enabled={profile.digest_email ?? false} />
         <TokensSection tokens={tokens} />
         <p className="font-ui text-xs text-muted-foreground">
-          Raccourcis clavier : j/k naviguer, Enter ouvrir, d rejeter, Esc retour
+          Raccourcis clavier : j/k naviguer, Enter ouvrir, d rejeter, Esc retour, h highlight (dans un article)
         </p>
       </div>
 

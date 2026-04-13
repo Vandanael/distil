@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { archiveArticle } from '../actions'
 import { NoteEditor } from './NoteEditor'
 import { TagInput } from './TagInput'
+import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
 
 type Props = {
   articleId: string
@@ -24,6 +25,7 @@ export function FloatingActionBar({
   const [tags, setTags] = useState<string[]>([])
   const [archived, setArchived] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const isOnline = useOnlineStatus()
 
   async function handleShare() {
     const shareData = { title: articleTitle ?? 'Article Distil', url: articleUrl }
@@ -83,10 +85,11 @@ export function FloatingActionBar({
           <button
             type="button"
             onClick={() => void handleShare()}
-            className="text-muted-foreground transition-colors hover:text-foreground p-1"
+            disabled={!isOnline}
+            className="text-muted-foreground transition-colors hover:text-foreground p-1 disabled:opacity-40"
             data-testid="action-share"
             aria-label="Partager"
-            title="Partager"
+            title={isOnline ? 'Partager' : 'Non disponible hors-ligne'}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           </button>
@@ -96,9 +99,11 @@ export function FloatingActionBar({
               setShowNote(true)
               setShowTag(false)
             }}
-            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
+            disabled={!isOnline}
+            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-note"
             aria-label="Ajouter une note"
+            title={isOnline ? undefined : 'Non disponible hors-ligne'}
           >
             Note
           </button>
@@ -108,9 +113,11 @@ export function FloatingActionBar({
               setShowTag(true)
               setShowNote(false)
             }}
-            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground"
+            disabled={!isOnline}
+            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-tag"
             aria-label="Ajouter un tag"
+            title={isOnline ? undefined : 'Non disponible hors-ligne'}
           >
             Tag
           </button>
@@ -131,10 +138,11 @@ export function FloatingActionBar({
         <button
           type="button"
           onClick={handleArchive}
-          disabled={isPending}
+          disabled={isPending || !isOnline}
           className="font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
           data-testid="action-archive"
           aria-label="Archiver cet article"
+          title={isOnline ? undefined : 'Non disponible hors-ligne'}
         >
           {isPending ? '...' : 'Archiver'}
         </button>

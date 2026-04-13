@@ -19,7 +19,7 @@ export function StepRecap({ interests, sources, dailyCap, serendipityQuota }: Pr
 
       {interests.length === 0 && sources.length === 0 && (
         <p className="font-body text-sm text-muted-foreground border-l-2 border-accent pl-3">
-          Aucun centre d'intérêt ni source définis. Distil aura du mal à personnaliser votre feed.
+          {'Aucun centre d\'intérêt ni source définis. Distil aura du mal à personnaliser votre feed.'}
         </p>
       )}
 
