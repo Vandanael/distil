@@ -4,6 +4,7 @@
  */
 import { JSDOM } from 'jsdom'
 import type { UserProfile } from './types'
+export { buildSearchQueries } from './profile-queries'
 
 const MAX_URLS_PER_RUN = 30
 
@@ -318,28 +319,3 @@ export async function runDiscoveryAgent(
   return { urls: Array.from(discovered), durationMs: Date.now() - start, error }
 }
 
-/**
- * Retourne les sources et sujets suivis (affichage profil).
- */
-export function buildSearchQueries(profile: UserProfile): string[] {
-  const language = (profile.profileStructured as Record<string, unknown> | null)
-    ?.language as string | undefined
-
-  const effectiveSources =
-    profile.pinnedSources.length >= 2
-      ? profile.pinnedSources
-      : language === 'fr'
-        ? DEFAULT_SOURCES_FR
-        : language === 'en'
-          ? DEFAULT_SOURCES_EN
-          : DEFAULT_SOURCES_BOTH
-
-  const lines: string[] = []
-  for (const s of effectiveSources.slice(0, 5)) {
-    lines.push(`RSS ${normalizeDomain(s)}`)
-  }
-  for (const topic of profile.interests.slice(0, 3)) {
-    lines.push(`Sujet : ${topic}`)
-  }
-  return lines
-}
