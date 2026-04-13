@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['jsdom'],
   devIndicators: false,
   compress: true,
   async headers() {
