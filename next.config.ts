@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     viewTransition: true,
-    optimizePackageImports: ['sonner', 'lucide-react'],
+    optimizePackageImports: ['sonner'],
   },
   images: {
     remotePatterns: [
