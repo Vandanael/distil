@@ -126,4 +126,25 @@ describe('buildUserPrompt', () => {
     expect(prompt).toContain('PM senior')
     expect(prompt).not.toContain('archives recemment')
   })
+
+  it('inclut les exemples negatifs dans le prompt', () => {
+    const prompt = buildUserPrompt(PROFILE, CANDIDATES, [], [
+      'crypto spam - spamsite.com',
+      'NFT news - nftdaily.io',
+    ])
+    expect(prompt).toContain('crypto spam - spamsite.com')
+    expect(prompt).toContain('nftdaily.io')
+    expect(prompt).toContain('penalite')
+    expect(prompt).not.toContain('obligatoire')
+  })
+
+  it('sans exemples negatifs, pas de section rejet', () => {
+    const prompt = buildUserPrompt(PROFILE, CANDIDATES, [], [])
+    expect(prompt).not.toContain('explicitement rejetes')
+  })
+
+  it('fonctionne sans le 4eme argument negativeExamples', () => {
+    const prompt = buildUserPrompt(PROFILE, CANDIDATES, [])
+    expect(prompt).not.toContain('explicitement rejetes')
+  })
 })

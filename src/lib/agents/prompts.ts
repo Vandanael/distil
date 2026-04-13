@@ -76,7 +76,7 @@ export function buildUserPrompt(
 
   if (negativeExamples.length > 0) {
     profileLines.push(
-      `Sujets explicitement rejetes comme HORS SUJET par l'utilisateur (score < 20, accepted = false obligatoire) : ${negativeExamples.join(' | ')}`
+      `Sujets explicitement rejetes par l'utilisateur comme hors sujet (penalite de -30 a -40 pts ; ne pas forcer accepted=false si l'article reste pertinent par ailleurs) : ${negativeExamples.join(' | ')}`
     )
   }
 
