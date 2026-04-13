@@ -1,5 +1,7 @@
 import type { UserProfile, ArticleCandidate } from './types'
 
+export const PROMPT_VERSION = '2026-04-13.1'
+
 export function buildSystemPrompt(): string {
   return `Tu es l'agent de scoring de Distil, une veille intelligente.
 Ton role : evaluer des articles candidats par rapport au profil d'un utilisateur et retourner un scoring JSON strict.

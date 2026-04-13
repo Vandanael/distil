@@ -28,6 +28,11 @@ export type ScoredArticle = {
   accepted: boolean
 }
 
+export type ScoringFunctionResult = {
+  scored: ScoredArticle[]
+  modelUsed: string
+}
+
 export type ScoringRequest = {
   profile: UserProfile
   candidates: ArticleCandidate[]
@@ -40,6 +45,8 @@ export type ScoringResult = {
   runId: string
   scored: ScoredArticle[]
   agentType: 'managed' | 'messages'
+  modelUsed: string | null
+  promptVersion: string
   durationMs: number
   error: string | null
 }

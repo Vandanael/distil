@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildSystemPrompt, buildUserPrompt } from './prompts'
+import { buildSystemPrompt, buildUserPrompt, PROMPT_VERSION } from './prompts'
 import type { UserProfile, ArticleCandidate } from './types'
 
 const PROFILE: UserProfile = {
@@ -24,6 +24,12 @@ const CANDIDATES: ArticleCandidate[] = [
     wordCount: 8,
   },
 ]
+
+describe('PROMPT_VERSION', () => {
+  it('suit le format YYYY-MM-DD.N', () => {
+    expect(PROMPT_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}\.\d+$/)
+  })
+})
 
 describe('buildSystemPrompt', () => {
   it('contient les regles de scoring', () => {

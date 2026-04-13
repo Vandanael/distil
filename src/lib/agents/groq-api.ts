@@ -1,5 +1,5 @@
 import Groq from 'groq-sdk'
-import type { ArticleCandidate, ScoredArticle, UserProfile } from './types'
+import type { ArticleCandidate, ScoringFunctionResult, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
 
 const MODEL = 'llama-3.3-70b-versatile'
@@ -20,7 +20,7 @@ export async function scoreWithGroq(
   candidates: ArticleCandidate[],
   archivedTags: string[] = [],
   negativeExamples: string[] = []
-): Promise<ScoredArticle[]> {
+): Promise<ScoringFunctionResult> {
   const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
   const completion = await client.chat.completions.create({
@@ -47,12 +47,15 @@ export async function scoreWithGroq(
     throw new Error(`Groq: JSON invalide: ${match[0].slice(0, 100)}`)
   }
 
-  return parsed.scored.map((item) => ({
-    url: item.url,
-    score: item.score,
-    justification: item.justification,
-    isSerendipity: item.is_serendipity,
-    rejectionReason: item.rejection_reason,
-    accepted: item.accepted,
-  }))
+  return {
+    scored: parsed.scored.map((item) => ({
+      url: item.url,
+      score: item.score,
+      justification: item.justification,
+      isSerendipity: item.is_serendipity,
+      rejectionReason: item.rejection_reason,
+      accepted: item.accepted,
+    })),
+    modelUsed: MODEL,
+  }
 }

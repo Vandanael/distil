@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import type { ArticleCandidate, ScoredArticle, UserProfile } from './types'
+import type { ArticleCandidate, ScoringFunctionResult, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
 
 // gemini-2.5-flash : ~$0.15/1M tokens input, seul modele avec quota actif
@@ -23,7 +23,7 @@ export async function scoreWithGemini(
   candidates: ArticleCandidate[],
   archivedTags: string[] = [],
   negativeExamples: string[] = []
-): Promise<ScoredArticle[]> {
+): Promise<ScoringFunctionResult> {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
   const model = genAI.getGenerativeModel({
     model: MODEL,
@@ -52,12 +52,15 @@ export async function scoreWithGemini(
     throw new Error(`Gemini: JSON invalide: ${match[0].slice(0, 100)}`)
   }
 
-  return parsed.scored.map((item) => ({
-    url: item.url,
-    score: item.score,
-    justification: item.justification,
-    isSerendipity: item.is_serendipity,
-    rejectionReason: item.rejection_reason,
-    accepted: item.accepted,
-  }))
+  return {
+    scored: parsed.scored.map((item) => ({
+      url: item.url,
+      score: item.score,
+      justification: item.justification,
+      isSerendipity: item.is_serendipity,
+      rejectionReason: item.rejection_reason,
+      accepted: item.accepted,
+    })),
+    modelUsed: MODEL,
+  }
 }

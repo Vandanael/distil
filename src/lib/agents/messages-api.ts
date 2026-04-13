@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import type { ArticleCandidate, ScoredArticle, UserProfile } from './types'
+import type { ArticleCandidate, ScoringFunctionResult, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
 import { scoreWithGroq } from './groq-api'
 import { scoreWithGemini } from './gemini-api'
@@ -22,7 +22,7 @@ export async function scoreWithMessagesApi(
   candidates: ArticleCandidate[],
   archivedTags: string[] = [],
   negativeExamples: string[] = []
-): Promise<ScoredArticle[]> {
+): Promise<ScoringFunctionResult> {
   // Groq (gratuit, 14k req/jour, Llama 3.1 70B)
   if (process.env.GROQ_API_KEY) {
     return scoreWithGroq(profile, candidates, archivedTags, negativeExamples)
@@ -59,12 +59,15 @@ export async function scoreWithMessagesApi(
     throw new Error(`Messages API: JSON invalide: ${match[0].slice(0, 100)}`)
   }
 
-  return parsed.scored.map((item) => ({
-    url: item.url,
-    score: item.score,
-    justification: item.justification,
-    isSerendipity: item.is_serendipity,
-    rejectionReason: item.rejection_reason,
-    accepted: item.accepted,
-  }))
+  return {
+    scored: parsed.scored.map((item) => ({
+      url: item.url,
+      score: item.score,
+      justification: item.justification,
+      isSerendipity: item.is_serendipity,
+      rejectionReason: item.rejection_reason,
+      accepted: item.accepted,
+    })),
+    modelUsed: MODEL,
+  }
 }

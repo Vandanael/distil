@@ -7,7 +7,7 @@ vi.mock('./messages-api', () => ({
 
 import { runScoringAgent } from './scoring-agent'
 import { scoreWithMessagesApi } from './messages-api'
-import type { ScoringRequest, ScoredArticle } from './types'
+import type { ScoringRequest, ScoredArticle, ScoringFunctionResult } from './types'
 
 const PROFILE = {
   profileText: 'PM senior',
@@ -42,24 +42,27 @@ const CANDIDATES = [
   },
 ]
 
-const MOCK_RESULTS: ScoredArticle[] = [
-  {
-    url: 'https://example.com/1',
-    score: 80,
-    justification: 'Tres pertinent',
-    isSerendipity: false,
-    rejectionReason: null,
-    accepted: true,
-  },
-  {
-    url: 'https://example.com/2',
-    score: 20,
-    justification: 'Hors sujet',
-    isSerendipity: false,
-    rejectionReason: 'Sujet non lie au profil',
-    accepted: false,
-  },
-]
+const MOCK_RESULTS: ScoringFunctionResult = {
+  scored: [
+    {
+      url: 'https://example.com/1',
+      score: 80,
+      justification: 'Tres pertinent',
+      isSerendipity: false,
+      rejectionReason: null,
+      accepted: true,
+    },
+    {
+      url: 'https://example.com/2',
+      score: 20,
+      justification: 'Hors sujet',
+      isSerendipity: false,
+      rejectionReason: 'Sujet non lie au profil',
+      accepted: false,
+    },
+  ],
+  modelUsed: 'test-model',
+}
 
 const REQUEST: ScoringRequest = {
   profile: PROFILE,
