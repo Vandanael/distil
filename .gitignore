@@ -61,5 +61,11 @@ supabase/.temp/
 .netlify
 deno.lock
 
+# Playwright MCP (logs de session locale)
+.playwright-mcp/
+
+# Screenshots de session (captures MCP)
+docs/screenshots/
+
 # Claude Code (local config, skills, commands)
 .claude/
