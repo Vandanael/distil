@@ -1,4 +1,5 @@
 import { Readability } from '@mozilla/readability'
+import { parseHTML } from 'linkedom'
 import DOMPurify from 'isomorphic-dompurify'
 import { fetchHtml } from './fetcher'
 
@@ -33,13 +34,19 @@ const WORDS_PER_MINUTE = 238
 
 export async function parseUrl(url: string): Promise<ParsedArticle> {
   const html = await fetchHtml(url)
-  return await parseHtml(html, url)
+  return parseHtml(html, url)
 }
 
-export async function parseHtml(html: string, url: string): Promise<ParsedArticle> {
-  const { JSDOM } = await import('jsdom')
-  const dom = new JSDOM(html, { url })
-  const reader = new Readability(dom.window.document)
+export function parseHtml(html: string, url: string): ParsedArticle {
+  const { document } = parseHTML(html)
+  // linkedom ne supporte pas location sur document - on le simule pour Readability
+  Object.defineProperty(document, 'location', {
+    value: { href: url },
+    writable: true,
+    configurable: true,
+  })
+
+  const reader = new Readability(document as unknown as Document)
   const article = reader.parse()
 
   if (!article) {
@@ -51,15 +58,9 @@ export async function parseHtml(html: string, url: string): Promise<ParsedArticl
   const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE))
 
   const ogImageUrl =
-    dom.window.document
-      .querySelector('meta[property="og:image:secure_url"]')
-      ?.getAttribute('content') ??
-    dom.window.document
-      .querySelector('meta[property="og:image"]')
-      ?.getAttribute('content') ??
-    dom.window.document
-      .querySelector('meta[name="twitter:image"]')
-      ?.getAttribute('content') ??
+    document.querySelector('meta[property="og:image:secure_url"]')?.getAttribute('content') ??
+    document.querySelector('meta[property="og:image"]')?.getAttribute('content') ??
+    document.querySelector('meta[name="twitter:image"]')?.getAttribute('content') ??
     null
 
   return {

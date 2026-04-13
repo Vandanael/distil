@@ -236,19 +236,15 @@ async function fetchRssUrls(feedUrl: string): Promise<string[]> {
     if (!res.ok) return []
 
     const xml = await res.text()
-    const { JSDOM } = await import('jsdom')
-    const dom = new JSDOM(xml, { contentType: 'text/xml' })
-    const doc = dom.window.document
     const urls: string[] = []
 
-    for (const item of doc.querySelectorAll('item')) {
-      const url = item.querySelector('link')?.textContent?.trim()
-      if (url) urls.push(url)
+    // RSS 2.0 : <link>https://...</link> (hors balises CDATA channel)
+    for (const m of xml.matchAll(/<item[\s\S]*?<link>([^<]+)<\/link>/g)) {
+      urls.push(m[1].trim())
     }
-
-    for (const entry of doc.querySelectorAll('entry')) {
-      const url = entry.querySelector('link[href]')?.getAttribute('href')
-      if (url) urls.push(url)
+    // Atom : <link href="https://..." />
+    for (const m of xml.matchAll(/<link[^>]+href="([^"]+)"/g)) {
+      urls.push(m[1].trim())
     }
 
     return urls.filter((u) => {
