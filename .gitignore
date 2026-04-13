@@ -69,3 +69,6 @@ docs/screenshots/
 
 # Claude Code (local config, skills, commands)
 .claude/
+
+# Lighthouse temp Chrome profiles (Windows paths via WSL2)
+C:\\Users\\
