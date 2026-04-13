@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -50,6 +51,9 @@ export default function LoginPage() {
   if (sent) {
     return (
       <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
+        <div className="fixed top-3 right-3">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-sm space-y-6">
           <div className="space-y-4">
             <h1 className="font-ui text-6xl font-bold tracking-tight text-accent">Distil</h1>
@@ -67,6 +71,9 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
+      <div className="fixed top-3 right-3">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm space-y-10">
         {/* Masthead */}
         <div className="space-y-5">

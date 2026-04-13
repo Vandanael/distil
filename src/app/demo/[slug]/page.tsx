@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const PERSONAS: Record<string, { label: string; description: string; email: string }> = {
   pm: {
@@ -197,12 +198,15 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
               Exemple de veille
               <span className="text-muted-foreground"> — {persona.label}</span>
             </p>
-            <Link
-              href="/"
-              className="font-ui text-xs text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
-            >
-              ← Accueil
-            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Link
+                href="/"
+                className="font-ui text-xs text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
+              >
+                ← Accueil
+              </Link>
+            </div>
           </div>
         </div>
 
