@@ -134,10 +134,12 @@ describe('buildUserPrompt', () => {
   })
 
   it('inclut les exemples negatifs dans le prompt', () => {
-    const prompt = buildUserPrompt(PROFILE, CANDIDATES, [], [
-      'crypto spam - spamsite.com',
-      'NFT news - nftdaily.io',
-    ])
+    const prompt = buildUserPrompt(
+      PROFILE,
+      CANDIDATES,
+      [],
+      ['crypto spam - spamsite.com', 'NFT news - nftdaily.io']
+    )
     expect(prompt).toContain('crypto spam - spamsite.com')
     expect(prompt).toContain('nftdaily.io')
     expect(prompt).toContain('penalite')

@@ -7,7 +7,7 @@ vi.mock('./messages-api', () => ({
 
 import { runScoringAgent } from './scoring-agent'
 import { scoreWithMessagesApi } from './messages-api'
-import type { ScoringRequest, ScoredArticle, ScoringFunctionResult } from './types'
+import type { ScoringRequest, ScoringFunctionResult } from './types'
 
 const PROFILE = {
   profileText: 'PM senior',
