@@ -1,6 +1,6 @@
 /**
- * POST /api/push/subscribe  — enregistre une souscription push
- * DELETE /api/push/subscribe — supprime la souscription
+ * POST /api/push/subscribe  - enregistre une souscription push
+ * DELETE /api/push/subscribe - supprime la souscription
  * La souscription est stockee dans profiles.profile_structured.pushSubscription
  */
 import { NextRequest, NextResponse } from 'next/server'

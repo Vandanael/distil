@@ -22,7 +22,10 @@ function scoreColor(score: number): string {
 
 function articleRow(article: DigestArticle, appUrl: string): string {
   const title = article.title ?? 'Sans titre'
-  const meta = [article.site_name, article.reading_time_minutes ? `${article.reading_time_minutes} min` : null]
+  const meta = [
+    article.site_name,
+    article.reading_time_minutes ? `${article.reading_time_minutes} min` : null,
+  ]
     .filter(Boolean)
     .join(' · ')
   const link = `${appUrl}/article/${article.id}`

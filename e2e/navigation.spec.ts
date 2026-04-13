@@ -17,21 +17,33 @@ test.describe('Navigation desktop (header)', () => {
   })
 
   test('Feed → Profil → Feed via header', async ({ page }) => {
-    await page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Profil' }).click()
+    await page
+      .getByRole('navigation', { name: 'Navigation principale' })
+      .getByRole('link', { name: 'Profil' })
+      .click()
     await expect(page).toHaveURL(/\/profile/)
     await expect(page.getByRole('heading', { name: /[Pp]reference/ })).toBeVisible()
 
-    await page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Feed' }).click()
+    await page
+      .getByRole('navigation', { name: 'Navigation principale' })
+      .getByRole('link', { name: 'Feed' })
+      .click()
     await expect(page).toHaveURL(/\/feed/)
   })
 
   test('Feed → Archives via header', async ({ page }) => {
-    await page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Archives' }).click()
+    await page
+      .getByRole('navigation', { name: 'Navigation principale' })
+      .getByRole('link', { name: 'Archives' })
+      .click()
     await expect(page).toHaveURL(/\/archive/)
   })
 
   test('Feed → Recherche via header', async ({ page }) => {
-    await page.getByRole('navigation', { name: 'Navigation principale' }).getByRole('link', { name: 'Recherche' }).click()
+    await page
+      .getByRole('navigation', { name: 'Navigation principale' })
+      .getByRole('link', { name: 'Recherche' })
+      .click()
     await expect(page).toHaveURL(/\/search/)
   })
 })

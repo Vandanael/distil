@@ -43,7 +43,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <AppHeader />
 
       {/* Contenu principal avec padding-bottom pour la BottomNav mobile */}
-      <main id="main-content" className="flex-1 pb-14 md:pb-0">{children}</main>
+      <main id="main-content" className="flex-1 pb-14 md:pb-0">
+        {children}
+      </main>
 
       {/* Navigation mobile bas d'ecran */}
       <BottomNav />

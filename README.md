@@ -4,15 +4,15 @@ Veille intelligente et read-later personnel. Distil capte, filtre et organise l'
 
 ## Stack
 
-| | |
-|---|---|
-| Framework | Next.js 16 App Router, TypeScript strict |
-| Style | Tailwind v4, shadcn/ui retokenisé |
-| Base de données | Supabase (Postgres + pgvector + Auth) |
-| Scoring | Groq (Llama 3.3 70B) > Gemini 2.5 Flash > Anthropic Haiku |
-| Embeddings | Voyage AI (voyage-3) |
-| Email | Resend |
-| Deploy | Netlify |
+|                 |                                                           |
+| --------------- | --------------------------------------------------------- |
+| Framework       | Next.js 16 App Router, TypeScript strict                  |
+| Style           | Tailwind v4, shadcn/ui retokenisé                         |
+| Base de données | Supabase (Postgres + pgvector + Auth)                     |
+| Scoring         | Groq (Llama 3.3 70B) > Gemini 2.5 Flash > Anthropic Haiku |
+| Embeddings      | Voyage AI (voyage-3)                                      |
+| Email           | Resend                                                    |
+| Deploy          | Netlify                                                   |
 
 ## Démarrage
 
@@ -29,6 +29,7 @@ L'app tourne sur [localhost:3000](http://localhost:3000).
 Voir `.env.local.example` -- toutes les clés sont documentées.
 
 Les clés essentielles pour le dev :
+
 - `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`
 - `ANTHROPIC_API_KEY` (fallback scoring)
 - `DEV_BYPASS_AUTH=true` (bypass auth en local)

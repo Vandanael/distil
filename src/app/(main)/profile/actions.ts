@@ -65,7 +65,9 @@ export async function toggleDigestEmail(enabled: boolean) {
   revalidatePath('/profile')
 }
 
-export async function updatePinnedSources(urls: string[]): Promise<{ added: number; total: number }> {
+export async function updatePinnedSources(
+  urls: string[]
+): Promise<{ added: number; total: number }> {
   const supabase = await createClient()
   const {
     data: { user },

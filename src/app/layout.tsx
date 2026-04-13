@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Playfair_Display, Geist } from 'next/font/google'
 // Playfair Display : titres d'articles en lecture (font-heading)
-// Geist : tout le reste — UI, body, titres cartes, labels, logo
+// Geist : tout le reste - UI, body, titres cartes, labels, logo
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import { cookies } from 'next/headers'

@@ -225,7 +225,9 @@ export function ProfileForm({ profile }: Props) {
         </Button>
         {saved && <span className="font-ui text-sm text-muted-foreground">Profil mis à jour.</span>}
         {saveError && (
-          <p role="alert" className="font-ui text-sm text-destructive">{saveError}</p>
+          <p role="alert" className="font-ui text-sm text-destructive">
+            {saveError}
+          </p>
         )}
       </div>
 

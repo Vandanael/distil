@@ -7,7 +7,9 @@ export default async function OnboardingLayout({ children }: { children: React.R
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return (
       <>
-        <div className="fixed top-3 right-3"><ThemeToggle /></div>
+        <div className="fixed top-3 right-3">
+          <ThemeToggle />
+        </div>
         {children}
       </>
     )
@@ -35,7 +37,9 @@ export default async function OnboardingLayout({ children }: { children: React.R
 
   return (
     <>
-      <div className="fixed top-3 right-3"><ThemeToggle /></div>
+      <div className="fixed top-3 right-3">
+        <ThemeToggle />
+      </div>
       {children}
     </>
   )

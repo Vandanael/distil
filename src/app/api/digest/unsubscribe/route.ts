@@ -36,10 +36,7 @@ export async function GET(req: NextRequest) {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({ digest_email: false })
-    .eq('id', userId)
+  const { error } = await supabase.from('profiles').update({ digest_email: false }).eq('id', userId)
 
   if (error) {
     return new NextResponse(page('Erreur', 'Impossible de mettre a jour vos preferences.'), {
@@ -49,7 +46,10 @@ export async function GET(req: NextRequest) {
   }
 
   return new NextResponse(
-    page('Desabonne', 'Vous ne recevrez plus le digest Distil. Vous pouvez le reactiver dans vos preferences.'),
+    page(
+      'Desabonne',
+      'Vous ne recevrez plus le digest Distil. Vous pouvez le reactiver dans vos preferences.'
+    ),
     { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   )
 }

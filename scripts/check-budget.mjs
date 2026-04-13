@@ -17,9 +17,10 @@ import { join } from 'node:path'
 
 const BUDGETS = {
   // Total JS dans .next/static/chunks/ (framework + app)
-  // Sprint 1 baseline : 870 KB — budget = baseline + 25% de marge
-  totalChunksKb: 1100,
-  // Plus gros chunk individuel — React + Next.js runtime ~ 222 KB actuellement
+  // Sprint 23 baseline : 1176 KB (React 19 + Next.js 16 + Supabase = ~660 KB fixe)
+  // Budget = baseline + 10% de marge pour detecter les regressions
+  totalChunksKb: 1300,
+  // Plus gros chunk individuel - Supabase client ~ 226 KB actuellement
   largestChunkKb: 300,
 }
 

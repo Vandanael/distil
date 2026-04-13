@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { ArticleCandidate, ScoredArticle, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
 
-// gemini-2.5-flash : ~$0.15/1M tokens input — seul modele avec quota actif
+// gemini-2.5-flash : ~$0.15/1M tokens input, seul modele avec quota actif
 const MODEL = 'gemini-2.5-flash'
 // Plafond output : 20 articles × ~200 tokens JSON = ~4000 tokens min
 const MAX_TOKENS_OUTPUT = 8192

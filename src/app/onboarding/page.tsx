@@ -6,16 +6,14 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg space-y-12">
         {/* En-tete */}
         <div className="space-y-5">
-          <p className="font-ui text-xs uppercase tracking-wider text-accent">
-            Personnalisation
-          </p>
+          <p className="font-ui text-xs uppercase tracking-wider text-accent">Personnalisation</p>
           <h1 className="font-heading text-5xl leading-tight text-foreground">
             Comment lisez-vous ?
           </h1>
           <div className="h-px bg-border" />
         </div>
 
-        {/* Choix editoriaux — pas de cards */}
+        {/* Choix editoriaux */}
         <div className="space-y-10">
           <Link
             href="/onboarding/express"

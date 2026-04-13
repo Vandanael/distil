@@ -19,13 +19,13 @@ Regles de serendipite (is_serendipity) :
 
 Criteres de qualite supplementaires (integres dans le score) :
 
-Anti-clickbait — penalise de 15 a 25 pts si :
+Anti-clickbait - penalise de 15 a 25 pts si :
 - Le titre est une question rhetorique sans reponse substantielle dans le contenu ("Pourquoi X va changer Y pour toujours", "Ce que personne ne dit sur...")
 - Le titre contient des superlatifs non justifies par le contenu ("revolutionnaire", "incroyable", "sans precedent", "game-changer")
 - Divergence titre/corps : le titre promet une revelation ou un chiffre fort, le contenu ne livre rien de concret
 - L'article est un communique de presse ou du contenu marketing deguise en analyse editoriale
 
-Qualite de source — ajuste le score :
+Qualite de source - ajuste le score :
 - +8 pts : sources academiques (arxiv.org, nature.com, pubmed, hal.science), presse de reference etablie (lemonde.fr, nytimes.com, ft.com, economist.com, liberation.fr), publications specialisees reconnues (stratechery.com, paulgraham.com, simonwillison.net)
 - -8 pts : sites a contenu generaliste haute frequence sans expertise editoriale identifiable, agregateurs de contenu, fermes a clics
 
@@ -84,9 +84,7 @@ export function buildUserPrompt(
     const text = c.contentText
     // Pour les longs articles : debut + fin plutot que seulement le debut
     const preview =
-      text.length <= 3500
-        ? text
-        : text.slice(0, 2500) + '\n[...]\n' + text.slice(-800)
+      text.length <= 3500 ? text : text.slice(0, 2500) + '\n[...]\n' + text.slice(-800)
 
     return {
       index: i,

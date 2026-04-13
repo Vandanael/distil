@@ -40,9 +40,7 @@ export function SaveOfflineButton({ articleId }: Props) {
       aria-label={saved ? 'Article sauvegarde hors-ligne' : 'Sauvegarder pour lire hors-ligne'}
       className={[
         'font-ui text-[13px] transition-colors disabled:opacity-50',
-        saved
-          ? 'text-accent cursor-default'
-          : 'text-muted-foreground hover:text-foreground',
+        saved ? 'text-accent cursor-default' : 'text-muted-foreground hover:text-foreground',
       ].join(' ')}
     >
       {isPending ? '...' : saved ? 'Hors-ligne' : 'Hors-ligne ?'}

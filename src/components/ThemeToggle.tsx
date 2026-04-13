@@ -7,7 +7,7 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Evite le flash de mauvais theme au montage — pattern standard next-themes
+  // Evite le flash de mauvais theme au montage - pattern standard next-themes
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), [])
   if (!mounted) return <div className="w-8 h-8" />

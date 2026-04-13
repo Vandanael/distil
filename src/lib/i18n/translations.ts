@@ -11,18 +11,21 @@ export const translations = {
       configure: 'Configurer',
       keyboardHint: 'j/k naviguer · Enter ouvrir · d rejeter',
       searching: 'Distil cherche vos premiers articles...',
-      searchingDetail: "L'analyse prend quelques instants. La page se mettra à jour automatiquement.",
+      searchingDetail:
+        "L'analyse prend quelques instants. La page se mettra à jour automatiquement.",
       errorTitle: 'Impossible de charger les articles pour l\u2019instant.',
       errorDetail: 'Vérifiez votre connexion et réessayez depuis votre',
       errorLink: 'profil',
       noneTitle: 'Aucun article pertinent trouvé cette fois.',
-      noneDetail: "Distil n'a pas trouvé d'articles correspondant à votre profil lors de cette recherche. Enrichissez vos",
+      noneDetail:
+        "Distil n'a pas trouvé d'articles correspondant à votre profil lors de cette recherche. Enrichissez vos",
       noneLink: "centres d'intérêt",
       noneEnd: 'ou ajoutez des sources pour améliorer les résultats.',
     },
     article: {
       serendipity: 'Découverte',
-      serendipityTitle: 'Article hors de vos sources habituelles - introduit pour élargir votre veille',
+      serendipityTitle:
+        'Article hors de vos sources habituelles - introduit pour élargir votre veille',
       serendipityDetail: 'Découverte - article hors de vos sources habituelles.',
       relevance: 'Pertinence',
       paywall: 'Paywall',
@@ -32,7 +35,7 @@ export const translations = {
       undo: 'Annuler',
       bookmarked: 'Sauvegardé par vous',
       positiveSent: 'Signal envoyé - plus comme ça',
-      ago: "il y a",
+      ago: 'il y a',
       yesterday: 'hier',
       now: "à l'instant",
     },

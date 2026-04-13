@@ -37,7 +37,7 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
         <h1 className="font-ui text-[13px] text-foreground">
           {t.feed.title}
           {topInterests.length > 0 && (
-            <span className="text-muted-foreground"> — {topInterests.join(', ')}</span>
+            <span className="text-muted-foreground"> - {topInterests.join(', ')}</span>
           )}
         </h1>
         <Link

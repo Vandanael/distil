@@ -71,9 +71,7 @@ export default async function ProfilePage() {
       {/* Ce que Distil recherche */}
       {searchQueries.length > 0 && (
         <div className="border-t border-border pt-8 space-y-3">
-          <p className="font-ui text-xs text-accent">
-            Ce que Distil recherche
-          </p>
+          <p className="font-ui text-xs text-accent">Ce que Distil recherche</p>
           <p className="font-body text-xs text-muted-foreground">
             Requetes utilisees lors du prochain rafraichissement.
           </p>
@@ -90,15 +88,17 @@ export default async function ProfilePage() {
         </div>
       )}
 
-      <ProfileForm profile={{
-        profile_text: profile.profile_text,
-        interests: profile.interests ?? [],
-        pinned_sources: profile.pinned_sources ?? [],
-        daily_cap: profile.daily_cap ?? 10,
-        serendipity_quota: profile.serendipity_quota ?? 0.15,
-        show_scores: profile.show_scores ?? true,
-        language,
-      }} />
+      <ProfileForm
+        profile={{
+          profile_text: profile.profile_text,
+          interests: profile.interests ?? [],
+          pinned_sources: profile.pinned_sources ?? [],
+          daily_cap: profile.daily_cap ?? 10,
+          serendipity_quota: profile.serendipity_quota ?? 0.15,
+          show_scores: profile.show_scores ?? true,
+          language,
+        }}
+      />
 
       {/* Import OPML */}
       <div className="border-t border-border pt-8 space-y-4">
@@ -108,13 +108,22 @@ export default async function ProfilePage() {
 
       {/* Navigation secondaire */}
       <div className="border-t border-border pt-8 space-y-3">
-        <Link href="/archive" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
+        <Link
+          href="/archive"
+          className="block font-ui text-sm text-foreground hover:text-accent transition-colors"
+        >
           Archives
         </Link>
-        <Link href="/highlights" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
+        <Link
+          href="/highlights"
+          className="block font-ui text-sm text-foreground hover:text-accent transition-colors"
+        >
           Highlights
         </Link>
-        <Link href="/rejected" className="block font-ui text-sm text-foreground hover:text-accent transition-colors">
+        <Link
+          href="/rejected"
+          className="block font-ui text-sm text-foreground hover:text-accent transition-colors"
+        >
           Articles rejetes
         </Link>
       </div>
@@ -126,9 +135,10 @@ export default async function ProfilePage() {
           <ThemeToggle />
         </div>
         <PushSubscribe />
-<TokensSection tokens={tokens} />
+        <TokensSection tokens={tokens} />
         <p className="font-ui text-xs text-muted-foreground">
-          Raccourcis clavier : j/k naviguer, Enter ouvrir, d rejeter, Esc retour, h highlight (dans un article)
+          Raccourcis clavier : j/k naviguer, Enter ouvrir, d rejeter, Esc retour, h highlight (dans
+          un article)
         </p>
       </div>
 

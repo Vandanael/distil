@@ -43,7 +43,7 @@ export default async function RootPage() {
   if (serviceKey) {
     const serviceClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
 
-// IDs stables des comptes démo (créés par create-test-accounts.mjs)
+    // IDs stables des comptes démo (créés par create-test-accounts.mjs)
     const DEMO_USER_IDS = [
       '795c2637-7e43-4b74-82b1-560899cf62d7', // test-pm (Politique & Monde)
       '17e9ac27-5bc3-403c-94e4-cb2d6db1e38c', // test-consultant (Cuisine)
@@ -67,9 +67,7 @@ export default async function RootPage() {
         )
       )
 
-      featuredArticles = picks
-        .filter((r) => r.data !== null)
-        .map((r) => r.data!)
+      featuredArticles = picks.filter((r) => r.data !== null).map((r) => r.data!)
     }
   }
 

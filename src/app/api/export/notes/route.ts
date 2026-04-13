@@ -122,7 +122,7 @@ export async function GET() {
     '  - notes',
     '---',
     '',
-    `# Notes Distil — ${exportDate}`,
+    `# Notes Distil - ${exportDate}`,
     '',
   ]
 

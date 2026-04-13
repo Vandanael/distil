@@ -29,16 +29,14 @@ export function AppHeader() {
         .trim()}
     >
       <div className="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
-        <Link
-          href="/feed"
-          className="font-ui text-xl font-bold tracking-tight text-accent"
-        >
+        <Link href="/feed" className="font-ui text-xl font-bold tracking-tight text-accent">
           Distil
         </Link>
 
         <nav className="hidden md:flex items-center gap-6" aria-label="Navigation principale">
           {NAV_ITEMS.map(({ href }) => {
-            const active = pathname === href || (href !== '/feed' && pathname.startsWith(href + '/'))
+            const active =
+              pathname === href || (href !== '/feed' && pathname.startsWith(href + '/'))
             const labelKey = NAV_KEYS[href]
             return (
               <Link

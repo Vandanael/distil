@@ -44,8 +44,9 @@ function normalizeDomain(source: string): string {
 }
 
 export function buildSearchQueries(profile: UserProfile): string[] {
-  const language = (profile.profileStructured as Record<string, unknown> | null)
-    ?.language as string | undefined
+  const language = (profile.profileStructured as Record<string, unknown> | null)?.language as
+    | string
+    | undefined
 
   const effectiveSources =
     profile.pinnedSources.length >= 2

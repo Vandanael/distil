@@ -55,9 +55,7 @@ export function ArchiveList({ articles }: Props) {
           </h2>
           <div className="flex items-center gap-3">
             {a.site_name && (
-              <span className="font-ui text-[13px] text-muted-foreground">
-                {a.site_name}
-              </span>
+              <span className="font-ui text-[13px] text-muted-foreground">{a.site_name}</span>
             )}
             {a.reading_time_minutes && (
               <span className="font-ui text-xs text-muted-foreground">

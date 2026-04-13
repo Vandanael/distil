@@ -62,7 +62,9 @@ export async function POST(request: Request) {
   const [profileResult, archivedResult, dismissedResult] = await Promise.all([
     supabase
       .from('profiles')
-      .select('profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota')
+      .select(
+        'profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota'
+      )
       .eq('id', user.id)
       .single(),
     supabase
@@ -87,11 +89,11 @@ export async function POST(request: Request) {
   }
 
   const archivedTags = (archivedResult.data ?? [])
-    .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+    .map((a) => [a.title, a.site_name].filter(Boolean).join(' - '))
     .filter(Boolean)
 
   const negativeExamples = (dismissedResult.data ?? [])
-    .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+    .map((a) => [a.title, a.site_name].filter(Boolean).join(' - '))
     .filter(Boolean)
 
   const userProfile: UserProfile = {
@@ -115,7 +117,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Impossible de creer le run' }, { status: 500 })
   }
 
-  // Parser les URLs en parallele — on conserve les resultats pour eviter un double-parse
+  // Parser les URLs en parallele, on conserve les resultats pour eviter un double-parse
   const parseResults = await Promise.allSettled(urls.map((url) => parseUrl(url)))
   const parsedByUrl = new Map(
     parseResults
@@ -165,7 +167,6 @@ export async function POST(request: Request) {
   const rejected = result.scored.filter((a) => !a.accepted)
 
   if (result.scored.length > 0) {
-
     const { data: insertedArticles } = await supabase
       .from('articles')
       .insert(

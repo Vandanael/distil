@@ -17,12 +17,18 @@ const PERSONA_EXAMPLES = [
   {
     slug: 'pm',
     label: { fr: 'Politique & Monde', en: 'Politics & World' },
-    description: { fr: 'Géopolitique, démocratie, actualité internationale', en: 'Geopolitics, democracy, international news' },
+    description: {
+      fr: 'Géopolitique, démocratie, actualité internationale',
+      en: 'Geopolitics, democracy, international news',
+    },
   },
   {
     slug: 'consultant',
     label: { fr: 'Cuisine & Gastronomie', en: 'Food & Gastronomy' },
-    description: { fr: 'Techniques, chefs, restaurants, recettes', en: 'Techniques, chefs, restaurants, recipes' },
+    description: {
+      fr: 'Techniques, chefs, restaurants, recettes',
+      en: 'Techniques, chefs, restaurants, recipes',
+    },
   },
   {
     slug: 'dev',
@@ -32,12 +38,18 @@ const PERSONA_EXAMPLES = [
   {
     slug: 'chercheur',
     label: { fr: 'Sport & Bien-être', en: 'Sport & Wellness' },
-    description: { fr: 'Running, mental, nutrition, performance', en: 'Running, mindset, nutrition, performance' },
+    description: {
+      fr: 'Running, mental, nutrition, performance',
+      en: 'Running, mindset, nutrition, performance',
+    },
   },
   {
     slug: 'ml',
     label: { fr: 'Culture & Société', en: 'Culture & Society' },
-    description: { fr: 'Cinéma, musique, littérature, idées', en: 'Cinema, music, literature, ideas' },
+    description: {
+      fr: 'Cinéma, musique, littérature, idées',
+      en: 'Cinema, music, literature, ideas',
+    },
   },
 ]
 
@@ -61,7 +73,7 @@ const COPY = {
     tagline: 'Your daily briefing, without the noise.',
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
-    cta: 'Get started - it\'s free',
+    cta: "Get started - it's free",
     noSpam: 'No commitment.',
     examplesTitle: 'Feed examples',
     examplesSubtitle: 'Click a topic to see what your daily selection looks like.',
@@ -94,7 +106,8 @@ function ArticlePreview({ article, lang }: { article: FeaturedArticle; lang: 'fr
       {article.score !== null && (
         <p className="font-ui text-[13px] text-muted-foreground mt-2">
           {article.is_serendipity && <span className="text-accent mr-2">{t.serendipity}</span>}
-          {t.relevance} <span className="font-semibold tabular-nums">{Math.round(article.score)}%</span>
+          {t.relevance}{' '}
+          <span className="font-semibold tabular-nums">{Math.round(article.score)}%</span>
         </p>
       )}
     </div>
@@ -139,7 +152,9 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             >
               FR
             </button>
-            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">|</span>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
+              |
+            </span>
             <button
               onClick={() => setLang('en')}
               aria-pressed={lang === 'en'}
@@ -148,7 +163,9 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             >
               EN
             </button>
-            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">|</span>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
+              |
+            </span>
             <ThemeToggle />
           </div>
         </div>
@@ -158,15 +175,9 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           <h1 className="font-ui text-7xl md:text-9xl font-bold tracking-tight text-accent leading-none">
             Distil
           </h1>
-          <p className="font-ui text-xl font-bold text-accent leading-snug">
-            {t.tagline}
-          </p>
-          <p className="font-body text-base text-muted-foreground leading-relaxed">
-            {t.body}
-          </p>
-          <p className="font-ui text-sm text-muted-foreground/70">
-            {t.format}
-          </p>
+          <p className="font-ui text-xl font-bold text-accent leading-snug">{t.tagline}</p>
+          <p className="font-body text-base text-muted-foreground leading-relaxed">{t.body}</p>
+          <p className="font-ui text-sm text-muted-foreground/70">{t.format}</p>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
             <Link
               href="/login"
@@ -174,18 +185,14 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             >
               {t.cta}
             </Link>
-            <p className="font-ui text-xs text-muted-foreground/60">
-              {t.noSpam}
-            </p>
+            <p className="font-ui text-xs text-muted-foreground/60">{t.noSpam}</p>
           </div>
         </div>
 
         {/* Exemples de veille */}
         <div className="mb-14">
           <div className="border-t border-border pt-6 mb-6">
-            <p className="font-ui text-[13px] text-foreground font-medium">
-              {t.examplesTitle}
-            </p>
+            <p className="font-ui text-[13px] text-foreground font-medium">{t.examplesTitle}</p>
             <p className="font-body text-[13px] text-muted-foreground mt-0.5">
               {t.examplesSubtitle}
             </p>
@@ -212,13 +219,9 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
         <div>
           <div className="border-t-2 border-foreground pt-3 mb-0">
             <div className="flex items-baseline justify-between">
-              <p className="font-ui text-[13px] text-foreground font-medium">
-                {t.feedTitle}
-              </p>
+              <p className="font-ui text-[13px] text-foreground font-medium">{t.feedTitle}</p>
               {articles.length > 0 && (
-                <p className="font-ui text-xs text-muted-foreground/60">
-                  {t.feedSub}
-                </p>
+                <p className="font-ui text-xs text-muted-foreground/60">{t.feedSub}</p>
               )}
             </div>
           </div>
@@ -229,9 +232,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
               ))}
             </div>
           ) : (
-            <p className="font-body text-[13px] text-muted-foreground italic py-4">
-              {t.feedEmpty}
-            </p>
+            <p className="font-body text-[13px] text-muted-foreground italic py-4">{t.feedEmpty}</p>
           )}
         </div>
       </div>

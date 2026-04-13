@@ -28,7 +28,10 @@ export async function scoreWithGroq(
     response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: buildSystemPrompt() },
-      { role: 'user', content: buildUserPrompt(profile, candidates, archivedTags, negativeExamples) },
+      {
+        role: 'user',
+        content: buildUserPrompt(profile, candidates, archivedTags, negativeExamples),
+      },
     ],
     max_tokens: 4096,
   })

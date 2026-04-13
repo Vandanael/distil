@@ -46,7 +46,11 @@ export function useFeedKeyboard({ onDismiss, onNavigate }: UseFeedKeyboardOption
     function onKeyDown(e: KeyboardEvent) {
       // Ignorer si focus dans un champ texte
       const tag = (document.activeElement?.tagName ?? '').toLowerCase()
-      if (tag === 'input' || tag === 'textarea' || document.activeElement?.hasAttribute('contenteditable')) {
+      if (
+        tag === 'input' ||
+        tag === 'textarea' ||
+        document.activeElement?.hasAttribute('contenteditable')
+      ) {
         return
       }
 

@@ -13,7 +13,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const { id } = await params
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) return { title: 'Article - Distil' }
 
   const { data } = await supabase

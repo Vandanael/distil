@@ -87,11 +87,12 @@ function scoreArticle(
   const accepted = score >= 35
   const isSerendipity = matchedKeywords.length <= 1 && score >= 35
 
-  const justification = matchedKeywords.length > 0
-    ? `Correspond aux sujets : ${matchedKeywords.slice(0, 4).join(', ')}${isPinned ? ' (source favorite)' : ''}`
-    : isPinned
-      ? 'Source favorite'
-      : 'Article hors profil'
+  const justification =
+    matchedKeywords.length > 0
+      ? `Correspond aux sujets : ${matchedKeywords.slice(0, 4).join(', ')}${isPinned ? ' (source favorite)' : ''}`
+      : isPinned
+        ? 'Source favorite'
+        : 'Article hors profil'
 
   return { score, justification, accepted, isSerendipity }
 }
@@ -116,7 +117,9 @@ async function populateForUser(email: string) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota')
+    .select(
+      'profile_text, profile_structured, sector, interests, pinned_sources, daily_cap, serendipity_quota'
+    )
     .eq('id', user.id)
     .single()
 
@@ -175,7 +178,10 @@ async function populateForUser(email: string) {
   console.log('  Parsing articles...')
   const parsedResults = await Promise.allSettled(discovery.urls.map((url) => parseUrl(url)))
   const parsed = parsedResults
-    .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> => r.status === 'fulfilled')
+    .filter(
+      (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
+        r.status === 'fulfilled'
+    )
     .map((r) => r.value)
     .filter((p) => p.contentText.length > 200)
 

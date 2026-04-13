@@ -63,42 +63,39 @@ export function useSwipeToDismiss({
     [enabled]
   )
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!active.current) return
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!active.current) return
 
-      const deltaX = e.clientX - startX.current
-      const deltaY = e.clientY - startY.current
-      const absDx = Math.abs(deltaX)
-      const absDy = Math.abs(deltaY)
+    const deltaX = e.clientX - startX.current
+    const deltaY = e.clientY - startY.current
+    const absDx = Math.abs(deltaX)
+    const absDy = Math.abs(deltaY)
 
-      // Pas encore verrouille : determiner la direction
-      if (!locked.current) {
-        if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return
-        if (absDx > absDy * ANGLE_RATIO) {
-          locked.current = 'horizontal'
-          setIsSwiping(true)
-        } else {
-          locked.current = 'vertical'
-          return
-        }
+    // Pas encore verrouille : determiner la direction
+    if (!locked.current) {
+      if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return
+      if (absDx > absDy * ANGLE_RATIO) {
+        locked.current = 'horizontal'
+        setIsSwiping(true)
+      } else {
+        locked.current = 'vertical'
+        return
       }
+    }
 
-      if (locked.current !== 'horizontal') return
+    if (locked.current !== 'horizontal') return
 
-      // Empecher le clic sur le Link pendant le swipe
-      e.preventDefault()
+    // Empecher le clic sur le Link pendant le swipe
+    e.preventDefault()
 
-      const opacity = Math.max(0.3, 1 - absDx / 300)
-      setStyle({
-        transform: `translateX(${deltaX}px)`,
-        opacity,
-        transition: 'none',
-        willChange: 'transform, opacity',
-      })
-    },
-    []
-  )
+    const opacity = Math.max(0.3, 1 - absDx / 300)
+    setStyle({
+      transform: `translateX(${deltaX}px)`,
+      opacity,
+      transition: 'none',
+      willChange: 'transform, opacity',
+    })
+  }, [])
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {

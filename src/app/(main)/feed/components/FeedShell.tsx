@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useFeedKeyboard } from '@/lib/hooks/useFeedKeyboard'
-import { dismissArticle } from '../../article/[id]/actions'
+import { dismissArticle } from '@/app/(main)/article/[id]/actions'
 import { useLocale } from '@/lib/i18n/context'
 import { useDismissContext } from './DismissContext'
 

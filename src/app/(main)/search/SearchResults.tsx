@@ -39,9 +39,7 @@ export function SearchResults({ results, query }: Props) {
             </div>
 
             {result.site_name && (
-              <span className="font-ui text-[13px] text-muted-foreground">
-                {result.site_name}
-              </span>
+              <span className="font-ui text-[13px] text-muted-foreground">{result.site_name}</span>
             )}
 
             {result.excerpt && (

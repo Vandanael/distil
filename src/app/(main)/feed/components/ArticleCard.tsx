@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
-import { dismissArticle } from '../../article/[id]/actions'
+import { dismissArticle } from '@/app/(main)/article/[id]/actions'
 import { useSwipeToDismiss } from '@/lib/hooks/useSwipeToDismiss'
 import { useLocale } from '@/lib/i18n/context'
 import { useDismissContext } from './DismissContext'
@@ -91,13 +91,25 @@ export function ArticleCard({
     first?.focus()
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setShowScorePopover(false); return }
+      if (e.key === 'Escape') {
+        setShowScorePopover(false)
+        return
+      }
       if (e.key !== 'Tab') return
-      if (focusable.length === 0) { e.preventDefault(); return }
+      if (focusable.length === 0) {
+        e.preventDefault()
+        return
+      }
       if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last?.focus() }
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last?.focus()
+        }
       } else {
-        if (document.activeElement === last) { e.preventDefault(); first?.focus() }
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first?.focus()
+        }
       }
     }
 
@@ -161,7 +173,7 @@ export function ArticleCard({
       toast.success(t.article.positiveSent)
     } catch {
       setPositiveSignalSent(false)
-      toast.error(locale === 'fr' ? 'Erreur lors de l\'envoi du signal.' : 'Error sending signal.')
+      toast.error(locale === 'fr' ? "Erreur lors de l'envoi du signal." : 'Error sending signal.')
     }
   }
 
@@ -183,16 +195,21 @@ export function ArticleCard({
             data-testid={`origin-badge-${id}`}
             title="Sauvegarde par vous"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="none"
+              aria-hidden="true"
+            >
+              <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
           </span>
         )}
-        {siteName && (
-          <span className="font-ui">{siteName}</span>
-        )}
+        {siteName && <span className="font-ui">{siteName}</span>}
         {siteName && relativeDate && <span>·</span>}
-        {relativeDate && (
-          <span className="font-ui">{relativeDate}</span>
-        )}
+        {relativeDate && <span className="font-ui">{relativeDate}</span>}
         {readingTimeMinutes && (
           <>
             <span>·</span>
@@ -216,7 +233,9 @@ export function ArticleCard({
       {/* Ligne 3-4 : titre + thumbnail */}
       <div className="flex items-start gap-5">
         <div className="flex-1 min-w-0">
-          <h2 className={`font-ui text-xl font-bold leading-snug group-hover:text-accent transition-colors duration-150${isPaywall ? ' line-through decoration-muted-foreground/40' : ''}${isRead ? ' text-muted-foreground' : ' text-foreground'}`}>
+          <h2
+            className={`font-ui text-xl font-bold leading-snug group-hover:text-accent transition-colors duration-150${isPaywall ? ' line-through decoration-muted-foreground/40' : ''}${isRead ? ' text-muted-foreground' : ' text-foreground'}`}
+          >
             {title ?? 'Sans titre'}
           </h2>
           {excerpt && !isPaywall && (
@@ -289,7 +308,8 @@ export function ArticleCard({
                     Pertinence
                   </span>
                   <span className="font-ui text-xl font-semibold tabular-nums text-foreground">
-                    {Math.round(score)}<span className="text-[13px] text-muted-foreground font-normal">%</span>
+                    {Math.round(score)}
+                    <span className="text-[13px] text-muted-foreground font-normal">%</span>
                   </span>
                 </div>
                 {justification && (
@@ -298,9 +318,7 @@ export function ArticleCard({
                   </p>
                 )}
                 {isSerendipity && (
-                  <p className="font-ui text-[13px] text-accent">
-                    {t.article.serendipityDetail}
-                  </p>
+                  <p className="font-ui text-[13px] text-accent">{t.article.serendipityDetail}</p>
                 )}
               </div>
             )}
@@ -319,9 +337,34 @@ export function ArticleCard({
             title="Plus comme ca"
           >
             {positiveSignalSent ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
             ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 10v12" />
+                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+              </svg>
             )}
           </button>
 
@@ -337,7 +380,21 @@ export function ArticleCard({
             data-testid={`dismiss-${id}`}
             className="font-ui text-muted-foreground/60 transition-colors p-1.5 hover:text-destructive hover:bg-muted disabled:opacity-20"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="m15 9-6 6" />
+              <path d="m9 9 6 6" />
+            </svg>
           </button>
         </div>
       </div>

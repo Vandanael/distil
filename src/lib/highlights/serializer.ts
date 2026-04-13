@@ -63,7 +63,7 @@ export function anchorHighlight(anchor: HighlightAnchor, container: HTMLElement)
   try {
     parentEl = container.querySelector(anchor.cssSelector)
   } catch {
-    // Selecteur invalide — fallback sur le container
+    // Selecteur invalide, fallback sur le container
   }
   if (!parentEl) parentEl = container
 
@@ -76,7 +76,7 @@ export function anchorHighlight(anchor: HighlightAnchor, container: HTMLElement)
   )
 
   if (anchor.prefixContext && !expectedPrefix.endsWith(anchor.prefixContext.slice(-10))) {
-    // Contexte incompatible — ancrage orphelin
+    // Contexte incompatible, ancrage orphelin
     return null
   }
 

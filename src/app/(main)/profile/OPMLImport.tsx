@@ -53,7 +53,7 @@ export function OPMLImport() {
           const { added, total } = await updatePinnedSources(urlsToImport)
           toast.success(`${added} source(s) ajoutée(s) - total : ${total}`)
         } catch (err) {
-          toast.error(err instanceof Error ? err.message : 'Erreur lors de l\'import')
+          toast.error(err instanceof Error ? err.message : "Erreur lors de l'import")
         }
       })
     }

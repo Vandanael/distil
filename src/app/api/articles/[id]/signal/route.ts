@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export async function PATCH(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL

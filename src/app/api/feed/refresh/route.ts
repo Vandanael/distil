@@ -91,7 +91,7 @@ export async function POST() {
     .limit(15)
 
   const negativeExamples = (dismissed ?? [])
-    .map((a) => [a.title, a.site_name].filter(Boolean).join(' — '))
+    .map((a) => [a.title, a.site_name].filter(Boolean).join(' - '))
     .filter(Boolean)
 
   // Créer le scoring_run
@@ -127,7 +127,9 @@ export async function POST() {
   }
 
   // 2. Parser les URLs en parallèle (échecs ignorés individuellement)
-  const parsedResults = await Promise.allSettled(discovery.urls.slice(0, 20).map((url) => parseUrl(url)))
+  const parsedResults = await Promise.allSettled(
+    discovery.urls.slice(0, 20).map((url) => parseUrl(url))
+  )
 
   const candidates: ArticleCandidate[] = parsedResults
     .filter(

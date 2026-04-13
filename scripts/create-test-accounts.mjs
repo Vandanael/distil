@@ -70,7 +70,13 @@ const PERSONAS = [
       profile_text:
         'Chercheuse en sciences sociales, veille academique et geopolitique, analyse semantique profonde, export Obsidian',
       sector: 'Recherche',
-      interests: ['geopolitique', 'sciences sociales', 'epistemologie', 'data analysis', 'recherche'],
+      interests: [
+        'geopolitique',
+        'sciences sociales',
+        'epistemologie',
+        'data analysis',
+        'recherche',
+      ],
       pinned_sources: ['arxiv.org', 'nature.com', 'lemonde.fr'],
       daily_cap: 15,
       serendipity_quota: 0.5,

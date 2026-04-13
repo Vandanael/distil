@@ -44,9 +44,7 @@ export default function ExpressPage() {
       <div className="w-full max-w-md space-y-10">
         {/* En-tete */}
         <div className="space-y-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-accent">
-            Methode rapide
-          </p>
+          <p className="font-ui text-xs uppercase tracking-wider text-accent">Methode rapide</p>
           <h1 className="font-heading text-4xl font-semibold text-foreground">En quelques mots</h1>
           <p className="font-body text-base text-muted-foreground">
             {"Decrivez librement ce qui vous interesse. L'IA s'adapte a votre style."}

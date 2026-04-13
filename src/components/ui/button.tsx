@@ -8,13 +8,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        /* Marine — autorite, CTA principal */
+        /* Marine - autorite, CTA principal */
         default: 'bg-primary text-primary-foreground hover:bg-primary/85',
-        /* Contour — alternatif discret */
+        /* Contour - alternatif discret */
         outline: 'border-border bg-background hover:bg-muted hover:text-foreground',
-        /* Creme muet — secondaire */
+        /* Creme muet - secondaire */
         secondary: 'bg-secondary text-secondary-foreground border-border hover:bg-muted',
-        /* Orange — emphase editoriale */
+        /* Orange - emphase editoriale */
         accent: 'bg-accent text-accent-foreground hover:bg-accent/85',
         /* Fantome */
         ghost: 'hover:bg-muted hover:text-foreground',

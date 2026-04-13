@@ -38,8 +38,7 @@ export async function sendPushNotification(
       subscription as webpush.PushSubscription,
       JSON.stringify(payload)
     )
-  } catch (err) {
-    // Souscription expiree ou invalide — on ignore (sera nettoyee au prochain cycle)
-    console.error('[push] sendNotification error:', err instanceof Error ? err.message : err)
+  } catch {
+    // Souscription expiree ou invalide, on ignore (sera nettoyee au prochain cycle)
   }
 }

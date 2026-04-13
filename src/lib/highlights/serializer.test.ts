@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { serializeSelection } from './serializer'
 
-// jsdom ne supporte pas bien Selection/Range — on teste la logique via des stubs
+// jsdom ne supporte pas bien Selection/Range, on teste la logique via des stubs
 function makeContainer(html: string): HTMLElement {
   const div = document.createElement('div')
   div.innerHTML = html

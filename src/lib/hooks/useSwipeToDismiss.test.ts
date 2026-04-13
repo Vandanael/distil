@@ -19,9 +19,7 @@ function makePointerEvent(type: string, x: number, y: number, pointerId = 1) {
 describe('useSwipeToDismiss', () => {
   it('ne declenche pas onDismiss sous le seuil', () => {
     const onDismiss = vi.fn()
-    const { result } = renderHook(() =>
-      useSwipeToDismiss({ onDismiss, threshold: 80 })
-    )
+    const { result } = renderHook(() => useSwipeToDismiss({ onDismiss, threshold: 80 }))
 
     act(() => {
       result.current.handlers.onPointerDown(makePointerEvent('pointerdown', 200, 100))
@@ -39,9 +37,7 @@ describe('useSwipeToDismiss', () => {
   it('declenche onDismiss au-dessus du seuil', () => {
     vi.useFakeTimers()
     const onDismiss = vi.fn()
-    const { result } = renderHook(() =>
-      useSwipeToDismiss({ onDismiss, threshold: 80 })
-    )
+    const { result } = renderHook(() => useSwipeToDismiss({ onDismiss, threshold: 80 }))
 
     act(() => {
       result.current.handlers.onPointerDown(makePointerEvent('pointerdown', 300, 100))
@@ -64,9 +60,7 @@ describe('useSwipeToDismiss', () => {
 
   it('ignore le mouvement vertical', () => {
     const onDismiss = vi.fn()
-    const { result } = renderHook(() =>
-      useSwipeToDismiss({ onDismiss, threshold: 80 })
-    )
+    const { result } = renderHook(() => useSwipeToDismiss({ onDismiss, threshold: 80 }))
 
     act(() => {
       result.current.handlers.onPointerDown(makePointerEvent('pointerdown', 200, 100))
@@ -104,9 +98,7 @@ describe('useSwipeToDismiss', () => {
 
   it('signale isSwiping pendant un geste horizontal', () => {
     const onDismiss = vi.fn()
-    const { result } = renderHook(() =>
-      useSwipeToDismiss({ onDismiss, threshold: 80 })
-    )
+    const { result } = renderHook(() => useSwipeToDismiss({ onDismiss, threshold: 80 }))
 
     act(() => {
       result.current.handlers.onPointerDown(makePointerEvent('pointerdown', 200, 100))

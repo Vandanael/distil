@@ -45,11 +45,16 @@ export function EmptyFeed() {
     return (
       <div className="py-12 space-y-6">
         <div className="h-px w-full bg-border overflow-hidden">
-          <div className="h-px bg-accent animate-[progress_2s_ease-in-out_infinite]" style={{ width: '40%' }} />
+          <div
+            className="h-px bg-accent animate-[progress_2s_ease-in-out_infinite]"
+            style={{ width: '40%' }}
+          />
         </div>
         <div className="space-y-2">
           <p className="font-ui text-sm text-foreground font-medium">{t.feed.searching}</p>
-          <p className="font-body text-sm text-muted-foreground leading-relaxed">{t.feed.searchingDetail}</p>
+          <p className="font-body text-sm text-muted-foreground leading-relaxed">
+            {t.feed.searchingDetail}
+          </p>
         </div>
       </div>
     )
@@ -61,7 +66,10 @@ export function EmptyFeed() {
         <p className="font-ui text-sm text-foreground font-medium">{t.feed.errorTitle}</p>
         <p className="font-body text-sm text-muted-foreground">
           {t.feed.errorDetail}{' '}
-          <Link href="/profile" className="text-accent hover:underline">{t.feed.errorLink}</Link>.
+          <Link href="/profile" className="text-accent hover:underline">
+            {t.feed.errorLink}
+          </Link>
+          .
         </p>
       </div>
     )
@@ -72,7 +80,9 @@ export function EmptyFeed() {
       <p className="font-ui text-sm text-foreground font-medium">{t.feed.noneTitle}</p>
       <p className="font-body text-sm text-muted-foreground leading-relaxed">
         {t.feed.noneDetail}{' '}
-        <Link href="/profile" className="text-accent hover:underline">{t.feed.noneLink}</Link>{' '}
+        <Link href="/profile" className="text-accent hover:underline">
+          {t.feed.noneLink}
+        </Link>{' '}
         {t.feed.noneEnd}
       </p>
     </div>

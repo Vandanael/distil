@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { markAsRead } from '../../actions'
+import { markAsRead } from '@/app/(main)/actions'
 import { HighlightPopover } from './components/HighlightPopover'
 import { FloatingActionBar } from './components/FloatingActionBar'
 import { ScoringPanel } from './components/ScoringPanel'
@@ -59,7 +59,12 @@ export function ReadingView({
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const tag = (document.activeElement?.tagName ?? '').toLowerCase()
-      if (tag === 'input' || tag === 'textarea' || document.activeElement?.hasAttribute('contenteditable')) return
+      if (
+        tag === 'input' ||
+        tag === 'textarea' ||
+        document.activeElement?.hasAttribute('contenteditable')
+      )
+        return
       if (e.key === 'h') {
         e.preventDefault()
         contentRef.current?.focus()
@@ -148,9 +153,7 @@ export function ReadingView({
                 {title ?? 'Sans titre'}
               </h1>
 
-              {author && (
-                <p className="font-ui text-sm text-muted-foreground">{author}</p>
-              )}
+              {author && <p className="font-ui text-sm text-muted-foreground">{author}</p>}
             </div>
 
             {/* Contenu selectionnable */}
@@ -168,12 +171,10 @@ export function ReadingView({
                 className="space-y-6 py-8 border border-border p-6"
                 data-testid="article-content-unavailable"
               >
-                <p className="font-ui text-[13px] text-muted-foreground">
-                  Contenu non disponible
-                </p>
+                <p className="font-ui text-[13px] text-muted-foreground">Contenu non disponible</p>
                 <p className="font-body text-sm text-muted-foreground leading-relaxed">
-                  Le contenu de cet article n&apos;a pas pu etre recupere - il est probablement protege
-                  par un paywall ou inaccessible au parsing.
+                  Le contenu de cet article n&apos;a pas pu etre recupere - il est probablement
+                  protege par un paywall ou inaccessible au parsing.
                 </p>
                 <a
                   href={url}

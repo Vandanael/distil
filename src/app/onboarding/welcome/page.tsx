@@ -69,7 +69,8 @@ export default function WelcomePage() {
         {/* Message */}
         <div className="space-y-3">
           <p className="font-body text-lg text-foreground">
-            {message}{dots}
+            {message}
+            {dots}
           </p>
           <p className="font-body text-sm text-muted-foreground">
             Distil recherche vos premiers articles. Vous serez redirige automatiquement.

@@ -14,10 +14,11 @@ const MOCK_ARTICLES = [
     title: 'The Intelligence Trap: Why Smart People Make Dumb Mistakes',
     siteName: 'aeon.co',
     excerpt:
-      'Educated people are not necessarily better at reasoning — they may just be better at rationalising their preconceptions.',
+      'Educated people are not necessarily better at reasoning - they may just be better at rationalising their preconceptions.',
     readingTimeMinutes: 8,
     score: 87,
-    justification: 'Correspond a vos interets en epistemologie et sciences cognitives. Densite editoriale elevee.',
+    justification:
+      'Correspond a vos interets en epistemologie et sciences cognitives. Densite editoriale elevee.',
     isSerendipity: false,
     origin: 'agent',
     scoredAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -43,7 +44,7 @@ const MOCK_ARTICLES = [
     id: 'mock-3',
     title: 'How LLMs Actually Work: A Practical Guide',
     siteName: 'arxiv.org',
-    excerpt: 'Transformers, attention, tokenization — what matters for practitioners.',
+    excerpt: 'Transformers, attention, tokenization - what matters for practitioners.',
     readingTimeMinutes: 5,
     score: 94,
     justification: 'Source primaire, forte densite technique. Correspond a votre profil ML.',
@@ -178,7 +179,7 @@ export function DevDashboard() {
         {/* Header */}
         <div className="space-y-2 border-b border-border pb-6">
           <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
-            Dev only — not in production
+            Dev only - not in production
           </p>
           <h1 className="font-ui text-3xl font-semibold text-foreground">Dev Dashboard</h1>
           <p className="font-body text-sm text-muted-foreground">
@@ -192,7 +193,7 @@ export function DevDashboard() {
         <section className="space-y-4">
           <div className="space-y-1">
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
-              01 — Lancer un run de scoring
+              01 - Lancer un run de scoring
             </h2>
             <p className="font-body text-xs text-muted-foreground">
               POST /api/scoring/run - une URL par ligne (max 20)
@@ -251,7 +252,7 @@ export function DevDashboard() {
         <section className="space-y-4">
           <div className="space-y-1">
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
-              02 — Statut d&apos;un run
+              02 - Statut d&apos;un run
             </h2>
             <p className="font-body text-xs text-muted-foreground">
               GET /api/scoring/status?runId=...
@@ -319,7 +320,7 @@ export function DevDashboard() {
         <section className="space-y-4">
           <div className="space-y-1">
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
-              03 — Tester le parsing
+              03 - Tester le parsing
             </h2>
             <p className="font-body text-xs text-muted-foreground">
               Parse une URL via Readability et retourne les metadonnees.
@@ -355,7 +356,7 @@ export function DevDashboard() {
         <section className="space-y-4">
           <div className="space-y-1">
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
-              04 — Feed avec donnees fictives
+              04 - Feed avec donnees fictives
             </h2>
             <p className="font-body text-xs text-muted-foreground">
               Apercu des composants UI sans Supabase.
@@ -374,7 +375,12 @@ export function DevDashboard() {
 
           <div className="space-y-6 border border-border p-6">
             {MOCK_ARTICLES.map((a) => (
-              <ArticleCard key={a.id} {...a} score={showScores ? a.score : null} justification={showScores ? a.justification : null} />
+              <ArticleCard
+                key={a.id}
+                {...a}
+                score={showScores ? a.score : null}
+                justification={showScores ? a.justification : null}
+              />
             ))}
           </div>
         </section>
@@ -383,7 +389,7 @@ export function DevDashboard() {
         <section className="space-y-4">
           <div className="space-y-1">
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
-              05 — Rejets avec donnees fictives
+              05 - Rejets avec donnees fictives
             </h2>
           </div>
 

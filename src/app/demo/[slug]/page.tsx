@@ -92,7 +92,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
         )}
       </div>
 
-      {/* Score — identique à ArticleCard */}
+      {/* Score - identique a ArticleCard */}
       {article.score !== null && (
         <div className="flex items-center gap-3 mt-2">
           {article.is_serendipity && (
@@ -116,7 +116,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
         isRejected ? 'opacity-40' : ''
       }`}
       data-testid={`demo-card-${article.id}`}
-      // Pas d'animation côté serveur — on garde la cohérence visuelle sans JS requis
+      // Pas d'animation cote serveur, on garde la coherence visuelle sans JS requis
     >
       {article.url && !isRejected ? (
         <a
@@ -152,11 +152,11 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
 
     // Map email → ID stable (comptes créés par create-test-accounts.mjs)
     const EMAIL_TO_ID: Record<string, string> = {
-      'test-pm@distil.app':         '795c2637-7e43-4b74-82b1-560899cf62d7',
+      'test-pm@distil.app': '795c2637-7e43-4b74-82b1-560899cf62d7',
       'test-consultant@distil.app': '17e9ac27-5bc3-403c-94e4-cb2d6db1e38c',
-      'test-dev@distil.app':        'a615fba9-490a-4dd9-a161-45f8c9b54943',
-      'test-chercheur@distil.app':  'e970bbf3-eb89-476a-bf68-250f53f6ec13',
-      'test-ml@distil.app':         'ce745cc5-266e-4293-a677-2cad575f1aef',
+      'test-dev@distil.app': 'a615fba9-490a-4dd9-a161-45f8c9b54943',
+      'test-chercheur@distil.app': 'e970bbf3-eb89-476a-bf68-250f53f6ec13',
+      'test-ml@distil.app': 'ce745cc5-266e-4293-a677-2cad575f1aef',
     }
     const userId = EMAIL_TO_ID[persona.email]
     const user = userId ? { id: userId } : null
@@ -164,7 +164,9 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
     if (user) {
       const { data } = await sb
         .from('articles')
-        .select('id, title, site_name, excerpt, url, reading_time_minutes, score, justification, is_serendipity, status')
+        .select(
+          'id, title, site_name, excerpt, url, reading_time_minutes, score, justification, is_serendipity, status'
+        )
         .eq('user_id', user.id)
         .order('score', { ascending: false })
         .limit(20)
@@ -186,8 +188,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
   return (
     <div className="min-h-full bg-background">
       <div className="max-w-2xl mx-auto px-4 py-6 md:py-10 w-full">
-
-        {/* En-tête — identique au vrai feed */}
+        {/* En-tete - identique au vrai feed */}
         <div className="border-t-2 border-foreground mb-8 pt-3 space-y-1">
           <div className="flex items-center justify-between">
             <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
@@ -196,7 +197,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
           <div className="flex items-baseline justify-between gap-4">
             <p className="font-ui text-[13px] text-foreground">
               Exemple de veille
-              <span className="text-muted-foreground"> — {persona.label}</span>
+              <span className="text-muted-foreground"> - {persona.label}</span>
             </p>
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -223,7 +224,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
           ))}
         </div>
 
-        {/* Articles — même espacement que le feed */}
+        {/* Articles - meme espacement que le feed */}
         <div className="space-y-8" data-testid="demo-articles">
           {all.length === 0 ? (
             <p className="font-body text-sm text-muted-foreground py-12">
@@ -248,7 +249,6 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
             Créer mon profil - c&apos;est gratuit
           </Link>
         </div>
-
       </div>
     </div>
   )
