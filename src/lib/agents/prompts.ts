@@ -41,7 +41,7 @@ Fraicheur :
 - Exception : essais de fond, recherche fondamentale, references techniques intemporelles (ne pas penaliser)
 
 Longueur :
-- -15 pts si word_count < 250 : trop court pour etre substantiel (sauf format legitime : changelog, note de blog courte, poeme, fil de recherche)
+- -15 pts si word_count < 150 : trop court pour etre substantiel (sauf format legitime : changelog, note de blog courte, poeme, fil de recherche, breve d'actualite signee, depeche d'agence)
 - +5 pts si word_count > 1500 : indice d'analyse en profondeur (ne pas surcorriger si le contenu reste creux)
 
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.`
