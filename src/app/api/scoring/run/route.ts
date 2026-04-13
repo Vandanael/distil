@@ -217,6 +217,8 @@ export async function POST(request: Request) {
       articles_accepted: accepted.length,
       articles_rejected: rejected.length,
       agent_type: result.agentType,
+      model_used: result.modelUsed,
+      prompt_version: result.promptVersion,
       error: result.error,
       duration_ms: result.durationMs,
     })

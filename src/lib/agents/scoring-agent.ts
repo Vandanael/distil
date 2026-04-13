@@ -1,5 +1,6 @@
 import type { ScoredArticle, ScoringRequest, ScoringResult } from './types'
 import { scoreWithMessagesApi } from './messages-api'
+import { PROMPT_VERSION } from './prompts'
 
 // Taille max de batch pour eviter les prompts trop longs
 const BATCH_SIZE = 10
@@ -10,6 +11,7 @@ export async function runScoringAgent(request: ScoringRequest): Promise<ScoringR
 
   let scored: ScoredArticle[] = []
   const agentType: 'managed' | 'messages' = 'messages'
+  let modelUsed: string | null = null
   let error: string | null = null
 
   try {
@@ -17,8 +19,9 @@ export async function runScoringAgent(request: ScoringRequest): Promise<ScoringR
     const batches = chunk(candidates, BATCH_SIZE)
 
     for (const batch of batches) {
-      const results = await scoreWithMessagesApi(profile, batch, archivedTags, negativeExamples)
-      scored = scored.concat(results)
+      const batchResult = await scoreWithMessagesApi(profile, batch, archivedTags, negativeExamples)
+      scored = scored.concat(batchResult.scored)
+      if (!modelUsed) modelUsed = batchResult.modelUsed
     }
   } catch (err) {
     error = err instanceof Error ? err.message : String(err)
@@ -29,6 +32,8 @@ export async function runScoringAgent(request: ScoringRequest): Promise<ScoringR
     runId,
     scored,
     agentType,
+    modelUsed,
+    promptVersion: PROMPT_VERSION,
     durationMs: Date.now() - start,
     error,
   }
