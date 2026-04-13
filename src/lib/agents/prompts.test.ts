@@ -49,6 +49,24 @@ describe('buildSystemPrompt', () => {
   it('mentionne le fallback borderline pour atteindre le quota serendipite', () => {
     expect(buildSystemPrompt()).toContain('borderline')
   })
+
+  it('definit trois statuts mutuellement exclusifs', () => {
+    const prompt = buildSystemPrompt()
+    expect(prompt).toContain('mutuellement exclusifs')
+    expect(prompt).toContain('>= 55')
+    expect(prompt).toContain('40 et 54')
+    expect(prompt).toContain('< 40')
+  })
+
+  it('interdit is_serendipity si score >= 55', () => {
+    expect(buildSystemPrompt()).toContain('is_serendipity=true si score >= 55')
+  })
+
+  it('bumpe les articles borderline dans la tranche 40-54', () => {
+    const prompt = buildSystemPrompt()
+    expect(prompt).toContain('DANS la tranche 40-54')
+    expect(prompt).toContain('jamais en dessous de 40')
+  })
 })
 
 describe('buildUserPrompt', () => {
