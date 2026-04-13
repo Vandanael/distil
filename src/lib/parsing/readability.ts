@@ -1,5 +1,4 @@
 import { Readability } from '@mozilla/readability'
-import { JSDOM } from 'jsdom'
 import DOMPurify from 'isomorphic-dompurify'
 import { fetchHtml } from './fetcher'
 
@@ -34,10 +33,11 @@ const WORDS_PER_MINUTE = 238
 
 export async function parseUrl(url: string): Promise<ParsedArticle> {
   const html = await fetchHtml(url)
-  return parseHtml(html, url)
+  return await parseHtml(html, url)
 }
 
-export function parseHtml(html: string, url: string): ParsedArticle {
+export async function parseHtml(html: string, url: string): Promise<ParsedArticle> {
+  const { JSDOM } = await import('jsdom')
   const dom = new JSDOM(html, { url })
   const reader = new Readability(dom.window.document)
   const article = reader.parse()

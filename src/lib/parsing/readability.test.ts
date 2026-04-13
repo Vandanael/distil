@@ -29,40 +29,40 @@ const RICH_HTML = `<!DOCTYPE html>
 </html>`
 
 describe('parseHtml', () => {
-  it('extrait le titre', () => {
-    const result = parseHtml(MINIMAL_HTML, 'https://example.com/article')
+  it('extrait le titre', async () => {
+    const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
     expect(result.title).toBeTruthy()
   })
 
-  it('extrait le contenu texte', () => {
-    const result = parseHtml(MINIMAL_HTML, 'https://example.com/article')
+  it('extrait le contenu texte', async () => {
+    const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
     expect(result.contentText.length).toBeGreaterThan(10)
   })
 
-  it('calcule le word count', () => {
-    const result = parseHtml(MINIMAL_HTML, 'https://example.com/article')
+  it('calcule le word count', async () => {
+    const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
     expect(result.wordCount).toBeGreaterThan(0)
   })
 
-  it('calcule le temps de lecture minimum a 1 minute', () => {
-    const result = parseHtml(MINIMAL_HTML, 'https://example.com/article')
+  it('calcule le temps de lecture minimum a 1 minute', async () => {
+    const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
     expect(result.readingTimeMinutes).toBeGreaterThanOrEqual(1)
   })
 
-  it('calcule un temps de lecture coherent pour un long article', () => {
-    const result = parseHtml(RICH_HTML, 'https://example.com/long')
+  it('calcule un temps de lecture coherent pour un long article', async () => {
+    const result = await parseHtml(RICH_HTML, 'https://example.com/long')
     // 300 x "Contenu " = ~600 mots -> 3 minutes environ
     expect(result.readingTimeMinutes).toBeGreaterThanOrEqual(2)
   })
 
-  it('preserves lurl dans le resultat', () => {
+  it('preserves lurl dans le resultat', async () => {
     const url = 'https://example.com/article'
-    const result = parseHtml(MINIMAL_HTML, url)
+    const result = await parseHtml(MINIMAL_HTML, url)
     expect(result.url).toBe(url)
   })
 
-  it('retourne contentHtml non vide', () => {
-    const result = parseHtml(MINIMAL_HTML, 'https://example.com/article')
+  it('retourne contentHtml non vide', async () => {
+    const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
     expect(result.contentHtml.length).toBeGreaterThan(0)
   })
 })

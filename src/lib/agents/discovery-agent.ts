@@ -2,7 +2,6 @@
  * Discovery agent : trouve des URLs d'articles via flux RSS.
  * Zero coût API.
  */
-import { JSDOM } from 'jsdom'
 import type { UserProfile } from './types'
 export { buildSearchQueries } from './profile-queries'
 
@@ -237,6 +236,7 @@ async function fetchRssUrls(feedUrl: string): Promise<string[]> {
     if (!res.ok) return []
 
     const xml = await res.text()
+    const { JSDOM } = await import('jsdom')
     const dom = new JSDOM(xml, { contentType: 'text/xml' })
     const doc = dom.window.document
     const urls: string[] = []
