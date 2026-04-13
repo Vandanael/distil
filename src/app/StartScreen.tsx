@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 type FeaturedArticle = {
   title: string | null
@@ -147,6 +148,8 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             >
               EN
             </button>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">|</span>
+            <ThemeToggle />
           </div>
         </div>
 

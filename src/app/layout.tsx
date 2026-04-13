@@ -64,7 +64,7 @@ export default async function RootLayout({
         >
           Passer au contenu
         </a>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <LocaleProvider initialLocale={initialLocale}>
             {children}
             <Toaster position="bottom-center" />
