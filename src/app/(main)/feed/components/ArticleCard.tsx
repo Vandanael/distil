@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { dismissArticle } from '@/app/(main)/article/[id]/actions'
 import { useSwipeToDismiss } from '@/lib/hooks/useSwipeToDismiss'
 import { useLocale } from '@/lib/i18n/context'
+import { isReferenceDomain } from '@/lib/agents/sources'
 import { useDismissContext } from './DismissContext'
 
 type Props = {
@@ -207,13 +208,26 @@ export function ArticleCard({
             </svg>
           </span>
         )}
-        {siteName && <span className="font-ui">{siteName}</span>}
+        {siteName && (
+          <span className="font-ui">
+            {siteName}
+            {isReferenceDomain(siteName) && (
+              <span className="ml-1 text-[11px] text-accent/70" title="Source de reference">Ref.</span>
+            )}
+          </span>
+        )}
         {siteName && relativeDate && <span>·</span>}
         {relativeDate && <span className="font-ui">{relativeDate}</span>}
         {readingTimeMinutes && (
           <>
             <span>·</span>
             <span className="font-ui">{readingTimeMinutes} min</span>
+          </>
+        )}
+        {!isPaywall && wordCount != null && wordCount > 0 && (
+          <>
+            <span>·</span>
+            <span className="font-ui">{wordCount.toLocaleString('fr-FR')} mots</span>
           </>
         )}
         {isPaywall && (
