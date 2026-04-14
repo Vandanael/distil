@@ -28,7 +28,8 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
     const diffH = Math.floor(diffMs / (1000 * 60 * 60))
     const isFr = locale === 'fr'
     if (diffH < 1) return { label: isFr ? "a l'instant" : 'just now', isStale: false }
-    if (diffH < 24) return { label: isFr ? `il y a ${diffH}h` : `${diffH}h ago`, isStale: diffH > 12 }
+    if (diffH < 24)
+      return { label: isFr ? `il y a ${diffH}h` : `${diffH}h ago`, isStale: diffH > 12 }
     const diffD = Math.floor(diffH / 24)
     return { label: isFr ? `il y a ${diffD}j` : `${diffD}d ago`, isStale: true }
   }
@@ -69,7 +70,9 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
         <span className="font-ui text-xs text-muted-foreground capitalize">{formattedDate}</span>
         <div className="flex items-center gap-2">
           {refreshInfo && (
-            <span className={`font-ui text-xs ${refreshInfo.isStale ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>
+            <span
+              className={`font-ui text-xs ${refreshInfo.isStale ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}
+            >
               {refreshInfo.label}
             </span>
           )}

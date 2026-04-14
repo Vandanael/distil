@@ -86,9 +86,9 @@ export async function GET() {
     if (!article) continue
     const highlight = Array.isArray(n.highlights) ? (n.highlights[0] ?? null) : n.highlights
 
-    const articleTags = (article as Record<string, unknown>).article_tags as
-      | Array<{ tags: { name: string } | null }>
-      | null
+    const articleTags = (article as Record<string, unknown>).article_tags as Array<{
+      tags: { name: string } | null
+    }> | null
     const tagNames = (articleTags ?? [])
       .map((at) => at.tags?.name)
       .filter((name): name is string => Boolean(name))
