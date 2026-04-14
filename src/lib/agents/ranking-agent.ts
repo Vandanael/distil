@@ -68,6 +68,9 @@ async function callRankingLlm(
   profilePrompt: ReturnType<typeof buildRankingUserPrompt>,
   modelId: string
 ): Promise<LlmResponse> {
+  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  assertBudget('gemini')
+
   const apiKey = process.env.GOOGLE_AI_API_KEY
   if (!apiKey) throw new Error('GOOGLE_AI_API_KEY manquante')
 
@@ -88,6 +91,7 @@ async function callRankingLlm(
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Aucun JSON dans la reponse')
 
+  recordProviderCall('gemini')
   return JSON.parse(match[0]) as LlmResponse
 }
 

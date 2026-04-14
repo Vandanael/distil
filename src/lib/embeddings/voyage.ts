@@ -40,6 +40,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export async function generateEmbeddingBatch(texts: string[]): Promise<number[][]> {
   if (texts.length === 0) return []
 
+  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  assertBudget('voyage')
+
   const apiKey = process.env.VOYAGE_API_KEY
   if (!apiKey) {
     throw new EmbeddingError('VOYAGE_API_KEY non configurée')
@@ -68,6 +71,7 @@ export async function generateEmbeddingBatch(texts: string[]): Promise<number[][
   }
 
   const data: VoyageResponse = (await response.json()) as VoyageResponse
+  recordProviderCall('voyage')
 
   // Retourne les embeddings dans l'ordre original
   return data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding)

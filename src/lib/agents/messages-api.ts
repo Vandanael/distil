@@ -34,6 +34,9 @@ export async function scoreWithMessagesApi(
   }
 
   // Fallback : Anthropic Haiku
+  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  assertBudget('anthropic')
+
   const client = new Anthropic()
 
   const message = await client.messages.create({
@@ -58,6 +61,8 @@ export async function scoreWithMessagesApi(
   } catch {
     throw new Error(`Messages API: JSON invalide: ${match[0].slice(0, 100)}`)
   }
+
+  recordProviderCall('anthropic')
 
   return {
     scored: parsed.scored.map((item) => ({

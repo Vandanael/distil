@@ -21,6 +21,9 @@ export async function scoreWithGroq(
   archivedTags: string[] = [],
   negativeExamples: string[] = []
 ): Promise<ScoringFunctionResult> {
+  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  assertBudget('groq')
+
   const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
   const completion = await client.chat.completions.create({
@@ -46,6 +49,8 @@ export async function scoreWithGroq(
   } catch {
     throw new Error(`Groq: JSON invalide: ${match[0].slice(0, 100)}`)
   }
+
+  recordProviderCall('groq')
 
   return {
     scored: parsed.scored.map((item) => ({

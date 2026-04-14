@@ -24,6 +24,9 @@ export async function scoreWithGemini(
   archivedTags: string[] = [],
   negativeExamples: string[] = []
 ): Promise<ScoringFunctionResult> {
+  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  assertBudget('gemini')
+
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
   const model = genAI.getGenerativeModel({
     model: MODEL,
@@ -51,6 +54,8 @@ export async function scoreWithGemini(
   } catch {
     throw new Error(`Gemini: JSON invalide: ${match[0].slice(0, 100)}`)
   }
+
+  recordProviderCall('gemini')
 
   return {
     scored: parsed.scored.map((item) => ({
