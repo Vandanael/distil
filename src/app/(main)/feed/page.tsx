@@ -45,7 +45,8 @@ export default async function FeedPage() {
       const dailyCap = profileResult.data?.daily_cap ?? 10
       interests = profileResult.data?.interests ?? []
 
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      const now = new Date()
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
       const [articlesResult, lastRunResult, rejectedResult] = await Promise.all([
         supabase
