@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from './ProfileForm'
@@ -6,7 +5,6 @@ import { TokensSection } from './TokensSection'
 import { PushSubscribe } from '@/components/PushSubscribe'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { listApiTokens } from './token-actions'
-import { buildSearchQueries } from '@/lib/agents/profile-queries'
 import { signOut } from './actions'
 import { OPMLImport } from './OPMLImport'
 
@@ -20,7 +18,7 @@ export default async function ProfilePage() {
       <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
         <div className="space-y-4 border-b border-border pb-8">
           <p className="font-ui text-xs text-accent">Profil</p>
-          <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Préférences</h1>
+          <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
         </div>
         <TokensSection tokens={[]} />
       </div>
@@ -49,17 +47,6 @@ export default async function ProfilePage() {
   const structured = profile.profile_structured as Record<string, unknown> | null
   const language = structured?.language as 'fr' | 'en' | 'both' | undefined
 
-  // Calcule les requetes que Distil utilisera au prochain refresh
-  const searchQueries = buildSearchQueries({
-    profileText: profile.profile_text ?? null,
-    profileStructured: structured,
-    sector: null,
-    interests: profile.interests ?? [],
-    pinnedSources: profile.pinned_sources ?? [],
-    dailyCap: profile.daily_cap ?? 10,
-    serendipityQuota: profile.serendipity_quota ?? 0.15,
-  })
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
       <div className="space-y-4 border-b border-border pb-8">
@@ -67,26 +54,6 @@ export default async function ProfilePage() {
         <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
         <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
-
-      {/* Ce que Distil recherche */}
-      {searchQueries.length > 0 && (
-        <div className="border-t border-border pt-8 space-y-3">
-          <p className="font-ui text-xs text-accent">Ce que Distil recherche</p>
-          <p className="font-body text-xs text-muted-foreground">
-            Requetes utilisees lors du prochain rafraichissement.
-          </p>
-          <ul className="space-y-1.5">
-            {searchQueries.map((q, i) => (
-              <li key={i} className="font-ui text-xs text-foreground/70 flex gap-2">
-                <span className="text-muted-foreground/40 shrink-0 tabular-nums">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span>{q}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <ProfileForm
         profile={{
@@ -100,48 +67,6 @@ export default async function ProfilePage() {
         }}
       />
 
-      {/* Import OPML */}
-      <div className="border-t border-border pt-8 space-y-4">
-        <p className="font-ui text-xs text-accent">Sources RSS</p>
-        <OPMLImport />
-      </div>
-
-      {/* Navigation secondaire */}
-      <div className="border-t border-border pt-8 space-y-3">
-        <Link
-          href="/archive"
-          className="block font-ui text-sm text-foreground hover:text-accent transition-colors"
-        >
-          Archives
-        </Link>
-        <Link
-          href="/highlights"
-          className="block font-ui text-sm text-foreground hover:text-accent transition-colors"
-        >
-          Highlights
-        </Link>
-        <Link
-          href="/rejected"
-          className="block font-ui text-sm text-foreground hover:text-accent transition-colors"
-        >
-          Articles rejetes
-        </Link>
-      </div>
-
-      {/* Reglages */}
-      <div className="border-t border-border pt-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <span className="font-ui text-sm text-foreground">Theme</span>
-          <ThemeToggle />
-        </div>
-        <PushSubscribe />
-        <TokensSection tokens={tokens} />
-        <p className="font-ui text-xs text-muted-foreground">
-          Raccourcis clavier : j/k naviguer, Enter ouvrir, d rejeter, Esc retour, h highlight (dans
-          un article)
-        </p>
-      </div>
-
       <div className="border-t border-border pt-8">
         <form action={signOut}>
           <button
@@ -152,6 +77,41 @@ export default async function ProfilePage() {
           </button>
         </form>
       </div>
+
+      {/* Parametres avances */}
+      <details className="border-t border-border pt-6 group">
+        <summary className="font-ui text-xs text-muted-foreground cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-1.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="transition-transform group-open:rotate-90"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+          Parametres avances
+        </summary>
+        <div className="mt-6 space-y-8">
+          <div className="space-y-4">
+            <p className="font-ui text-xs text-accent">Sources RSS</p>
+            <OPMLImport />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="font-ui text-sm text-foreground">Theme</span>
+            <ThemeToggle />
+          </div>
+
+          <PushSubscribe />
+          <TokensSection tokens={tokens} />
+        </div>
+      </details>
     </div>
   )
 }

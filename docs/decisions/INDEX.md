@@ -20,4 +20,5 @@ Les ADR sont crees via le skill `adr-new` (a venir).
 | [ADR-006](ADR-006-format-profil-hybride.md) | Format hybride pour le profil utilisateur | accepte | 2026-04-10 |
 | [ADR-007](ADR-007-stockage-highlights-ancrage-texte.md) | Stockage des highlights par ancrage texte avec fallback | accepte | 2026-04-10 |
 | [ADR-008](ADR-008-schema-supabase-sprint1.md) | Schema Supabase initial - Sprint 1 (profil et auth) | accepte | 2026-04-10 |
-| [ADR-009](ADR-009-reequilibrage-source-qualite.md) | Reequilibrage bonus sources etablies vs marqueurs intrinseques | propose | 2026-04-13 |
+| [ADR-009](ADR-009-reequilibrage-source-qualite.md) | Reequilibrage bonus sources etablies vs marqueurs intrinseques | supersede | 2026-04-13 |
+| [ADR-010](ADR-010-scoring-v2-serendipite-recherche.md) | Scoring v2 - pipeline serendipite aligne recherche 2024-2025 | accepte | 2026-04-14 |

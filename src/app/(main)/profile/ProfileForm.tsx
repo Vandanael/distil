@@ -18,16 +18,6 @@ async function runScoring(urls: string[]): Promise<{ accepted: number; rejected:
   return res.json() as Promise<{ accepted: number; rejected: number }>
 }
 
-async function refreshFeed(): Promise<{
-  discovered: number
-  accepted: number
-  rejected: number
-}> {
-  const res = await fetch('/api/feed/refresh', { method: 'POST' })
-  if (!res.ok) throw new Error('Erreur serveur')
-  return res.json() as Promise<{ discovered: number; accepted: number; rejected: number }>
-}
-
 type ProfileData = {
   profile_text: string | null
   interests: string[]
@@ -55,8 +45,6 @@ export function ProfileForm({ profile }: Props) {
   const [showScoringPanel, setShowScoringPanel] = useState(false)
   const [scoringUrls, setScoringUrls] = useState('')
   const [isScoringPending, startScoringTransition] = useTransition()
-  const [isRefreshPending, startRefreshTransition] = useTransition()
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSaved(false)
@@ -231,47 +219,8 @@ export function ProfileForm({ profile }: Props) {
         )}
       </div>
 
-      {/* Declencheur de scoring manuel */}
+      {/* Scoring manuel */}
       <div className="border-t border-border pt-6 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <p className="font-ui text-sm font-medium text-foreground">Rafraîchir le feed</p>
-            <p className="font-body text-xs text-muted-foreground">
-              Distil cherche de nouveaux articles depuis vos sources et centres d&apos;intérêt.
-            </p>
-            <p className="font-ui text-xs text-muted-foreground">
-              Actualisation automatique chaque matin à 6h30.
-            </p>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            disabled={isRefreshPending}
-            data-testid="refresh-feed-btn"
-            title="Actualisation automatique chaque matin a 6h30"
-            onClick={() => {
-              startRefreshTransition(async () => {
-                const toastId = toast.loading('Recherche de nouveaux articles...')
-                try {
-                  const result = await refreshFeed()
-                  if (result.accepted > 0) {
-                    toast.success(
-                      `${result.accepted} nouvel article${result.accepted > 1 ? 's' : ''} dans votre feed`,
-                      { id: toastId }
-                    )
-                  } else {
-                    toast.info('Aucun nouvel article pertinent trouvé', { id: toastId })
-                  }
-                } catch {
-                  toast.error('Erreur lors du rafraîchissement', { id: toastId })
-                }
-              })
-            }}
-          >
-            {isRefreshPending ? 'Recherche...' : 'Rafraîchir'}
-          </Button>
-        </div>
-
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <p className="font-ui text-sm font-medium text-foreground">Analyser des articles</p>

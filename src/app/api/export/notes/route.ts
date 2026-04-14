@@ -44,14 +44,14 @@ export async function GET() {
     return NextResponse.json({ error: 'Non authentifie' }, { status: 401 })
   }
 
-  // Charger les notes avec article et highlight associes
+  // Charger les notes avec article, highlight et tags associes
   const { data: notes } = await supabase
     .from('notes')
     .select(
       `
       content,
       created_at,
-      articles (id, title, url, site_name, author, published_at),
+      articles (id, title, url, site_name, author, published_at, article_tags (tags (name))),
       highlights (text_content)
     `
     )
@@ -69,22 +69,29 @@ export async function GET() {
   }
 
   // Regrouper par article
-  const byArticle = new Map<
-    string,
-    {
-      title: string | null
-      url: string
-      siteName: string | null
-      author: string | null
-      publishedAt: string | null
-      entries: Array<{ note: string; highlight: string | null; date: string }>
-    }
-  >()
+  type ArticleGroup = {
+    title: string | null
+    url: string
+    siteName: string | null
+    author: string | null
+    publishedAt: string | null
+    tags: string[]
+    entries: Array<{ note: string; highlight: string | null; date: string }>
+  }
+
+  const byArticle = new Map<string, ArticleGroup>()
 
   for (const n of notes) {
     const article = Array.isArray(n.articles) ? n.articles[0] : n.articles
     if (!article) continue
     const highlight = Array.isArray(n.highlights) ? (n.highlights[0] ?? null) : n.highlights
+
+    const articleTags = (article as Record<string, unknown>).article_tags as Array<{
+      tags: { name: string } | null
+    }> | null
+    const tagNames = (articleTags ?? [])
+      .map((at) => at.tags?.name)
+      .filter((name): name is string => Boolean(name))
 
     const key = article.id
     if (!byArticle.has(key)) {
@@ -94,6 +101,7 @@ export async function GET() {
         siteName: article.site_name,
         author: article.author,
         publishedAt: article.published_at,
+        tags: tagNames,
         entries: [],
       })
     }
@@ -103,6 +111,17 @@ export async function GET() {
       highlight: highlight?.text_content ?? null,
       date: n.created_at,
     })
+  }
+
+  // Construire un index tag -> titres pour les backlinks
+  const tagToTitles = new Map<string, string[]>()
+  for (const [, art] of byArticle) {
+    const title = art.title ?? 'Sans titre'
+    for (const tag of art.tags) {
+      const existing = tagToTitles.get(tag) ?? []
+      existing.push(title)
+      tagToTitles.set(tag, existing)
+    }
   }
 
   // Construire le Markdown
@@ -127,9 +146,14 @@ export async function GET() {
   ]
 
   for (const [, art] of byArticle) {
-    lines.push(`## ${art.title ?? 'Sans titre'}`)
+    const title = art.title ?? 'Sans titre'
+    lines.push(`## [[${title}]]`)
     lines.push('')
 
+    if (art.tags.length > 0) {
+      lines.push(`Tags : ${art.tags.map((t) => `#${t.replace(/\s+/g, '-')}`).join(' ')}`)
+      lines.push('')
+    }
     if (art.author) lines.push(`Auteur : ${art.author}`)
     if (art.siteName) lines.push(`Source : ${art.siteName}`)
     if (art.publishedAt) lines.push(`Publie le : ${formatDate(art.publishedAt)}`)
@@ -146,6 +170,18 @@ export async function GET() {
       lines.push(`*Note du ${formatDate(entry.date)}*`)
       lines.push('')
       lines.push('---')
+      lines.push('')
+    }
+
+    // Backlinks via tags partages
+    const related = new Set<string>()
+    for (const tag of art.tags) {
+      for (const other of tagToTitles.get(tag) ?? []) {
+        if (other !== title) related.add(other)
+      }
+    }
+    if (related.size > 0) {
+      lines.push(`Voir aussi : ${[...related].map((r) => `[[${r}]]`).join(', ')}`)
       lines.push('')
     }
   }

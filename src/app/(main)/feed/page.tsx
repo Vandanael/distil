@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ArticleCard } from './components/ArticleCard'
+import { BucketSection } from './components/BucketSection'
 import { EmptyFeed } from './components/EmptyFeed'
 import { FeedShell } from './components/FeedShell'
 import { FeedHeader } from './components/FeedHeader'
@@ -25,6 +27,7 @@ export default async function FeedPage() {
   let showScores = true
   let lastRefreshAt: string | null = null
   let interests: string[] = []
+  let rejectedCount = 0
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const supabase = await createClient()
@@ -43,7 +46,10 @@ export default async function FeedPage() {
       const dailyCap = profileResult.data?.daily_cap ?? 10
       interests = profileResult.data?.interests ?? []
 
-      const [articlesResult, lastRunResult] = await Promise.all([
+      const now = new Date()
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+      const [articlesResult, lastRunResult, rejectedResult] = await Promise.all([
         supabase
           .from('articles')
           .select(
@@ -62,10 +68,17 @@ export default async function FeedPage() {
           .order('completed_at', { ascending: false })
           .limit(1)
           .single(),
+        supabase
+          .from('articles')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('status', 'rejected')
+          .gte('scored_at', sevenDaysAgo),
       ])
 
       articles = articlesResult.data ?? []
       lastRefreshAt = lastRunResult.data?.completed_at ?? null
+      rejectedCount = rejectedResult.count ?? 0
     }
   }
 
@@ -74,7 +87,7 @@ export default async function FeedPage() {
   const topInterests = interests.slice(0, 3)
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 md:py-10 w-full">
+    <div className="max-w-2xl mx-auto px-4 py-3 md:py-10 w-full">
       <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
 
       {/* Articles */}
@@ -83,28 +96,67 @@ export default async function FeedPage() {
           {articles.length === 0 ? (
             <EmptyFeed />
           ) : (
-            articles.map((a, i) => (
-              <ArticleCard
-                key={a.id}
-                id={a.id}
-                staggerIndex={i}
-                title={a.title}
-                siteName={a.site_name}
-                excerpt={a.excerpt}
-                readingTimeMinutes={a.reading_time_minutes}
-                score={showScores ? a.score : null}
-                justification={showScores ? a.justification : null}
-                isSerendipity={a.is_serendipity}
-                origin={a.origin}
-                scoredAt={a.scored_at}
-                wordCount={a.word_count}
-                ogImageUrl={a.og_image_url}
-                isRead={a.status === 'read'}
-              />
-            ))
+            (() => {
+              const essentials = articles.filter((a) => !a.is_serendipity)
+              const surprises = articles.filter((a) => a.is_serendipity)
+              const hasBuckets = surprises.length > 0
+
+              if (!hasBuckets) {
+                return articles.map((a, i) => (
+                  <ArticleCard
+                    key={a.id}
+                    id={a.id}
+                    staggerIndex={i}
+                    title={a.title}
+                    siteName={a.site_name}
+                    excerpt={a.excerpt}
+                    readingTimeMinutes={a.reading_time_minutes}
+                    score={showScores ? a.score : null}
+                    justification={showScores ? a.justification : null}
+                    isSerendipity={a.is_serendipity}
+                    origin={a.origin}
+                    scoredAt={a.scored_at}
+                    wordCount={a.word_count}
+                    ogImageUrl={a.og_image_url}
+                    isRead={a.status === 'read'}
+                  />
+                ))
+              }
+
+              return (
+                <>
+                  <BucketSection
+                    title="Essentiel"
+                    subtitle="A ne pas manquer"
+                    articles={essentials}
+                    showScores={showScores}
+                  />
+                  <div className="border-t border-border" />
+                  <BucketSection
+                    title="Decouverte"
+                    subtitle="Hors de vos habitudes"
+                    articles={surprises}
+                    showScores={showScores}
+                    staggerOffset={essentials.length}
+                  />
+                </>
+              )
+            })()
           )}
         </FeedShell>
       </DismissProvider>
+
+      {rejectedCount > 0 && (
+        <div className="mt-8 pt-4 border-t border-border">
+          <Link
+            href="/rejected"
+            className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
+          >
+            {rejectedCount} article{rejectedCount > 1 ? 's' : ''} filtre
+            {rejectedCount > 1 ? 's' : ''} cette semaine
+          </Link>
+        </div>
+      )}
     </div>
   )
 }
