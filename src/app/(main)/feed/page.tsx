@@ -95,52 +95,54 @@ export default async function FeedPage() {
         <FeedShell className="space-y-8">
           {articles.length === 0 ? (
             <EmptyFeed />
-          ) : (() => {
-            const essentials = articles.filter((a) => !a.is_serendipity)
-            const surprises = articles.filter((a) => a.is_serendipity)
-            const hasBuckets = surprises.length > 0
+          ) : (
+            (() => {
+              const essentials = articles.filter((a) => !a.is_serendipity)
+              const surprises = articles.filter((a) => a.is_serendipity)
+              const hasBuckets = surprises.length > 0
 
-            if (!hasBuckets) {
-              return articles.map((a, i) => (
-                <ArticleCard
-                  key={a.id}
-                  id={a.id}
-                  staggerIndex={i}
-                  title={a.title}
-                  siteName={a.site_name}
-                  excerpt={a.excerpt}
-                  readingTimeMinutes={a.reading_time_minutes}
-                  score={showScores ? a.score : null}
-                  justification={showScores ? a.justification : null}
-                  isSerendipity={a.is_serendipity}
-                  origin={a.origin}
-                  scoredAt={a.scored_at}
-                  wordCount={a.word_count}
-                  ogImageUrl={a.og_image_url}
-                  isRead={a.status === 'read'}
-                />
-              ))
-            }
+              if (!hasBuckets) {
+                return articles.map((a, i) => (
+                  <ArticleCard
+                    key={a.id}
+                    id={a.id}
+                    staggerIndex={i}
+                    title={a.title}
+                    siteName={a.site_name}
+                    excerpt={a.excerpt}
+                    readingTimeMinutes={a.reading_time_minutes}
+                    score={showScores ? a.score : null}
+                    justification={showScores ? a.justification : null}
+                    isSerendipity={a.is_serendipity}
+                    origin={a.origin}
+                    scoredAt={a.scored_at}
+                    wordCount={a.word_count}
+                    ogImageUrl={a.og_image_url}
+                    isRead={a.status === 'read'}
+                  />
+                ))
+              }
 
-            return (
-              <>
-                <BucketSection
-                  title="Essentiel"
-                  subtitle="A ne pas manquer"
-                  articles={essentials}
-                  showScores={showScores}
-                />
-                <div className="border-t border-border" />
-                <BucketSection
-                  title="Decouverte"
-                  subtitle="Hors de vos habitudes"
-                  articles={surprises}
-                  showScores={showScores}
-                  staggerOffset={essentials.length}
-                />
-              </>
-            )
-          })()}
+              return (
+                <>
+                  <BucketSection
+                    title="Essentiel"
+                    subtitle="A ne pas manquer"
+                    articles={essentials}
+                    showScores={showScores}
+                  />
+                  <div className="border-t border-border" />
+                  <BucketSection
+                    title="Decouverte"
+                    subtitle="Hors de vos habitudes"
+                    articles={surprises}
+                    showScores={showScores}
+                    staggerOffset={essentials.length}
+                  />
+                </>
+              )
+            })()
+          )}
         </FeedShell>
       </DismissProvider>
 
@@ -150,7 +152,8 @@ export default async function FeedPage() {
             href="/rejected"
             className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
           >
-            {rejectedCount} article{rejectedCount > 1 ? 's' : ''} filtre{rejectedCount > 1 ? 's' : ''} cette semaine
+            {rejectedCount} article{rejectedCount > 1 ? 's' : ''} filtre
+            {rejectedCount > 1 ? 's' : ''} cette semaine
           </Link>
         </div>
       )}

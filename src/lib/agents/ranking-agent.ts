@@ -1,7 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
-import { RANKING_SYSTEM_PROMPT, RANKING_PROMPT_VERSION, buildRankingUserPrompt } from './ranking-prompts'
+import {
+  RANKING_SYSTEM_PROMPT,
+  RANKING_PROMPT_VERSION,
+  buildRankingUserPrompt,
+} from './ranking-prompts'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,7 +95,10 @@ async function callRankingLlm(
   return JSON.parse(match[0]) as LlmResponse
 }
 
-function cosineFallback(candidates: RankingCandidate[]): { essential: RankedItem[]; surprise: RankedItem[] } {
+function cosineFallback(candidates: RankingCandidate[]): {
+  essential: RankedItem[]
+  surprise: RankedItem[]
+} {
   // Sort by cosine distance (closest = most relevant)
   const sorted = [...candidates].sort((a, b) => a.distance - b.distance)
 
@@ -181,10 +188,7 @@ async function persistRanking(
   }
 }
 
-async function rankForUser(
-  supabase: AnySupabaseClient,
-  userId: string
-): Promise<RankingResult> {
+async function rankForUser(supabase: AnySupabaseClient, userId: string): Promise<RankingResult> {
   const start = Date.now()
   const today = new Date().toISOString().slice(0, 10)
 
@@ -202,7 +206,7 @@ async function rankForUser(
       essential: [],
       surprise: [],
       fallback: false,
-      error: 'Deja classe aujourd\'hui',
+      error: "Deja classe aujourd'hui",
       durationMs: Date.now() - start,
     }
   }
@@ -216,7 +220,7 @@ async function rankForUser(
       essential: [],
       surprise: [],
       fallback: false,
-      error: 'Pas d\'embedding profil disponible',
+      error: "Pas d'embedding profil disponible",
       durationMs: Date.now() - start,
     }
   }

@@ -21,10 +21,7 @@ function estimateWordCount(text: string | undefined): number {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabaseClient = SupabaseClient<any, any, any>
 
-async function fetchFeed(
-  supabase: AnySupabaseClient,
-  feed: Feed
-): Promise<IngestResult> {
+async function fetchFeed(supabase: AnySupabaseClient, feed: Feed): Promise<IngestResult> {
   const result: IngestResult = {
     feedId: feed.id,
     feedUrl: feed.url,
@@ -80,26 +77,28 @@ async function fetchFeed(
     if (!parsed.items || parsed.items.length === 0) return result
 
     // Prepare items for insert
-    const rows = parsed.items.map((item) => {
-      const itemUrl = item.link ?? item.guid ?? ''
-      const hash = contentHash(itemUrl, item.title ?? null, item.contentSnippet ?? null)
-      const rawItem = item as Record<string, unknown>
-      const contentText = String(
-        rawItem['content:encoded'] ?? item.content ?? item.contentSnippet ?? ''
-      )
+    const rows = parsed.items
+      .map((item) => {
+        const itemUrl = item.link ?? item.guid ?? ''
+        const hash = contentHash(itemUrl, item.title ?? null, item.contentSnippet ?? null)
+        const rawItem = item as Record<string, unknown>
+        const contentText = String(
+          rawItem['content:encoded'] ?? item.content ?? item.contentSnippet ?? ''
+        )
 
-      return {
-        feed_id: feed.id,
-        guid: item.guid ?? null,
-        url: itemUrl,
-        title: item.title ?? null,
-        author: (rawItem['dc:creator'] as string | undefined) ?? item.creator ?? null,
-        published_at: item.isoDate ?? null,
-        content_text: contentText.slice(0, 50_000), // Cap at 50k chars
-        content_hash: hash,
-        word_count: estimateWordCount(contentText),
-      }
-    }).filter((row) => row.url.length > 0)
+        return {
+          feed_id: feed.id,
+          guid: item.guid ?? null,
+          url: itemUrl,
+          title: item.title ?? null,
+          author: (rawItem['dc:creator'] as string | undefined) ?? item.creator ?? null,
+          published_at: item.isoDate ?? null,
+          content_text: contentText.slice(0, 50_000), // Cap at 50k chars
+          content_hash: hash,
+          word_count: estimateWordCount(contentText),
+        }
+      })
+      .filter((row) => row.url.length > 0)
 
     if (rows.length === 0) return result
 
@@ -145,9 +144,7 @@ export async function ingestAllFeeds(): Promise<IngestSummary> {
 
   for (let i = 0; i < feeds.length; i += CONCURRENCY) {
     const batch = feeds.slice(i, i + CONCURRENCY) as Feed[]
-    const batchResults = await Promise.allSettled(
-      batch.map((feed) => fetchFeed(supabase, feed))
-    )
+    const batchResults = await Promise.allSettled(batch.map((feed) => fetchFeed(supabase, feed)))
     for (let j = 0; j < batchResults.length; j++) {
       const r = batchResults[j]
       if (r.status === 'fulfilled') {

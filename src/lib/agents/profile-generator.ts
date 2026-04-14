@@ -99,15 +99,16 @@ async function generateForUser(
     }
 
     // Upsert profile
-    await supabase
-      .from('user_profile_text')
-      .upsert({
+    await supabase.from('user_profile_text').upsert(
+      {
         user_id: userId,
         static_profile: parsed.static_profile,
         long_term_profile: parsed.long_term_profile,
         short_term_profile: parsed.short_term_profile,
         updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' })
+      },
+      { onConflict: 'user_id' }
+    )
 
     return { userId, generated: true, error: null }
   } catch (err) {

@@ -29,8 +29,10 @@ export function buildProfileUserPrompt(context: {
 
   if (context.profileText) lines.push(`Description libre : ${context.profileText}`)
   if (context.sector) lines.push(`Secteur : ${context.sector}`)
-  if (context.interests.length > 0) lines.push(`Interets declares : ${context.interests.join(', ')}`)
-  if (context.pinnedSources.length > 0) lines.push(`Sources favorites : ${context.pinnedSources.join(', ')}`)
+  if (context.interests.length > 0)
+    lines.push(`Interets declares : ${context.interests.join(', ')}`)
+  if (context.pinnedSources.length > 0)
+    lines.push(`Sources favorites : ${context.pinnedSources.join(', ')}`)
 
   if (context.recentArticles.length > 0) {
     lines.push('')

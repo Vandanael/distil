@@ -24,7 +24,10 @@ export async function computePopularity(supabase: AnySupabaseClient): Promise<nu
   const { data: existing } = await supabase
     .from('item_popularity')
     .select('item_id')
-    .in('item_id', missing.map((m) => m.item_id))
+    .in(
+      'item_id',
+      missing.map((m) => m.item_id)
+    )
 
   const existingSet = new Set((existing ?? []).map((e) => e.item_id))
   const toCompute = missing.filter((m) => !existingSet.has(m.item_id))
@@ -47,14 +50,15 @@ export async function computePopularity(supabase: AnySupabaseClient): Promise<nu
     const similarCount = typeof count === 'number' ? count : 0
     const unpopScore = 1.0 / (1 + similarCount)
 
-    await supabase
-      .from('item_popularity')
-      .upsert({
+    await supabase.from('item_popularity').upsert(
+      {
         item_id: item.item_id,
         similar_count: similarCount,
         unpop_score: unpopScore,
         computed_at: new Date().toISOString(),
-      }, { onConflict: 'item_id' })
+      },
+      { onConflict: 'item_id' }
+    )
 
     computed++
   }

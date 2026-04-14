@@ -66,8 +66,9 @@ export async function embedNewItems(): Promise<EmbedResult> {
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   // Find items without embeddings
-  const { data: items, error } = await supabase
-    .rpc('get_items_without_embeddings', { max_count: MAX_ITEMS_PER_RUN })
+  const { data: items, error } = await supabase.rpc('get_items_without_embeddings', {
+    max_count: MAX_ITEMS_PER_RUN,
+  })
 
   // Fallback if RPC not yet created : raw query
   let itemsToEmbed: Array<{ id: string; content_text: string }>
@@ -83,7 +84,13 @@ export async function embedNewItems(): Promise<EmbedResult> {
 
     // Filter out items that already have embeddings
     if (!rawItems || rawItems.length === 0) {
-      return { itemsEmbedded: 0, popularityComputed: 0, rateLimited: false, error: null, durationMs: Date.now() - start }
+      return {
+        itemsEmbedded: 0,
+        popularityComputed: 0,
+        rateLimited: false,
+        error: null,
+        durationMs: Date.now() - start,
+      }
     }
 
     const ids = rawItems.map((i) => i.id)
@@ -99,7 +106,13 @@ export async function embedNewItems(): Promise<EmbedResult> {
   }
 
   if (itemsToEmbed.length === 0) {
-    return { itemsEmbedded: 0, popularityComputed: 0, rateLimited: false, error: null, durationMs: Date.now() - start }
+    return {
+      itemsEmbedded: 0,
+      popularityComputed: 0,
+      rateLimited: false,
+      error: null,
+      durationMs: Date.now() - start,
+    }
   }
 
   let totalEmbedded = 0
@@ -127,7 +140,8 @@ export async function embedNewItems(): Promise<EmbedResult> {
     try {
       popularityComputed = await computePopularity(supabase)
     } catch (err) {
-      embedError = (embedError ? embedError + '; ' : '') +
+      embedError =
+        (embedError ? embedError + '; ' : '') +
         `popularity: ${err instanceof Error ? err.message : String(err)}`
     }
   }
