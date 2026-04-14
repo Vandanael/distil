@@ -1,7 +1,7 @@
 ---
 numero: "ADR-009"
 titre: "Reequilibrage bonus sources etablies vs marqueurs intrinseques de qualite"
-statut: "propose"
+statut: "supersede par ADR-010"
 date: 2026-04-13
 ---
 

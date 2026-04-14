@@ -55,6 +55,41 @@ export function ReadingView({
     markAsRead(id)
   }, [id])
 
+  // Track reading time and log read_full feedback after 30s
+  useEffect(() => {
+    const startTime = Date.now()
+    let logged = false
+
+    function logReadFull() {
+      if (logged) return
+      const elapsed = Math.round((Date.now() - startTime) / 1000)
+      if (elapsed < 30) return
+      logged = true
+      void fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'read_full',
+          articleId: id,
+          secondsOnPage: elapsed,
+        }),
+      })
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === 'hidden') logReadFull()
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('beforeunload', logReadFull)
+
+    return () => {
+      logReadFull()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('beforeunload', logReadFull)
+    }
+  }, [id])
+
   // Raccourci clavier h : focus sur le contenu pour faciliter la selection et le highlight
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

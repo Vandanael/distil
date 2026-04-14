@@ -63,6 +63,7 @@ export function ArticleCard({
   const [dismissed, setDismissed] = useState(false)
   const [showScorePopover, setShowScorePopover] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
+  const [surprisedUsefulSent, setSurprisedUsefulSent] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
   const scorePopoverRef = useRef<HTMLDivElement>(null)
@@ -175,6 +176,25 @@ export function ArticleCard({
     } catch {
       setPositiveSignalSent(false)
       toast.error(locale === 'fr' ? "Erreur lors de l'envoi du signal." : 'Error sending signal.')
+    }
+  }
+
+  async function handleSurprisedUseful(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (surprisedUsefulSent) return
+    setSurprisedUsefulSent(true)
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'surprised_useful', articleId: id }),
+      })
+      if (!res.ok) throw new Error()
+      toast.success(t.article.surprisedUsefulSent)
+    } catch {
+      setSurprisedUsefulSent(false)
+      toast.error(locale === 'fr' ? 'Erreur lors du retour.' : 'Error sending feedback.')
     }
   }
 
@@ -341,6 +361,28 @@ export function ArticleCard({
 
         {/* Actions a droite */}
         <div className="ml-auto flex items-center gap-1">
+          {isSerendipity && (
+            <button
+              type="button"
+              onClick={handleSurprisedUseful}
+              disabled={surprisedUsefulSent}
+              aria-label={t.article.surprisedUseful}
+              data-testid={`surprised-${id}`}
+              className="font-ui text-[13px] text-muted-foreground/60 transition-colors p-1.5 hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
+              title={t.article.surprisedUseful}
+            >
+              {surprisedUsefulSent ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+                </svg>
+              )}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handlePositiveSignal}
