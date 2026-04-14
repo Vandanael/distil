@@ -51,20 +51,23 @@ export default async function RootPage() {
     ]
 
     if (DEMO_USER_IDS.length > 0) {
-      // Meilleur article de chacun des 3 premiers users demo
+      // Rotation quotidienne : offset different par jour et par persona
+      const startOfYear = new Date(new Date().getFullYear(), 0, 0).getTime()
+      const dayOfYear = Math.floor((Date.now() - startOfYear) / 86_400_000)
+
       const picks = await Promise.all(
-        DEMO_USER_IDS.map((uid) =>
-          serviceClient
+        DEMO_USER_IDS.map((uid, i) => {
+          const offset = (dayOfYear + i * 7) % 10
+          return serviceClient
             .from('articles')
             .select('title, url, site_name, excerpt, score, is_serendipity')
             .eq('user_id', uid)
             .eq('status', 'accepted')
-            .eq('is_serendipity', false)
             .not('score', 'is', null)
             .order('score', { ascending: false })
-            .limit(1)
+            .range(offset, offset)
             .single()
-        )
+        })
       )
 
       featuredArticles = picks.filter((r) => r.data !== null).map((r) => r.data!)

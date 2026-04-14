@@ -87,7 +87,7 @@ export default async function FeedPage() {
   const topInterests = interests.slice(0, 3)
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 md:py-10 w-full">
+    <div className="max-w-2xl mx-auto px-4 py-3 md:py-10 w-full">
       <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
 
       {/* Articles */}

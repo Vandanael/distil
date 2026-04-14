@@ -138,7 +138,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
   })
 
   return (
-    <main className="min-h-full flex flex-col items-center justify-center px-4 py-16 bg-background">
+    <main className="min-h-full flex flex-col items-center justify-center px-4 py-6 md:py-16 bg-background">
       <div className="w-full max-w-2xl">
         {/* Bandeau éditorial */}
         <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
