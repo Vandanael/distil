@@ -52,8 +52,9 @@ export default async function RootPage() {
 
     if (DEMO_USER_IDS.length > 0) {
       // Rotation quotidienne : offset different par jour et par persona
-      const startOfYear = new Date(new Date().getFullYear(), 0, 0).getTime()
-      const dayOfYear = Math.floor((Date.now() - startOfYear) / 86_400_000)
+      const now = new Date()
+      const startOfYear = new Date(now.getFullYear(), 0, 0).getTime()
+      const dayOfYear = Math.floor((now.getTime() - startOfYear) / 86_400_000)
 
       const picks = await Promise.all(
         DEMO_USER_IDS.map((uid, i) => {

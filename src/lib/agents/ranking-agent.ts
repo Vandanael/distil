@@ -1,11 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
-import {
-  RANKING_SYSTEM_PROMPT,
-  RANKING_PROMPT_VERSION,
-  buildRankingUserPrompt,
-} from './ranking-prompts'
+import { RANKING_SYSTEM_PROMPT, buildRankingUserPrompt } from './ranking-prompts'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
