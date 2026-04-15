@@ -12,14 +12,13 @@ import { createClient } from '@supabase/supabase-js'
  * These limits are generous safety caps, not normal operating targets.
  */
 
-type Provider = 'voyage' | 'gemini' | 'anthropic' | 'groq'
+type Provider = 'voyage' | 'gemini' | 'anthropic'
 
 // Hard daily call limits per provider
 const DAILY_LIMITS: Record<Provider, number> = {
   voyage: 100, // ~50 items/day normal, 100 = 2x safety margin
   gemini: 20, // 1 ranking + 1 profile normal, 20 = generous margin
   anthropic: 10, // fallback only, should rarely fire
-  groq: 50, // free tier, 14k/day limit on their side
 }
 
 // In-memory counters (reset on process restart, hydrated from DB on first access)
@@ -27,7 +26,6 @@ const counters: Record<Provider, { date: string; count: number; hydrated: boolea
   voyage: { date: '', count: 0, hydrated: false },
   gemini: { date: '', count: 0, hydrated: false },
   anthropic: { date: '', count: 0, hydrated: false },
-  groq: { date: '', count: 0, hydrated: false },
 }
 
 function todayUTC(): string {
