@@ -23,17 +23,29 @@ export async function scoreWithMessagesApi(
   archivedTags: string[] = [],
   negativeExamples: string[] = []
 ): Promise<ScoringFunctionResult> {
-  // Groq (gratuit, 14k req/jour, Llama 3.1 70B)
+  const errors: string[] = []
+
+  // Fallback chain : Groq -> Gemini -> Anthropic
   if (process.env.GROQ_API_KEY) {
-    return scoreWithGroq(profile, candidates, archivedTags, negativeExamples)
+    try {
+      return await scoreWithGroq(profile, candidates, archivedTags, negativeExamples)
+    } catch (err) {
+      errors.push(`groq: ${err instanceof Error ? err.message : String(err)}`)
+    }
   }
 
-  // Gemini Flash (gratuit avec billing activé)
   if (process.env.GOOGLE_AI_API_KEY) {
-    return scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
+    try {
+      return await scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
+    } catch (err) {
+      errors.push(`gemini: ${err instanceof Error ? err.message : String(err)}`)
+    }
   }
 
-  // Fallback : Anthropic Haiku
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error(`Scoring indisponible, aucun provider fonctionnel. ${errors.join('; ')}`)
+  }
+
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
   await assertBudget('anthropic')
 
