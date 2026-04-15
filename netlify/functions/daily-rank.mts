@@ -30,5 +30,5 @@ const handler = async (): Promise<void> => {
 export default handler
 
 export const config: Config = {
-  schedule: '30 6 * * *',
+  schedule: '0 7 * * *',
 }

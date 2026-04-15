@@ -1,3 +1,5 @@
+export const revalidate = 3600
+
 import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'

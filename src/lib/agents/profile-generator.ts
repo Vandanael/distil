@@ -76,7 +76,7 @@ async function generateForUser(
     })
 
     const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
-    assertBudget('gemini')
+    await assertBudget('gemini')
 
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({

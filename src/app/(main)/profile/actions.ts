@@ -47,6 +47,7 @@ export async function updateProfile(input: ProfileUpdate) {
   }
 
   revalidatePath('/profile')
+  revalidatePath('/feed')
 }
 
 export async function toggleDigestEmail(enabled: boolean) {

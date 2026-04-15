@@ -22,33 +22,58 @@ const DAILY_LIMITS: Record<Provider, number> = {
   groq: 50, // free tier, 14k/day limit on their side
 }
 
-// In-memory counters (reset on process restart, backed by DB for persistence)
-const counters: Record<Provider, { date: string; count: number }> = {
-  voyage: { date: '', count: 0 },
-  gemini: { date: '', count: 0 },
-  anthropic: { date: '', count: 0 },
-  groq: { date: '', count: 0 },
+// In-memory counters (reset on process restart, hydrated from DB on first access)
+const counters: Record<Provider, { date: string; count: number; hydrated: boolean }> = {
+  voyage: { date: '', count: 0, hydrated: false },
+  gemini: { date: '', count: 0, hydrated: false },
+  anthropic: { date: '', count: 0, hydrated: false },
+  groq: { date: '', count: 0, hydrated: false },
 }
 
 function todayUTC(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function getCounter(provider: Provider): { date: string; count: number } {
+function getCounter(provider: Provider): { date: string; count: number; hydrated: boolean } {
   const today = todayUTC()
   const c = counters[provider]
   if (c.date !== today) {
     c.date = today
     c.count = 0
+    c.hydrated = false
   }
   return c
+}
+
+async function hydrateFromDb(provider: Provider): Promise<void> {
+  const c = getCounter(provider)
+  if (c.hydrated) return
+  c.hydrated = true
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !supabaseServiceKey) return
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const { data } = await supabase
+    .from('api_budget_log')
+    .select('calls_used')
+    .eq('date', c.date)
+    .eq('provider', provider)
+    .single()
+
+  if (data) {
+    c.count = Math.max(c.count, data.calls_used)
+  }
 }
 
 /**
  * Check if a provider call is allowed. Returns true if within budget.
  * Call this BEFORE making any paid API call.
+ * Hydrates from DB on first access per day to survive serverless restarts.
  */
-export function canCallProvider(provider: Provider): boolean {
+export async function canCallProvider(provider: Provider): Promise<boolean> {
+  await hydrateFromDb(provider)
   const c = getCounter(provider)
   return c.count < DAILY_LIMITS[provider]
 }
@@ -87,8 +112,8 @@ export function budgetStatus(): Record<
 /**
  * Guard wrapper - throws if budget exceeded. Use as a pre-check.
  */
-export function assertBudget(provider: Provider): void {
-  if (!canCallProvider(provider)) {
+export async function assertBudget(provider: Provider): Promise<void> {
+  if (!(await canCallProvider(provider))) {
     throw new BudgetExceededError(provider)
   }
 }

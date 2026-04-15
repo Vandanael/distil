@@ -25,7 +25,7 @@ export async function scoreWithGemini(
   negativeExamples: string[] = []
 ): Promise<ScoringFunctionResult> {
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
-  assertBudget('gemini')
+  await assertBudget('gemini')
 
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
   const model = genAI.getGenerativeModel({
