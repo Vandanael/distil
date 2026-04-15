@@ -67,12 +67,7 @@ async function hydrateFromDb(provider: Provider): Promise<void> {
   }
 }
 
-/**
- * Check if a provider call is allowed. Returns true if within budget.
- * Call this BEFORE making any paid API call.
- * Hydrates from DB on first access per day to survive serverless restarts.
- */
-export async function canCallProvider(provider: Provider): Promise<boolean> {
+async function canCallProvider(provider: Provider): Promise<boolean> {
   await hydrateFromDb(provider)
   const c = getCounter(provider)
   return c.count < DAILY_LIMITS[provider]
@@ -84,29 +79,6 @@ export async function canCallProvider(provider: Provider): Promise<boolean> {
 export function recordProviderCall(provider: Provider, calls: number = 1): void {
   const c = getCounter(provider)
   c.count += calls
-}
-
-/**
- * Get remaining calls for a provider today.
- */
-export function remainingCalls(provider: Provider): number {
-  const c = getCounter(provider)
-  return Math.max(0, DAILY_LIMITS[provider] - c.count)
-}
-
-/**
- * Get budget status for all providers (for monitoring/debugging).
- */
-export function budgetStatus(): Record<
-  Provider,
-  { used: number; limit: number; remaining: number }
-> {
-  return Object.fromEntries(
-    (Object.keys(DAILY_LIMITS) as Provider[]).map((p) => {
-      const c = getCounter(p)
-      return [p, { used: c.count, limit: DAILY_LIMITS[p], remaining: remainingCalls(p) }]
-    })
-  ) as Record<Provider, { used: number; limit: number; remaining: number }>
 }
 
 /**
@@ -127,31 +99,5 @@ export class BudgetExceededError extends Error {
     )
     this.name = 'BudgetExceededError'
     this.provider = provider
-  }
-}
-
-/**
- * Persist daily totals to DB for observability (optional, best-effort).
- */
-export async function persistBudgetSnapshot(): Promise<void> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !supabaseServiceKey) return
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
-  const status = budgetStatus()
-  const today = todayUTC()
-
-  for (const [provider, data] of Object.entries(status)) {
-    if (data.used === 0) continue
-    await supabase.from('api_budget_log').upsert(
-      {
-        date: today,
-        provider,
-        calls_used: data.used,
-        calls_limit: data.limit,
-      },
-      { onConflict: 'date,provider' }
-    )
   }
 }

@@ -64,7 +64,7 @@ const ALLOWED_ATTR = [
   'media',
 ]
 
-export type ParsedArticle = {
+type ParsedArticle = {
   url: string
   title: string | null
   author: string | null

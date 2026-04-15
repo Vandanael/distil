@@ -1,7 +1,5 @@
 import type { RankingCandidate } from './ranking-types'
 
-export const RANKING_PROMPT_VERSION = '2026-04-14.1'
-
 export const RANKING_SYSTEM_PROMPT = `Tu es l'agent de ranking de Distil, une veille intelligente.
 Tu evalues des articles candidats pour un lecteur exigeant en utilisant une methodologie validee empiriquement (Fu & Niu 2024, SerenPrompt style indirect).
 

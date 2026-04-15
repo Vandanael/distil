@@ -3,7 +3,6 @@
  * Zero coût API.
  */
 import type { UserProfile } from './types'
-export { buildSearchQueries } from './profile-queries'
 
 const MAX_URLS_PER_RUN = 30
 
