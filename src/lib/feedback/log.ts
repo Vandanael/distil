@@ -1,12 +1,9 @@
-import { type SupabaseClient } from '@supabase/supabase-js'
+import type { ServiceClient } from '@/lib/supabase/types'
 
 type FeedbackAction = 'read_full' | 'skip' | 'saved' | 'surprised_useful'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
-
 export async function logFeedback(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string,
   action: FeedbackAction,
   options: {

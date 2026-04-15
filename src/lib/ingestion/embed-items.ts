@@ -1,10 +1,8 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { generateEmbeddingBatch, EmbeddingRateLimitError } from '@/lib/embeddings/voyage'
 import { stripHtml } from '@/lib/parsing/strip-html'
+import type { ServiceClient } from '@/lib/supabase/types'
 import { computePopularity } from './popularity'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
 
 const BATCH_SIZE = 8 // Conservative batch size to stay within Voyage limits
 const MAX_ITEMS_PER_RUN = 50
@@ -18,7 +16,7 @@ type EmbedResult = {
 }
 
 async function embedBatch(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   items: Array<{ id: string; content_text: string }>
 ): Promise<number> {
   const texts = items.map((i) => {

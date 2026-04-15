@@ -1,12 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
 import { RANKING_SYSTEM_PROMPT, buildRankingUserPrompt } from './ranking-prompts'
 import { parseUrl } from '@/lib/parsing/readability'
+import type { ServiceClient } from '@/lib/supabase/types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
 
 const MODEL = 'gemini-3-flash'
 const FALLBACK_MODEL = 'gemini-2.5-flash'
@@ -25,7 +23,7 @@ type LlmResponse = {
 }
 
 async function loadUserProfile(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string
 ): Promise<{
   staticProfile: string | null
@@ -133,7 +131,7 @@ function cosineFallback(candidates: RankingCandidate[]): {
 }
 
 async function persistRanking(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string,
   date: string,
   essential: RankedItem[],
@@ -202,7 +200,7 @@ async function persistRanking(
   }
 }
 
-async function rankForUser(supabase: AnySupabaseClient, userId: string): Promise<RankingResult> {
+async function rankForUser(supabase: ServiceClient, userId: string): Promise<RankingResult> {
   const start = Date.now()
   const today = new Date().toISOString().slice(0, 10)
 

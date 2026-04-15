@@ -1,9 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { PROFILE_SYSTEM_PROMPT, buildProfileUserPrompt } from './profile-prompts'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
+import type { ServiceClient } from '@/lib/supabase/types'
 
 const MODEL = 'gemini-2.5-flash'
 
@@ -20,7 +18,7 @@ export type ProfileGenResult = {
 }
 
 async function generateForUser(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string,
   profile: {
     profile_text: string | null
