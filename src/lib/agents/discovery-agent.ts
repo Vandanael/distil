@@ -6,7 +6,7 @@ import type { UserProfile } from './types'
 
 const MAX_URLS_PER_RUN = 30
 
-export const RSS_MAP: Record<string, string> = {
+const RSS_MAP: Record<string, string> = {
   // === TECH GÉNÉRALISTE ===
   'wired.com': 'https://www.wired.com/feed/rss',
   'technologyreview.com': 'https://www.technologyreview.com/feed/',

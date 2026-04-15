@@ -44,7 +44,7 @@ export type ScoringRequest = {
 export type ScoringResult = {
   runId: string
   scored: ScoredArticle[]
-  agentType: 'managed' | 'messages'
+  agentType: 'messages'
   modelUsed: string | null
   promptVersion: string
   durationMs: number

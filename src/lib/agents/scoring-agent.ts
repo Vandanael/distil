@@ -10,7 +10,7 @@ export async function runScoringAgent(request: ScoringRequest): Promise<ScoringR
   const { profile, candidates, runId, archivedTags = [], negativeExamples = [] } = request
 
   let scored: ScoredArticle[] = []
-  const agentType: 'managed' | 'messages' = 'messages'
+  const agentType = 'messages' as const
   let modelUsed: string | null = null
   let error: string | null = null
 
