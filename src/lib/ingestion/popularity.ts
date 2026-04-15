@@ -1,7 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
+import type { ServiceClient } from '@/lib/supabase/types'
 
 // Cosine distance threshold : items within this distance are considered "similar"
 const SIMILARITY_THRESHOLD = 0.15
@@ -11,7 +8,7 @@ const SIMILARITY_THRESHOLD = 0.15
  * Based on Tokutake & Okamoto 2024 : rarity as a signal for serendipity.
  * unpop_score = 1 / (1 + similar_count) -- higher means more unique.
  */
-export async function computePopularity(supabase: AnySupabaseClient): Promise<number> {
+export async function computePopularity(supabase: ServiceClient): Promise<number> {
   // Find items with embeddings but no popularity
   const { data: missing } = await supabase
     .from('item_embeddings')

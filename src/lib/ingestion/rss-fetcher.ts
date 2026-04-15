@@ -1,7 +1,8 @@
 import Parser from 'rss-parser'
 import { createHash } from 'crypto'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { stripHtml } from '@/lib/parsing/strip-html'
+import type { ServiceClient } from '@/lib/supabase/types'
 import type { Feed, IngestResult, IngestSummary } from './types'
 
 const parser = new Parser({
@@ -19,10 +20,7 @@ function estimateWordCount(text: string | undefined): number {
   return text.split(/\s+/).filter(Boolean).length
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
-
-async function fetchFeed(supabase: AnySupabaseClient, feed: Feed): Promise<IngestResult> {
+async function fetchFeed(supabase: ServiceClient, feed: Feed): Promise<IngestResult> {
   const result: IngestResult = {
     feedId: feed.id,
     feedUrl: feed.url,
