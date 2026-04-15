@@ -1,6 +1,7 @@
 import Parser from 'rss-parser'
 import { createHash } from 'crypto'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { stripHtml } from '@/lib/parsing/strip-html'
 import type { Feed, IngestResult, IngestSummary } from './types'
 
 const parser = new Parser({
@@ -82,9 +83,10 @@ async function fetchFeed(supabase: AnySupabaseClient, feed: Feed): Promise<Inges
         const itemUrl = item.link ?? item.guid ?? ''
         const hash = contentHash(itemUrl, item.title ?? null, item.contentSnippet ?? null)
         const rawItem = item as Record<string, unknown>
-        const contentText = String(
+        const rawContent = String(
           rawItem['content:encoded'] ?? item.content ?? item.contentSnippet ?? ''
         )
+        const contentText = stripHtml(rawContent)
 
         return {
           feed_id: feed.id,

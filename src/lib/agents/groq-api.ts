@@ -22,7 +22,7 @@ export async function scoreWithGroq(
   negativeExamples: string[] = []
 ): Promise<ScoringFunctionResult> {
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
-  assertBudget('groq')
+  await assertBudget('groq')
 
   const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
 

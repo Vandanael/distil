@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { generateEmbeddingBatch, EmbeddingRateLimitError } from '@/lib/embeddings/voyage'
+import { stripHtml } from '@/lib/parsing/strip-html'
 import { computePopularity } from './popularity'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -7,20 +8,6 @@ type AnySupabaseClient = SupabaseClient<any, any, any>
 
 const BATCH_SIZE = 8 // Conservative batch size to stay within Voyage limits
 const MAX_ITEMS_PER_RUN = 50
-
-// Strip HTML tags for cleaner embedding input
-function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim()
-}
 
 export type EmbedResult = {
   itemsEmbedded: number

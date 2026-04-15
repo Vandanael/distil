@@ -41,5 +41,8 @@ export async function GET() {
     .eq('user_id', user.id)
     .eq('status', 'accepted')
 
-  return NextResponse.json({ count: count ?? 0 })
+  return NextResponse.json(
+    { count: count ?? 0 },
+    { headers: { 'Cache-Control': 'no-store' } }
+  )
 }

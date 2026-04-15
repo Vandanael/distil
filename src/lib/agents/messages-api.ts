@@ -35,7 +35,7 @@ export async function scoreWithMessagesApi(
 
   // Fallback : Anthropic Haiku
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
-  assertBudget('anthropic')
+  await assertBudget('anthropic')
 
   const client = new Anthropic()
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const MAX_POLLS = 10
+const MAX_POLLS = 20
 const POLL_INTERVAL = 1500
 
 export default function WelcomePage() {

@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
 import { RANKING_SYSTEM_PROMPT, buildRankingUserPrompt } from './ranking-prompts'
+import { parseUrl } from '@/lib/parsing/readability'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,7 +70,7 @@ async function callRankingLlm(
   modelId: string
 ): Promise<LlmResponse> {
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
-  assertBudget('gemini')
+  await assertBudget('gemini')
 
   const apiKey = process.env.GOOGLE_AI_API_KEY
   if (!apiKey) throw new Error('GOOGLE_AI_API_KEY manquante')
@@ -160,31 +161,44 @@ async function persistRanking(
     )
   }
 
-  // Promote to articles table
+  // Promote to articles table, then enrich with full content via Readability
   for (const item of allRanked) {
     const candidate = candidateMap.get(item.itemId)
     if (!candidate) continue
 
-    await supabase.from('articles').upsert(
-      {
-        user_id: userId,
-        item_id: item.itemId,
-        url: candidate.url,
-        title: candidate.title,
-        author: candidate.author,
-        site_name: candidate.siteName,
-        published_at: candidate.publishedAt,
-        content_text: candidate.contentPreview,
-        word_count: candidate.wordCount,
-        score: item.q1 * 10,
-        justification: item.justification,
-        is_serendipity: item.bucket === 'surprise',
-        status: 'accepted',
-        origin: 'agent',
-        scored_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,item_id' }
-    )
+    const articleRow: Record<string, unknown> = {
+      user_id: userId,
+      item_id: item.itemId,
+      url: candidate.url,
+      title: candidate.title,
+      author: candidate.author,
+      site_name: candidate.siteName,
+      published_at: candidate.publishedAt,
+      content_text: candidate.contentPreview,
+      word_count: candidate.wordCount,
+      score: item.q1 * 10,
+      justification: item.justification,
+      is_serendipity: item.bucket === 'surprise',
+      status: 'accepted',
+      origin: 'agent',
+      scored_at: new Date().toISOString(),
+    }
+
+    // Best-effort : fetch + parse le contenu complet de l'article
+    try {
+      const parsed = await parseUrl(candidate.url)
+      articleRow.content_html = parsed.contentHtml
+      articleRow.content_text = parsed.contentText
+      articleRow.excerpt = parsed.excerpt
+      articleRow.reading_time_minutes = parsed.readingTimeMinutes
+      articleRow.og_image_url = parsed.ogImageUrl
+      articleRow.word_count = parsed.wordCount
+      if (parsed.author) articleRow.author = parsed.author
+    } catch {
+      // Paywall, timeout, JS-only - on insere quand meme sans content_html
+    }
+
+    await supabase.from('articles').upsert(articleRow, { onConflict: 'user_id,item_id' })
   }
 }
 

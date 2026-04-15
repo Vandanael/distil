@@ -33,4 +33,6 @@ export async function markAsRead(articleId: string): Promise<void> {
     .eq('id', articleId)
     .eq('user_id', user.id)
     .eq('status', 'accepted') // ne pas ecraser 'archived' ou autres
+
+  revalidatePath('/feed')
 }

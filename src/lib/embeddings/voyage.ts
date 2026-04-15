@@ -41,7 +41,7 @@ export async function generateEmbeddingBatch(texts: string[]): Promise<number[][
   if (texts.length === 0) return []
 
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
-  assertBudget('voyage')
+  await assertBudget('voyage')
 
   const apiKey = process.env.VOYAGE_API_KEY
   if (!apiKey) {
