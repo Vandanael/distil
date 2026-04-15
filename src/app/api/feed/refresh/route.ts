@@ -4,8 +4,7 @@
  * Lance une recherche d'articles depuis les sources et intérêts du profil utilisateur.
  */
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 import { runDiscoveryAgent } from '@/lib/agents/discovery-agent'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { parseUrl } from '@/lib/parsing/readability'
@@ -14,24 +13,7 @@ import { checkRefreshRateLimit } from '@/lib/rate-limit'
 import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
 
 export async function POST() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ error: 'Supabase non configure' }, { status: 503 })
-  }
-
-  const cookieStore = await cookies()
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: (toSet) => {
-        for (const { name, value, options } of toSet) {
-          cookieStore.set(name, value, options)
-        }
-      },
-    },
-  })
+  const supabase = await createClient()
 
   const {
     data: { user },

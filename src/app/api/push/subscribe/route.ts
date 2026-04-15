@@ -4,23 +4,14 @@
  * La souscription est stockee dans profiles.profile_structured.pushSubscription
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 
 async function getSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !supabaseKey) return null
-
-  const cookieStore = await cookies()
-  return createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: (toSet) => {
-        for (const { name, value, options } of toSet) cookieStore.set(name, value, options)
-      },
-    },
-  })
+  try {
+    return await createClient()
+  } catch {
+    return null
+  }
 }
 
 export async function POST(req: NextRequest) {

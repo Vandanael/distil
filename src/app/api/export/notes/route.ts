@@ -4,8 +4,7 @@
  * Une section par article, avec les highlights associes et les notes.
  */
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 
 function formatDate(iso: string | null): string {
   if (!iso) return ''
@@ -17,24 +16,7 @@ function formatDate(iso: string | null): string {
 }
 
 export async function GET() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ error: 'Supabase non configure' }, { status: 503 })
-  }
-
-  const cookieStore = await cookies()
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: (toSet) => {
-        for (const { name, value, options } of toSet) {
-          cookieStore.set(name, value, options)
-        }
-      },
-    },
-  })
+  const supabase = await createClient()
 
   const {
     data: { user },
