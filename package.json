@@ -27,7 +27,6 @@
     "@supabase/supabase-js": "^2.103.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "groq-sdk": "^1.1.2",
     "isomorphic-dompurify": "^3.8.0",
     "linkedom": "^0.18.12",
     "next": "16.2.3",

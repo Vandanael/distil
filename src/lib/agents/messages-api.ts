@@ -1,7 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ArticleCandidate, ScoringFunctionResult, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
-import { scoreWithGroq } from './groq-api'
 import { scoreWithGemini } from './gemini-api'
 
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -25,15 +24,7 @@ export async function scoreWithMessagesApi(
 ): Promise<ScoringFunctionResult> {
   const errors: string[] = []
 
-  // Fallback chain : Groq -> Gemini -> Anthropic
-  if (process.env.GROQ_API_KEY) {
-    try {
-      return await scoreWithGroq(profile, candidates, archivedTags, negativeExamples)
-    } catch (err) {
-      errors.push(`groq: ${err instanceof Error ? err.message : String(err)}`)
-    }
-  }
-
+  // Fallback chain : Gemini -> Anthropic
   if (process.env.GOOGLE_AI_API_KEY) {
     try {
       return await scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
