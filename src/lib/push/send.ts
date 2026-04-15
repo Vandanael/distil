@@ -21,7 +21,7 @@ function ensureVapid() {
   return true
 }
 
-export type PushPayload = {
+type PushPayload = {
   title: string
   body: string
   url?: string
