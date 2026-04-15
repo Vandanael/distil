@@ -30,7 +30,10 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const body = (await request.json()) as Record<string, unknown>
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null
+  if (!body) {
+    return NextResponse.json({ error: 'Corps JSON invalide' }, { status: 400 })
+  }
   const action = body.action as string
   if (!VALID_ACTIONS.includes(action as FeedbackAction)) {
     return NextResponse.json(

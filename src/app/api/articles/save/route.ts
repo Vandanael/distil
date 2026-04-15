@@ -174,19 +174,36 @@ export async function POST(request: Request) {
   }
 
   // Scorer l'article
-  const result = await runScoringAgent({
-    profile: userProfile,
-    candidates: [candidate],
-    runId: 'bookmarklet',
-  })
+  let scored:
+    | {
+        score: number
+        justification: string
+        isSerendipity: boolean
+        rejectionReason: string | null
+        accepted: boolean
+      }
+    | undefined
+  try {
+    const result = await runScoringAgent({
+      profile: userProfile,
+      candidates: [candidate],
+      runId: 'bookmarklet',
+    })
+    scored = result.scored[0]
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json(
+      { error: `Scoring echoue: ${message}` },
+      { status: 500, headers: CORS_HEADERS }
+    )
+  }
 
-  const scored = result.scored[0]
   if (!scored) {
     return NextResponse.json({ error: 'Scoring echoue' }, { status: 500, headers: CORS_HEADERS })
   }
 
   // Persister
-  const { data: inserted } = await supabase
+  const { data: inserted, error: insertError } = await supabase
     .from('articles')
     .insert({
       user_id: userId,
@@ -211,6 +228,10 @@ export async function POST(request: Request) {
     })
     .select('id')
     .single()
+
+  if (insertError) {
+    return NextResponse.json({ error: insertError.message }, { status: 500, headers: CORS_HEADERS })
+  }
 
   // Embedding best-effort
   if (inserted && process.env.VOYAGE_API_KEY && parsed.contentText) {
