@@ -10,7 +10,7 @@ import { OPMLImport } from './OPMLImport'
 
 export default async function ProfilePage() {
   if (
-    process.env.DEV_BYPASS_AUTH === 'true' ||
+    (process.env.NODE_ENV === 'development' && process.env.DEV_BYPASS_AUTH === 'true') ||
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {

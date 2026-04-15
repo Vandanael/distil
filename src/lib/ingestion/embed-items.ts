@@ -9,7 +9,7 @@ type AnySupabaseClient = SupabaseClient<any, any, any>
 const BATCH_SIZE = 8 // Conservative batch size to stay within Voyage limits
 const MAX_ITEMS_PER_RUN = 50
 
-export type EmbedResult = {
+type EmbedResult = {
   itemsEmbedded: number
   popularityComputed: number
   rateLimited: boolean
