@@ -221,9 +221,10 @@ export async function POST(req: NextRequest) {
           )
           .select('id, url, content_text, status')
 
-        // Embeddings best-effort
+        // Embeddings : await pour garantir l'execution avant fin de la requete.
+        // Scheduled function Netlify : timeout long, pas de risque utilisateur-facing.
         if (insertedArticles && process.env.VOYAGE_API_KEY) {
-          void Promise.allSettled(
+          await Promise.allSettled(
             insertedArticles
               .filter((a) => a.status === 'accepted' && a.content_text)
               .map(async (article) => {
@@ -252,14 +253,14 @@ export async function POST(req: NextRequest) {
         const pushSub = (profile.profile_structured as Record<string, unknown> | null)
           ?.pushSubscription as PushSubscriptionJSON | undefined
         if (pushSub?.endpoint) {
-          void sendPushNotification(pushSub, {
+          await sendPushNotification(pushSub, {
             title: 'Distil',
             body:
               accepted.length === 1
                 ? '1 nouvel article dans votre veille.'
                 : `${accepted.length} nouveaux articles dans votre veille.`,
             url: '/feed',
-          })
+          }).catch((err) => console.error('[cron/refresh] push failed', err))
         }
       }
 

@@ -179,9 +179,9 @@ export async function POST(request: Request) {
         )
         .select('id, url, content_text, status')
 
-      // Générer les embeddings pour les articles acceptés (best-effort, non bloquant)
+      // Embeddings : await pour garantir l'execution avant fin de la requete HTTP.
       if (insertedArticles && process.env.VOYAGE_API_KEY) {
-        void Promise.allSettled(
+        await Promise.allSettled(
           insertedArticles
             .filter((a) => a.status === 'accepted' && a.content_text)
             .map(async (article) => {

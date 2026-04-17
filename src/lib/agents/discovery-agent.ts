@@ -210,6 +210,21 @@ function normalizeDomain(source: string): string {
     .trim()
 }
 
+function dayOfYear(d: Date): number {
+  const start = Date.UTC(d.getUTCFullYear(), 0, 0)
+  const diff = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - start
+  return Math.floor(diff / 86_400_000)
+}
+
+function pickRotating<T>(pool: T[], count: number, seed: number): T[] {
+  if (pool.length === 0) return []
+  if (pool.length <= count) return [...pool]
+  const offset = ((seed % pool.length) + pool.length) % pool.length
+  const tail = pool.slice(offset, offset + count)
+  const head = pool.slice(0, Math.max(0, count - tail.length))
+  return [...tail, ...head]
+}
+
 function getRssFeedUrls(source: string): string[] {
   const key = source.toLowerCase().trim()
   if (RSS_MAP[key]) return [RSS_MAP[key]]
@@ -285,11 +300,13 @@ export async function runDiscoveryAgent(
           ? DEFAULT_SOURCES_EN
           : DEFAULT_SOURCES_BOTH
 
-  // Serendipity : 2 sources hors profil
+  // Serendipity : 2 sources hors profil, avec rotation journaliere deterministe.
+  // Sans rotation, l'utilisateur voit toujours les 2 memes sources et perd l'interet.
   const pinnedNormalized = profile.pinnedSources.map(normalizeDomain)
-  const serendipitySources = (language === 'fr' ? DEFAULT_SOURCES_FR : DEFAULT_SOURCES_EN)
-    .filter((s) => !pinnedNormalized.includes(normalizeDomain(s)))
-    .slice(0, 2)
+  const pool = (language === 'fr' ? DEFAULT_SOURCES_FR : DEFAULT_SOURCES_EN).filter(
+    (s) => !pinnedNormalized.includes(normalizeDomain(s))
+  )
+  const serendipitySources = pickRotating(pool, 2, dayOfYear(new Date()))
 
   const allSources = [...new Set([...effectiveSources, ...serendipitySources])]
 
