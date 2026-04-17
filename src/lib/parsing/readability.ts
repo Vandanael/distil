@@ -62,6 +62,8 @@ const ALLOWED_ATTR = [
   'sizes',
   'type',
   'media',
+  'target',
+  'rel',
 ]
 
 type ParsedArticle = {
