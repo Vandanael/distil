@@ -316,13 +316,27 @@ export async function runDiscoveryAgent(
 
   try {
     const results = await Promise.allSettled(allSources.map(fetchSourceUrls))
-    for (const result of results) {
-      if (result.status === 'rejected') continue
-      for (const url of result.value) {
-        if (!knownSet.has(url) && discovered.size < MAX_URLS_PER_RUN) {
-          discovered.add(url)
-        }
+    // Round-robin entre sources : sans ca, la premiere source (typiquement HN, 30+ URLs)
+    // sature le budget et les autres sources n'apparaissent jamais dans le feed.
+    const perSource = results.map((r) =>
+      r.status === 'fulfilled' ? r.value.filter((u) => !knownSet.has(u)) : []
+    )
+    const cursors = new Array(perSource.length).fill(0)
+    let remaining = perSource.reduce((sum, list) => sum + list.length, 0)
+    while (discovered.size < MAX_URLS_PER_RUN && remaining > 0) {
+      let advanced = false
+      for (let i = 0; i < perSource.length; i++) {
+        if (discovered.size >= MAX_URLS_PER_RUN) break
+        const list = perSource[i]
+        const idx = cursors[i]
+        if (idx >= list.length) continue
+        const url = list[idx]
+        cursors[i] = idx + 1
+        remaining--
+        advanced = true
+        if (!discovered.has(url)) discovered.add(url)
       }
+      if (!advanced) break
     }
   } catch (err) {
     error = err instanceof Error ? err.message : String(err)
