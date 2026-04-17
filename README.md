@@ -9,7 +9,7 @@ Veille intelligente et read-later personnel. Distil capte, filtre et organise l'
 | Framework       | Next.js 16 App Router, TypeScript strict                  |
 | Style           | Tailwind v4, shadcn/ui retokenisé                         |
 | Base de données | Supabase (Postgres + pgvector + Auth)                     |
-| Scoring         | Groq (Llama 3.3 70B) > Gemini 2.5 Flash > Anthropic Haiku |
+| Scoring         | Gemini 2.5 Flash                                          |
 | Embeddings      | Voyage AI (voyage-3)                                      |
 | Email           | Resend                                                    |
 | Deploy          | Netlify                                                   |
@@ -31,7 +31,8 @@ Voir `.env.local.example` -- toutes les clés sont documentées.
 Les clés essentielles pour le dev :
 
 - `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`
-- `ANTHROPIC_API_KEY` (fallback scoring)
+- `GOOGLE_AI_API_KEY` (scoring + ranking)
+- `VOYAGE_API_KEY` (embeddings)
 - `DEV_BYPASS_AUTH=true` (bypass auth en local)
 
 ## Commandes
@@ -62,7 +63,7 @@ src/
       scoring/    # pipeline de scoring à la demande
       articles/   # bookmarklet (save/signal)
   lib/
-    agents/       # scoring LLM (Groq > Gemini > Haiku), discovery RSS
+    agents/       # scoring LLM (Gemini), discovery RSS
     parsing/      # Readability + sanitize-html
     email/        # templates digest + tokens HMAC
     hooks/        # swipe to dismiss, keyboard nav, dismiss with undo

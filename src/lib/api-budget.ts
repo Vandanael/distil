@@ -6,8 +6,7 @@ import { createClient } from '@supabase/supabase-js'
  *
  * Expected monthly costs at normal usage:
  * - Voyage: ~$0.10 (embeddings, 50 items/day max)
- * - Gemini: ~$0.15 (1 ranking/day + 1 profile/week)
- * - Anthropic: ~$0.00 (fallback only, rarely used)
+ * - Gemini: ~$0.15 (scoring + ranking + profile-generator)
  *
  * These limits are generous safety caps, not normal operating targets.
  *
@@ -15,19 +14,17 @@ import { createClient } from '@supabase/supabase-js'
  * Le RPC est atomique cote DB et resync le compteur memoire avec la realite partagee.
  */
 
-type Provider = 'voyage' | 'gemini' | 'anthropic'
+type Provider = 'voyage' | 'gemini'
 
 // Hard daily call limits per provider
 const DAILY_LIMITS: Record<Provider, number> = {
   voyage: 100, // ~50 items/day normal, 100 = 2x safety margin
   gemini: 20, // 1 ranking + 1 profile normal, 20 = generous margin
-  anthropic: 10, // fallback only, should rarely fire
 }
 
 const counters: Record<Provider, { date: string; count: number; hydrated: boolean }> = {
   voyage: { date: '', count: 0, hydrated: false },
   gemini: { date: '', count: 0, hydrated: false },
-  anthropic: { date: '', count: 0, hydrated: false },
 }
 
 function todayUTC(): string {

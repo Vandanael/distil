@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     error: string | null
   }> = []
 
-  // Traiter chaque utilisateur sequentiellement (evite de surcharger l'API Anthropic)
+  // Traiter chaque utilisateur sequentiellement (evite de surcharger l'API Gemini)
   for (const profile of profiles) {
     try {
       const userProfile: UserProfile = {
