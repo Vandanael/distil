@@ -4,7 +4,10 @@ import { prefilterCandidates } from './prefilter'
 import { RANKING_SYSTEM_PROMPT, buildRankingUserPrompt } from './ranking-prompts'
 import { parseUrl } from '@/lib/parsing/readability'
 import type { ServiceClient } from '@/lib/supabase/types'
+import type { Database } from '@/lib/supabase/database.types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
+
+type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 
 const MODEL = 'gemini-3-flash'
 const FALLBACK_MODEL = 'gemini-2.5-flash'
@@ -166,7 +169,7 @@ async function persistRanking(
       const candidate = candidateMap.get(item.itemId)
       if (!candidate) return
 
-      const articleRow: Record<string, unknown> = {
+      const articleRow: ArticleInsert = {
         user_id: userId,
         item_id: item.itemId,
         url: candidate.url,

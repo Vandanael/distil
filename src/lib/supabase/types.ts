@@ -1,4 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from './database.types'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- pas de types generes, a remplacer par Database quand supabase gen types sera configure
-export type ServiceClient = SupabaseClient<any, any, any>
+export type ServiceClient = SupabaseClient<Database>
