@@ -94,7 +94,7 @@ async function generateForUser(
     if (!match) throw new Error('Aucun JSON dans la reponse')
 
     const parsed: ProfileOutput = JSON.parse(match[0])
-    recordProviderCall('gemini')
+    await recordProviderCall('gemini')
 
     if (!parsed.static_profile || !parsed.long_term_profile || !parsed.short_term_profile) {
       throw new Error('Profil incomplet : champs manquants')
