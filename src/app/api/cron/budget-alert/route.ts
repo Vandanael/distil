@@ -97,14 +97,18 @@ export async function POST(req: NextRequest) {
           (u) =>
             `- user \`${u.user_id.slice(0, 8)}\` ${u.provider} : ${u.used}/${USER_LIMITS[u.provider]} (${Math.round(u.ratio * 100)}%)`
         )
-      alerts.push(`**Users > ${Math.round(USER_THRESHOLD * 100)}%** (${hotUsers.length}) :\n${lines.join('\n')}`)
+      alerts.push(
+        `**Users > ${Math.round(USER_THRESHOLD * 100)}%** (${hotUsers.length}) :\n${lines.join('\n')}`
+      )
     }
 
     const { data: sizeBytes } = await supabase.rpc('db_size_bytes')
     if (typeof sizeBytes === 'number') {
       const sizeMb = Math.round(sizeBytes / 1_000_000)
       if (sizeMb >= DB_SIZE_WARN_MB) {
-        alerts.push(`**DB size** : ${sizeMb}MB (seuil ${DB_SIZE_WARN_MB}MB). Penser a upgrade Supabase Pro.`)
+        alerts.push(
+          `**DB size** : ${sizeMb}MB (seuil ${DB_SIZE_WARN_MB}MB). Penser a upgrade Supabase Pro.`
+        )
       }
     }
 
