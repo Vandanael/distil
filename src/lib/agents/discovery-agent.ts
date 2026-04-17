@@ -210,13 +210,13 @@ function normalizeDomain(source: string): string {
     .trim()
 }
 
-function dayOfYear(d: Date): number {
+export function dayOfYear(d: Date): number {
   const start = Date.UTC(d.getUTCFullYear(), 0, 0)
   const diff = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - start
   return Math.floor(diff / 86_400_000)
 }
 
-function pickRotating<T>(pool: T[], count: number, seed: number): T[] {
+export function pickRotating<T>(pool: T[], count: number, seed: number): T[] {
   if (pool.length === 0) return []
   if (pool.length <= count) return [...pool]
   const offset = ((seed % pool.length) + pool.length) % pool.length
