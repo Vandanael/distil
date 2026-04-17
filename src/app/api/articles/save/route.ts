@@ -230,6 +230,19 @@ export async function POST(request: Request) {
     .single()
 
   if (insertError) {
+    // Race avec le check de doublon ligne 98 : l'index unique (user_id,url) a tranche.
+    if (insertError.code === '23505') {
+      const { data: race } = await supabase
+        .from('articles')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('url', url)
+        .single()
+      return NextResponse.json(
+        { error: 'already_exists', articleId: race?.id ?? null },
+        { status: 409, headers: CORS_HEADERS }
+      )
+    }
     return NextResponse.json({ error: insertError.message }, { status: 500, headers: CORS_HEADERS })
   }
 

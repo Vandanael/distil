@@ -65,7 +65,7 @@ export async function scoreWithMessagesApi(
     throw new Error(`Messages API: JSON invalide: ${match[0].slice(0, 100)}`)
   }
 
-  recordProviderCall('anthropic')
+  await recordProviderCall('anthropic')
 
   return {
     scored: parsed.scored.map((item) => ({

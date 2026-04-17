@@ -10,6 +10,9 @@ import { createClient } from '@supabase/supabase-js'
  * - Anthropic: ~$0.00 (fallback only, rarely used)
  *
  * These limits are generous safety caps, not normal operating targets.
+ *
+ * Persistance : compteur en memoire (fast path) + RPC increment_api_budget (source de verite).
+ * Le RPC est atomique cote DB et resync le compteur memoire avec la realite partagee.
  */
 
 type Provider = 'voyage' | 'gemini' | 'anthropic'
@@ -21,7 +24,6 @@ const DAILY_LIMITS: Record<Provider, number> = {
   anthropic: 10, // fallback only, should rarely fire
 }
 
-// In-memory counters (reset on process restart, hydrated from DB on first access)
 const counters: Record<Provider, { date: string; count: number; hydrated: boolean }> = {
   voyage: { date: '', count: 0, hydrated: false },
   gemini: { date: '', count: 0, hydrated: false },
@@ -43,22 +45,27 @@ function getCounter(provider: Provider): { date: string; count: number; hydrated
   return c
 }
 
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) return null
+  return createClient(url, key)
+}
+
 async function hydrateFromDb(provider: Provider): Promise<void> {
   const c = getCounter(provider)
   if (c.hydrated) return
   c.hydrated = true
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !supabaseServiceKey) return
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
   const { data } = await supabase
     .from('api_budget_log')
     .select('calls_used')
     .eq('date', c.date)
     .eq('provider', provider)
-    .single()
+    .maybeSingle()
 
   if (data) {
     c.count = Math.max(c.count, data.calls_used)
@@ -72,11 +79,33 @@ async function canCallProvider(provider: Provider): Promise<boolean> {
 }
 
 /**
- * Record a provider call. Call this AFTER a successful API call.
+ * Enregistre un appel provider (increment atomique DB + memoire).
+ * Appeler APRES un appel reussi. Loggue et continue si la DB echoue :
+ * le compteur memoire reste correct pour la suite du process en cours.
  */
-export function recordProviderCall(provider: Provider, calls: number = 1): void {
+export async function recordProviderCall(provider: Provider, calls: number = 1): Promise<void> {
   const c = getCounter(provider)
   c.count += calls
+
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return
+
+  const { data, error } = await supabase.rpc('increment_api_budget', {
+    p_date: c.date,
+    p_provider: provider,
+    p_increment: calls,
+    p_limit: DAILY_LIMITS[provider],
+  })
+
+  if (error) {
+    console.error('[api-budget] increment_api_budget failed', error)
+    return
+  }
+
+  // Resync : si un autre process a deja incremente, prendre la valeur DB.
+  if (typeof data === 'number' && data > c.count) {
+    c.count = data
+  }
 }
 
 /**

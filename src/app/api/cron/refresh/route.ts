@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
 
         const { data: insertedArticles } = await supabase
           .from('articles')
-          .insert(
+          .upsert(
             scoringResult.scored.map((scored) => {
               const parsed = parsedByUrl.get(scored.url)
               return {
@@ -216,7 +216,8 @@ export async function POST(req: NextRequest) {
                 origin: 'agent',
                 scored_at: new Date().toISOString(),
               }
-            })
+            }),
+            { onConflict: 'user_id,url', ignoreDuplicates: true }
           )
           .select('id, url, content_text, status')
 

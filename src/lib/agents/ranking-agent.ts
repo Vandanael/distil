@@ -90,7 +90,7 @@ async function callRankingLlm(
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Aucun JSON dans la reponse')
 
-  recordProviderCall('gemini')
+  await recordProviderCall('gemini')
   return JSON.parse(match[0]) as LlmResponse
 }
 
