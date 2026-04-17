@@ -58,11 +58,14 @@ export async function POST(request: Request) {
 
   const { user_id: userId, id: tokenId } = tokenRow
 
-  // Rate limit : 5 sauvegardes par minute par user
+  // Rate limit : 5 sauvegardes bookmarklet par minute par user.
+  // Filtre sur origin='bookmarklet' pour ne pas compter les articles inseres
+  // par les crons (refresh, scoring) qui peuvent arriver en rafale.
   const { count: recentCount } = await supabase
     .from('articles')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
+    .eq('origin', 'bookmarklet')
     .gte('created_at', new Date(Date.now() - 60_000).toISOString())
 
   if ((recentCount ?? 0) >= 5) {
