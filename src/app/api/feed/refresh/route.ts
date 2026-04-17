@@ -12,6 +12,10 @@ import { generateEmbedding } from '@/lib/embeddings/voyage'
 import { checkRefreshRateLimit } from '@/lib/rate-limit'
 import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
 
+// Pipeline complet (discovery -> parse -> score -> embed) prend 30-60s selon la charge
+// Gemini. Netlify applique le timeout indique ici a la route handler Next.js.
+export const maxDuration = 90
+
 export async function POST() {
   const supabase = await createClient()
 

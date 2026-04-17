@@ -5,7 +5,8 @@ import { buildSystemPrompt, buildUserPrompt } from './prompts'
 // Chaine de modeles : si gemini-2.5-flash renvoie 503/429 (capacite saturee),
 // on bascule sur gemini-flash-latest puis gemini-2.0-flash.
 const MODELS = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'] as const
-const MAX_TOKENS_OUTPUT = 8192
+// 16k : un batch de 10 avec justifications verbeuses peut depasser 8k
+const MAX_TOKENS_OUTPUT = 16384
 const RETRY_BACKOFF_MS = [500, 1500]
 
 type ApiResponse = {
