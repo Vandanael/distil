@@ -2,10 +2,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { ArticleCandidate, ScoringFunctionResult, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
 
-// gemini-2.5-flash : ~$0.15/1M tokens input, seul modele avec quota actif
-const MODEL = 'gemini-2.5-flash'
-// Plafond output : 20 articles × ~200 tokens JSON = ~4000 tokens min
+// Chaine de modeles : si gemini-2.5-flash renvoie 503/429 (capacite saturee),
+// on bascule sur gemini-flash-latest puis gemini-2.0-flash.
+const MODELS = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'] as const
 const MAX_TOKENS_OUTPUT = 8192
+const RETRY_BACKOFF_MS = [500, 1500]
 
 type ApiResponse = {
   scored: Array<{
@@ -16,6 +17,32 @@ type ApiResponse = {
     rejection_reason: string | null
     accepted: boolean
   }>
+}
+
+function isTransientError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err)
+  return /\[(429|500|502|503|504)\b/.test(msg) || /overloaded|unavailable|high demand/i.test(msg)
+}
+
+async function callModel(
+  apiKey: string,
+  modelId: string,
+  systemPrompt: string,
+  userPrompt: string
+): Promise<string> {
+  const genAI = new GoogleGenerativeAI(apiKey)
+  const model = genAI.getGenerativeModel({
+    model: modelId,
+    systemInstruction: systemPrompt,
+    generationConfig: {
+      responseMimeType: 'application/json',
+      maxOutputTokens: MAX_TOKENS_OUTPUT,
+      // @ts-expect-error - thinkingConfig non encore type dans le SDK
+      thinkingConfig: { thinkingBudget: 0 },
+    },
+  })
+  const result = await model.generateContent(userPrompt)
+  return result.response.text()
 }
 
 export async function scoreWithGemini(
@@ -30,24 +57,32 @@ export async function scoreWithGemini(
   const apiKey = process.env.GOOGLE_AI_API_KEY
   if (!apiKey) throw new Error('GOOGLE_AI_API_KEY manquante')
 
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({
-    model: MODEL,
-    systemInstruction: buildSystemPrompt(),
-    generationConfig: {
-      responseMimeType: 'application/json',
-      maxOutputTokens: MAX_TOKENS_OUTPUT,
-      // Desactive le thinking pour les sorties JSON structurees (plus rapide, moins cher)
-      // @ts-expect-error - thinkingConfig non encore type dans le SDK
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  })
+  const systemPrompt = buildSystemPrompt()
+  const userPrompt = buildUserPrompt(profile, candidates, archivedTags, negativeExamples)
 
-  const result = await model.generateContent(
-    buildUserPrompt(profile, candidates, archivedTags, negativeExamples)
-  )
+  let text: string | null = null
+  let modelUsed: string | null = null
+  const errors: string[] = []
 
-  const text = result.response.text()
+  outer: for (const modelId of MODELS) {
+    for (let attempt = 0; attempt <= RETRY_BACKOFF_MS.length; attempt++) {
+      try {
+        text = await callModel(apiKey, modelId, systemPrompt, userPrompt)
+        modelUsed = modelId
+        break outer
+      } catch (err) {
+        errors.push(`${modelId} attempt ${attempt}: ${err instanceof Error ? err.message : String(err)}`)
+        if (!isTransientError(err)) break // erreur non transitoire, passer au modele suivant
+        const delay = RETRY_BACKOFF_MS[attempt]
+        if (delay !== undefined) await new Promise((r) => setTimeout(r, delay))
+      }
+    }
+  }
+
+  if (text === null || modelUsed === null) {
+    throw new Error(`Gemini: tous les modeles ont echoue. ${errors.join(' | ')}`)
+  }
+
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Gemini: aucun JSON dans la reponse')
 
@@ -69,6 +104,6 @@ export async function scoreWithGemini(
       rejectionReason: item.rejection_reason,
       accepted: item.accepted,
     })),
-    modelUsed: MODEL,
+    modelUsed,
   }
 }
