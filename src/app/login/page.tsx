@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -25,29 +26,36 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
+      <div className="fixed top-3 left-3">
+        <Link
+          href="/"
+          className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
+        >
+          ← Accueil
+        </Link>
+      </div>
       <div className="fixed top-3 right-3">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-sm space-y-10">
         {/* Masthead */}
         <div className="space-y-5">
-          <div className="space-y-4">
-            <h1 className="font-ui text-5xl md:text-7xl font-bold tracking-tight text-accent">
-              Distil
-            </h1>
-          </div>
+          <h1 className="font-ui text-5xl md:text-7xl font-bold tracking-tight text-accent">
+            Distil
+          </h1>
           <p className="font-body text-lg leading-relaxed text-muted-foreground">
             Votre veille quotidienne, sans le bruit.
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Button
             type="button"
             variant="outline"
-            className="w-full h-11 font-ui gap-3"
+            className="w-full h-11 font-ui gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={handleGoogle}
             disabled={googleLoading}
+            aria-describedby="login-help"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
               <path
@@ -70,8 +78,18 @@ export default function LoginPage() {
             {googleLoading ? 'Redirection...' : 'Continuer avec Google'}
           </Button>
 
+          <p id="login-help" className="font-ui text-xs text-muted-foreground leading-relaxed">
+            Connexion rapide et securisee via Google. Distil ne partage aucune donnee au-dela de
+            votre email et ne publie rien en votre nom.
+          </p>
+
           {error && (
-            <p id="login-error" role="alert" className="font-ui text-xs text-destructive">
+            <p
+              id="login-error"
+              role="alert"
+              aria-live="polite"
+              className="font-ui text-xs text-destructive border-l-2 border-destructive pl-3"
+            >
               {error}
             </p>
           )}

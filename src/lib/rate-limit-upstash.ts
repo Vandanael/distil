@@ -27,7 +27,11 @@ function getRedis(): Redis | null {
   return new Redis({ url, token })
 }
 
-function makeLimiter(prefix: string, limit: number, window: `${number} ${'s' | 'm' | 'h'}`): {
+function makeLimiter(
+  prefix: string,
+  limit: number,
+  window: `${number} ${'s' | 'm' | 'h'}`
+): {
   check: (key: string) => Promise<LimitResult>
 } {
   const redis = getRedis()

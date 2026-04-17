@@ -295,6 +295,21 @@ const FALLBACK_CATEGORIES_EN: Category[] = ['tech', 'politique', 'culture']
 const FALLBACK_CATEGORIES_FR: Category[] = ['politique', 'culture', 'science']
 const FALLBACK_CATEGORIES_BOTH: Category[] = ['tech', 'politique', 'culture']
 
+// Plancher de diversite : meme pour un profil mono-thematique, on force
+// au moins N categories pour ne jamais servir un flux mono-thematique.
+export const MIN_CATEGORIES = 3
+
+// Pool de categories "hors-bulle" : culture generale, sujets grand-public,
+// complement editorial des profils techniques. Sert a completer le plancher.
+const DIVERSIFYING_CATEGORIES: Category[] = [
+  'politique',
+  'culture',
+  'science',
+  'essais',
+  'cuisine',
+  'sport',
+]
+
 // Construction a plat pour le lookup par source (supporte les sources pinned
 // que l'utilisateur saisit en texte libre).
 const FLAT_SOURCE_MAP: Record<string, string> = Object.values(SOURCES_BY_CATEGORY).reduce(
@@ -367,6 +382,19 @@ export function inferCategories(profile: UserProfile): Category[] {
     }
   }
   return Array.from(matched)
+}
+
+// Complete une liste de categories jusqu'au plancher MIN_CATEGORIES en tirant
+// dans DIVERSIFYING_CATEGORIES via pickRotating (seed = dayOfYear) : meme jour
+// meme diversification, lendemain nouvelle combinaison. Respecte l'ordre des
+// categories inferees pour garder le signal editorial du user en tete.
+export function ensureMinCategories(inferred: Category[], seed: number): Category[] {
+  if (inferred.length >= MIN_CATEGORIES) return inferred
+  const needed = MIN_CATEGORIES - inferred.length
+  const inferredSet = new Set(inferred)
+  const pool = DIVERSIFYING_CATEGORIES.filter((c) => !inferredSet.has(c))
+  const pad = pickRotating(pool, needed, seed)
+  return [...inferred, ...pad]
 }
 
 function getRssFeedUrls(source: string): string[] {
@@ -445,7 +473,7 @@ export async function runDiscoveryAgent(
     | undefined
 
   const inferred = inferCategories(profile)
-  const activeCategories: Category[] =
+  const baseCategories: Category[] =
     inferred.length > 0
       ? inferred
       : language === 'fr'
@@ -453,6 +481,9 @@ export async function runDiscoveryAgent(
         : language === 'en'
           ? FALLBACK_CATEGORIES_EN
           : FALLBACK_CATEGORIES_BOTH
+  // Plancher diversite : meme avec un profil mono-thematique (ex: "tech, dev"),
+  // on garantit >= MIN_CATEGORIES pour eviter le feed mono-sujet.
+  const activeCategories = ensureMinCategories(baseCategories, seed)
 
   // Pour chaque categorie active, on pioche N sources en rotation journaliere.
   // Variante deterministe pour que le meme jour rende les memes sources mais

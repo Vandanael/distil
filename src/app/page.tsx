@@ -3,6 +3,45 @@ import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { StartScreen } from './StartScreen'
 
+// Fallback editorial : 3 articles perennes pour que la homepage ne soit jamais
+// vide meme si les comptes demo ne sont pas seed ou si serviceKey est absent.
+// Choisi pour illustrer la diversite thematique (politique / culture / science).
+const FALLBACK_ARTICLES: FeaturedArticle[] = [
+  {
+    title: 'The Atlantic - recent features in international affairs',
+    url: 'https://www.theatlantic.com/world/',
+    site_name: 'The Atlantic',
+    excerpt: null,
+    score: null,
+    is_serendipity: false,
+  },
+  {
+    title: 'The New Yorker - culture and ideas',
+    url: 'https://www.newyorker.com/culture',
+    site_name: 'The New Yorker',
+    excerpt: null,
+    score: null,
+    is_serendipity: false,
+  },
+  {
+    title: 'Quanta Magazine - science reporting',
+    url: 'https://www.quantamagazine.org/',
+    site_name: 'Quanta Magazine',
+    excerpt: null,
+    score: null,
+    is_serendipity: true,
+  },
+]
+
+type FeaturedArticle = {
+  title: string | null
+  url: string | null
+  site_name: string | null
+  excerpt: string | null
+  score: number | null
+  is_serendipity: boolean
+}
+
 export default async function RootPage() {
   // Dev : bypass auth (uniquement en developpement local)
   if (
@@ -30,14 +69,7 @@ export default async function RootPage() {
   }
 
   // Non-connecte : 1 article par persona (diversite des themes)
-  let featuredArticles: Array<{
-    title: string | null
-    url: string | null
-    site_name: string | null
-    excerpt: string | null
-    score: number | null
-    is_serendipity: boolean
-  }> = []
+  let featuredArticles: FeaturedArticle[] = []
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (serviceKey) {
@@ -73,6 +105,13 @@ export default async function RootPage() {
 
       featuredArticles = picks.filter((r) => r.data !== null).map((r) => r.data!)
     }
+  }
+
+  // Plancher prod : si on a moins de 3 articles reels, on complete avec le
+  // fallback editorial. Garantit que la homepage n'est jamais vide.
+  if (featuredArticles.length < 3) {
+    const needed = 3 - featuredArticles.length
+    featuredArticles = [...featuredArticles, ...FALLBACK_ARTICLES.slice(0, needed)]
   }
 
   return <StartScreen articles={featuredArticles} />

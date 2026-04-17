@@ -7,14 +7,7 @@ const BATCH_SIZE = 10
 
 export async function runScoringAgent(request: ScoringRequest): Promise<ScoringResult> {
   const start = Date.now()
-  const {
-    profile,
-    candidates,
-    runId,
-    userId,
-    archivedTags = [],
-    negativeExamples = [],
-  } = request
+  const { profile, candidates, runId, userId, archivedTags = [], negativeExamples = [] } = request
 
   let scored: ScoredArticle[] = []
   const agentType = 'messages' as const
