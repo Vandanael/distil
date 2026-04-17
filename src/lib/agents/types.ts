@@ -37,6 +37,7 @@ export type ScoringRequest = {
   profile: UserProfile
   candidates: ArticleCandidate[]
   runId: string
+  userId?: string // pour budget per-user, optionnel (absent = seul le cap global s'applique)
   archivedTags?: string[]
   negativeExamples?: string[] // titres/sujets rejetes comme hors sujet
 }

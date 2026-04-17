@@ -27,20 +27,25 @@ type VoyageResponse = {
   usage: { total_tokens: number }
 }
 
-// Tronque le texte à 4000 tokens environ (heuristique : 4 chars ≈ 1 token)
 function truncate(text: string, maxChars = 16000): string {
   return text.length > maxChars ? text.slice(0, maxChars) : text
 }
 
-export async function generateEmbedding(text: string): Promise<number[]> {
-  const results = await generateEmbeddingBatch([text])
+export async function generateEmbedding(text: string, userId?: string): Promise<number[]> {
+  const results = await generateEmbeddingBatch([text], userId)
   return results[0]
 }
 
-export async function generateEmbeddingBatch(texts: string[]): Promise<number[][]> {
+export async function generateEmbeddingBatch(
+  texts: string[],
+  userId?: string
+): Promise<number[][]> {
   if (texts.length === 0) return []
 
-  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  const { assertBudget, assertUserBudget, recordProviderCall, recordUserProviderCall } =
+    await import('@/lib/api-budget')
+
+  if (userId) await assertUserBudget('voyage', userId)
   await assertBudget('voyage')
 
   const apiKey = process.env.VOYAGE_API_KEY
@@ -72,7 +77,7 @@ export async function generateEmbeddingBatch(texts: string[]): Promise<number[][
 
   const data: VoyageResponse = (await response.json()) as VoyageResponse
   await recordProviderCall('voyage')
+  if (userId) await recordUserProviderCall('voyage', userId)
 
-  // Retourne les embeddings dans l'ordre original
   return data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding)
 }

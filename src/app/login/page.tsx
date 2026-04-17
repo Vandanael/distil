@@ -3,13 +3,9 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -25,48 +21,6 @@ export default function LoginPage() {
       setError(authError.message)
       setGoogleLoading(false)
     }
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
-
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    })
-
-    if (authError) {
-      setError(authError.message)
-      setLoading(false)
-      return
-    }
-
-    setSent(true)
-    setLoading(false)
-  }
-
-  if (sent) {
-    return (
-      <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
-        <div className="fixed top-3 right-3">
-          <ThemeToggle />
-        </div>
-        <div className="w-full max-w-sm space-y-6">
-          <div className="space-y-4">
-            <h1 className="font-ui text-6xl font-bold tracking-tight text-accent">Distil</h1>
-          </div>
-          <div className="space-y-2">
-            <p className="font-body text-lg text-foreground">Lien envoyé.</p>
-            <p className="font-ui text-sm text-muted-foreground">
-              Vérifiez votre boite mail pour <span className="text-foreground">{email}</span>.
-            </p>
-          </div>
-        </div>
-      </main>
-    )
   }
 
   return (
@@ -87,7 +41,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Google OAuth */}
         <div className="space-y-3">
           <Button
             type="button"
@@ -117,38 +70,12 @@ export default function LoginPage() {
             {googleLoading ? 'Redirection...' : 'Continuer avec Google'}
           </Button>
 
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-border" />
-            <span className="font-ui text-xs text-muted-foreground">ou</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-        </div>
-
-        {/* Formulaire magic link */}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <Input
-            id="login-email"
-            type="email"
-            placeholder="vous@exemple.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus
-            disabled={loading}
-            className="h-11 text-base"
-            aria-describedby={error ? 'login-error' : undefined}
-          />
-
           {error && (
             <p id="login-error" role="alert" className="font-ui text-xs text-destructive">
               {error}
             </p>
           )}
-
-          <Button type="submit" className="w-full h-11" disabled={loading || !email}>
-            {loading ? 'Envoi en cours...' : 'Recevoir un lien magique'}
-          </Button>
-        </form>
+        </div>
       </div>
     </main>
   )

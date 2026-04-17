@@ -4,6 +4,7 @@ import { validateTokenFormat, hashToken } from '@/lib/tokens/api-tokens'
 import { parseUrl } from '@/lib/parsing/readability'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 import type { UserProfile, ArticleCandidate } from '@/lib/agents/types'
 
 const CORS_HEADERS = {
@@ -18,6 +19,13 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const blocked = await enforceRateLimit('expensive', request)
+  if (blocked) {
+    // Preserver les headers CORS sur le 429 (bookmarklet cross-origin).
+    Object.entries(CORS_HEADERS).forEach(([k, v]) => blocked.headers.set(k, v))
+    return blocked
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -191,6 +199,7 @@ export async function POST(request: Request) {
       profile: userProfile,
       candidates: [candidate],
       runId: 'bookmarklet',
+      userId,
     })
     scored = result.scored[0]
   } catch (err) {
@@ -251,7 +260,7 @@ export async function POST(request: Request) {
 
   // Embedding best-effort
   if (inserted && process.env.VOYAGE_API_KEY && parsed.contentText) {
-    void generateEmbedding(parsed.contentText).then((embedding) =>
+    void generateEmbedding(parsed.contentText, userId).then((embedding) =>
       supabase.from('articles').update({ embedding }).eq('id', inserted.id)
     )
   }

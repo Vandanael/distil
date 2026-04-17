@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
 export async function GET(request: Request) {
+  const blocked = await enforceRateLimit('userAction', request)
+  if (blocked) return blocked
+
   const { searchParams } = new URL(request.url)
   const runId = searchParams.get('runId')
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

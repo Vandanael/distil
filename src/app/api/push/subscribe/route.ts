@@ -5,6 +5,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
 async function getSupabase() {
   try {
@@ -15,6 +16,9 @@ async function getSupabase() {
 }
 
 export async function POST(req: NextRequest) {
+  const blocked = await enforceRateLimit('userAction', req)
+  if (blocked) return blocked
+
   const supabase = await getSupabase()
   if (!supabase) return NextResponse.json({ error: 'Supabase non configure' }, { status: 503 })
 

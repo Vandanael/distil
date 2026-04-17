@@ -2,8 +2,12 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
 export async function GET(request: NextRequest) {
+  const blocked = await enforceRateLimit('auth', request)
+  if (blocked) return blocked
+
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
 

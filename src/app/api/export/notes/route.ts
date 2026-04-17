@@ -5,6 +5,7 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
 function formatDate(iso: string | null): string {
   if (!iso) return ''
@@ -15,7 +16,10 @@ function formatDate(iso: string | null): string {
   })
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const blocked = await enforceRateLimit('userAction', request)
+  if (blocked) return blocked
+
   const supabase = await createClient()
 
   const {

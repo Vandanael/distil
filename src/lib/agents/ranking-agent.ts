@@ -68,9 +68,12 @@ async function loadUserProfile(
 
 async function callRankingLlm(
   profilePrompt: ReturnType<typeof buildRankingUserPrompt>,
-  modelId: string
+  modelId: string,
+  userId: string
 ): Promise<LlmResponse> {
-  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  const { assertBudget, assertUserBudget, recordProviderCall, recordUserProviderCall } =
+    await import('@/lib/api-budget')
+  await assertUserBudget('gemini', userId)
   await assertBudget('gemini')
 
   const apiKey = process.env.GOOGLE_AI_API_KEY
@@ -94,6 +97,7 @@ async function callRankingLlm(
   if (!match) throw new Error('Aucun JSON dans la reponse')
 
   await recordProviderCall('gemini')
+  await recordUserProviderCall('gemini', userId)
   return JSON.parse(match[0]) as LlmResponse
 }
 
@@ -275,9 +279,9 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     // Try primary model first, fallback to secondary
     let llmResult: LlmResponse
     try {
-      llmResult = await callRankingLlm(userPrompt, MODEL)
+      llmResult = await callRankingLlm(userPrompt, MODEL, userId)
     } catch {
-      llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL)
+      llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL, userId)
     }
 
     essential = (llmResult.essential ?? []).slice(0, 5).map((item, i) => ({

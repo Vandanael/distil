@@ -54,7 +54,7 @@ export async function searchSemantic(
 
   let embedding: number[]
   try {
-    embedding = await generateEmbedding(query)
+    embedding = await generateEmbedding(query, userId)
   } catch (err) {
     if (err instanceof EmbeddingError) {
       // Fallback sur full-text si Voyage indisponible

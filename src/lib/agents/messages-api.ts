@@ -5,7 +5,8 @@ export async function scoreWithMessagesApi(
   profile: UserProfile,
   candidates: ArticleCandidate[],
   archivedTags: string[] = [],
-  negativeExamples: string[] = []
+  negativeExamples: string[] = [],
+  userId?: string
 ): Promise<ScoringFunctionResult> {
-  return scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
+  return scoreWithGemini(profile, candidates, archivedTags, negativeExamples, userId)
 }

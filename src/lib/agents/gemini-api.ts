@@ -50,9 +50,12 @@ export async function scoreWithGemini(
   profile: UserProfile,
   candidates: ArticleCandidate[],
   archivedTags: string[] = [],
-  negativeExamples: string[] = []
+  negativeExamples: string[] = [],
+  userId?: string
 ): Promise<ScoringFunctionResult> {
-  const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+  const { assertBudget, assertUserBudget, recordProviderCall, recordUserProviderCall } =
+    await import('@/lib/api-budget')
+  if (userId) await assertUserBudget('gemini', userId)
   await assertBudget('gemini')
 
   const apiKey = process.env.GOOGLE_AI_API_KEY
@@ -75,7 +78,7 @@ export async function scoreWithGemini(
         errors.push(
           `${modelId} attempt ${attempt}: ${err instanceof Error ? err.message : String(err)}`
         )
-        if (!isTransientError(err)) break // erreur non transitoire, passer au modele suivant
+        if (!isTransientError(err)) break
         const delay = RETRY_BACKOFF_MS[attempt]
         if (delay !== undefined) await new Promise((r) => setTimeout(r, delay))
       }
@@ -97,6 +100,7 @@ export async function scoreWithGemini(
   }
 
   await recordProviderCall('gemini')
+  if (userId) await recordUserProviderCall('gemini', userId)
 
   return {
     scored: parsed.scored.map((item) => ({

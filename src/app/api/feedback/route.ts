@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { logFeedback } from '@/lib/feedback/log'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
 const VALID_ACTIONS = ['read_full', 'skip', 'saved', 'surprised_useful'] as const
 type FeedbackAction = (typeof VALID_ACTIONS)[number]
 
 export async function POST(request: Request) {
+  const blocked = await enforceRateLimit('userAction', request)
+  if (blocked) return blocked
+
   const supabase = await createClient()
 
   const {

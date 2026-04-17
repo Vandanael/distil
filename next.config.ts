@@ -16,10 +16,25 @@ const nextConfig: NextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
-          // CSP minimal : clickjacking, Flash, base injection
+          // CSP renforcee : defense en profondeur contre XSS/exfil.
+          // Pas de nonces (React + Tailwind inlinent, trade-off accepte pour beta).
+          // unsafe-eval uniquement en dev (React dev mode l'utilise pour le debug).
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self';",
+            value: [
+              "default-src 'self'",
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' https: data: blob:",
+              "font-src 'self' data:",
+              `connect-src 'self' https://*.supabase.co wss://*.supabase.co${process.env.NODE_ENV === 'development' ? ' ws://localhost:* http://localhost:*' : ''}`,
+              "frame-ancestors 'none'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "manifest-src 'self'",
+              "worker-src 'self' blob:",
+            ].join('; '),
           },
         ],
       },

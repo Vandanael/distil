@@ -73,7 +73,9 @@ async function generateForUser(
       })),
     })
 
-    const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
+    const { assertBudget, assertUserBudget, recordProviderCall, recordUserProviderCall } =
+      await import('@/lib/api-budget')
+    await assertUserBudget('gemini', userId)
     await assertBudget('gemini')
 
     const genAI = new GoogleGenerativeAI(apiKey)
@@ -95,6 +97,7 @@ async function generateForUser(
 
     const parsed: ProfileOutput = JSON.parse(match[0])
     await recordProviderCall('gemini')
+    await recordUserProviderCall('gemini', userId)
 
     if (!parsed.static_profile || !parsed.long_term_profile || !parsed.short_term_profile) {
       throw new Error('Profil incomplet : champs manquants')

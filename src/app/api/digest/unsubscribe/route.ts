@@ -6,8 +6,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { verifyUnsubscribeToken } from '@/lib/email/token'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
 export async function GET(req: NextRequest) {
+  const blocked = await enforceRateLimit('auth', req)
+  if (blocked) return blocked
+
   const token = req.nextUrl.searchParams.get('token')
   if (!token) {
     return new NextResponse(page('Lien invalide', 'Token manquant.'), {

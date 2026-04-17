@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { enforceRateLimit } from '@/lib/api-rate-limit'
 
-export async function PATCH(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const blocked = await enforceRateLimit('userAction', request)
+  if (blocked) return blocked
+
   const { id } = await params
   const supabase = await createClient()
 
