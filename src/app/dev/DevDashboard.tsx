@@ -112,9 +112,6 @@ export function DevDashboard() {
   const [parseLoading, setParseLoading] = useState(false)
   const [parseResult, setParseResult] = useState<unknown>(null)
 
-  // --- Mock feed ---
-  const [showScores, setShowScores] = useState(true)
-
   async function triggerRun() {
     setRunLoading(true)
     setRunResult(null)
@@ -363,24 +360,9 @@ export function DevDashboard() {
             </p>
           </div>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showScores}
-              onChange={(e) => setShowScores(e.target.checked)}
-              className="h-4 w-4 border-input accent-primary"
-            />
-            <span className="font-ui text-sm text-muted-foreground">Afficher les scores</span>
-          </label>
-
           <div className="space-y-6 border border-border p-6">
             {MOCK_ARTICLES.map((a) => (
-              <ArticleCard
-                key={a.id}
-                {...a}
-                score={showScores ? a.score : null}
-                justification={showScores ? a.justification : null}
-              />
+              <ArticleCard key={a.id} {...a} />
             ))}
           </div>
         </section>

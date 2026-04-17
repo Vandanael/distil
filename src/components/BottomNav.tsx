@@ -7,7 +7,7 @@ import { useLocale } from '@/lib/i18n/context'
 
 const NAV_KEYS: Record<string, keyof ReturnType<typeof useLocale>['t']['nav']> = {
   '/feed': 'feed',
-  '/archive': 'archive',
+  '/library': 'library',
   '/search': 'search',
   '/profile': 'profile',
 }
@@ -30,7 +30,7 @@ const ICONS: Record<string, (active: boolean) => React.ReactNode> = {
       <rect x="3" y="14" width="7" height="7" />
     </svg>
   ),
-  '/archive': (active) => (
+  '/library': (active) => (
     <svg
       width="20"
       height="20"
@@ -41,9 +41,9 @@ const ICONS: Record<string, (active: boolean) => React.ReactNode> = {
       strokeWidth={active ? 2.5 : 2}
       strokeLinecap="square"
     >
-      <rect width="20" height="5" x="2" y="3" />
-      <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
-      <path d="M10 12h4" />
+      <path d="M4 4h4v16H4z" />
+      <path d="M10 4h4v16h-4z" />
+      <path d="m16.5 4.5 3.5 1-4 15-3.5-1z" />
     </svg>
   ),
   '/search': (active) => (

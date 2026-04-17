@@ -6,7 +6,6 @@ import { redirect } from 'next/navigation'
 
 export type ProfileUpdate = {
   profile_text?: string
-  sector?: string
   interests?: string[]
   pinned_sources?: string[]
   daily_cap?: number

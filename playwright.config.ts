@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Matrix limitee : chromium toujours. Firefox et webkit en CI via PW_FULL_MATRIX=1
+// pour garder les runs locaux rapides et eviter le cout des downloads sur dev.
+const FULL_MATRIX = process.env.PW_FULL_MATRIX === '1'
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -16,6 +20,26 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    ...(FULL_MATRIX
+      ? [
+          {
+            name: 'firefox',
+            use: { ...devices['Desktop Firefox'] },
+          },
+          {
+            name: 'webkit',
+            use: { ...devices['Desktop Safari'] },
+          },
+          {
+            name: 'mobile-chrome',
+            use: { ...devices['Pixel 7'] },
+          },
+          {
+            name: 'mobile-safari',
+            use: { ...devices['iPhone 14'] },
+          },
+        ]
+      : []),
   ],
   webServer: {
     command: 'pnpm dev',

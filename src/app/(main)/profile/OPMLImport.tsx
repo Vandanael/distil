@@ -2,15 +2,8 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
+import { parseOPML, OPML_MAX_URLS } from '@/lib/opml'
 import { updatePinnedSources } from './actions'
-
-function parseOPML(xml: string): string[] {
-  const doc = new DOMParser().parseFromString(xml, 'text/xml')
-  const outlines = doc.querySelectorAll('outline[xmlUrl], outline[xmlurl]')
-  return Array.from(outlines)
-    .map((el) => el.getAttribute('xmlUrl') ?? el.getAttribute('xmlurl') ?? '')
-    .filter(Boolean)
-}
 
 export function OPMLImport() {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -41,11 +34,11 @@ export function OPMLImport() {
         return
       }
 
-      const truncated = urls.length > 50
-      const urlsToImport = truncated ? urls.slice(0, 50) : urls
+      const truncated = urls.length > OPML_MAX_URLS
+      const urlsToImport = truncated ? urls.slice(0, OPML_MAX_URLS) : urls
 
       if (truncated) {
-        toast.warning(`${urls.length} sources trouvées - tronquées à 50`)
+        toast.warning(`${urls.length} sources trouvées - tronquées à ${OPML_MAX_URLS}`)
       }
 
       startTransition(async () => {

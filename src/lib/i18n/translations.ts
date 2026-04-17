@@ -2,7 +2,7 @@ export const translations = {
   fr: {
     nav: {
       feed: 'Feed',
-      archive: 'Archives',
+      library: 'Bibliothèque',
       search: 'Recherche',
       profile: 'Profil',
     },
@@ -31,6 +31,10 @@ export const translations = {
       serendipityTitle:
         'Article hors de vos sources habituelles - introduit pour élargir votre veille',
       serendipityDetail: 'Découverte - article hors de vos sources habituelles.',
+      tagMatchStrong: 'Match fort',
+      tagMatch: 'Match',
+      tagDiscovery: 'Découverte',
+      tagDetails: 'Pourquoi ?',
       relevance: 'Pertinence',
       paywall: 'Paywall',
       moreLikeThis: 'Plus comme ça',
@@ -66,7 +70,7 @@ export const translations = {
   en: {
     nav: {
       feed: 'Feed',
-      archive: 'Archive',
+      library: 'Library',
       search: 'Search',
       profile: 'Profile',
     },
@@ -92,6 +96,10 @@ export const translations = {
       serendipity: 'Discovery',
       serendipityTitle: 'Article outside your usual sources - introduced to broaden your feed',
       serendipityDetail: 'Discovery - article outside your usual sources.',
+      tagMatchStrong: 'Strong match',
+      tagMatch: 'Match',
+      tagDiscovery: 'Discovery',
+      tagDetails: 'Why?',
       relevance: 'Relevance',
       paywall: 'Paywall',
       moreLikeThis: 'More like this',

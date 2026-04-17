@@ -13,16 +13,18 @@ function RowSkeleton() {
   )
 }
 
-export default function ArchiveLoading() {
+export default function LibraryLoading() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
-      <div className="space-y-4 border-b border-border pb-8 animate-pulse">
-        <div className="h-8 w-32 bg-muted rounded-none" />
-        <div className="flex gap-6">
-          <div className="h-3 w-20 bg-muted rounded-none" />
-          <div className="h-3 w-28 bg-muted rounded-none" />
+    <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-8 w-full">
+      <div className="space-y-4 animate-pulse">
+        <div className="h-8 w-40 bg-muted rounded-none" />
+        <div className="flex gap-6 border-b border-border pb-3">
+          <div className="h-4 w-24 bg-muted rounded-none" />
+          <div className="h-4 w-24 bg-muted rounded-none" />
+          <div className="h-4 w-24 bg-muted rounded-none" />
         </div>
       </div>
+      <div className="h-3 w-20 bg-muted rounded-none animate-pulse" />
       <div>
         {Array.from({ length: 8 }).map((_, i) => (
           <RowSkeleton key={i} />

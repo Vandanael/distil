@@ -72,7 +72,9 @@ export async function scoreWithGemini(
         modelUsed = modelId
         break outer
       } catch (err) {
-        errors.push(`${modelId} attempt ${attempt}: ${err instanceof Error ? err.message : String(err)}`)
+        errors.push(
+          `${modelId} attempt ${attempt}: ${err instanceof Error ? err.message : String(err)}`
+        )
         if (!isTransientError(err)) break // erreur non transitoire, passer au modele suivant
         const delay = RETRY_BACKOFF_MS[attempt]
         if (delay !== undefined) await new Promise((r) => setTimeout(r, delay))

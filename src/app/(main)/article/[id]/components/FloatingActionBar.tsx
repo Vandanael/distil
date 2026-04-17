@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { archiveArticle } from '../actions'
 import { NoteEditor } from './NoteEditor'
 import { TagInput } from './TagInput'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
+import { useAutoHideOnScroll } from '@/lib/hooks/useAutoHideOnScroll'
 
 type Props = {
   articleId: string
@@ -26,6 +27,9 @@ export function FloatingActionBar({
   const [archived, setArchived] = useState(false)
   const [isPending, startTransition] = useTransition()
   const isOnline = useOnlineStatus()
+  const visible = useAutoHideOnScroll()
+  const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cancelledRef = useRef(false)
 
   async function handleShare() {
     const shareData = { title: articleTitle ?? 'Article Distil', url: articleUrl }
@@ -42,11 +46,34 @@ export function FloatingActionBar({
   }
 
   function handleArchive() {
-    startTransition(async () => {
-      await archiveArticle(articleId)
-      setArchived(true)
-      toast.success('Article archivé')
+    // Flip UI instantanement, vrai archivage apres 4s si pas d'undo.
+    setArchived(true)
+    cancelledRef.current = false
+    if (undoRef.current) clearTimeout(undoRef.current)
+
+    toast.success('Article archivé', {
+      action: {
+        label: 'Annuler',
+        onClick: () => {
+          cancelledRef.current = true
+          if (undoRef.current) clearTimeout(undoRef.current)
+          setArchived(false)
+        },
+      },
+      duration: 4000,
     })
+
+    undoRef.current = setTimeout(() => {
+      if (cancelledRef.current) return
+      startTransition(async () => {
+        try {
+          await archiveArticle(articleId)
+        } catch {
+          setArchived(false)
+          toast.error('Archivage echoue')
+        }
+      })
+    }, 4000)
   }
 
   if (archived) {
@@ -77,16 +104,23 @@ export function FloatingActionBar({
       )}
 
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between border-t border-border bg-background px-6 py-3"
+        className={[
+          'fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between border-t border-border bg-background px-4 py-1',
+          'transition-transform duration-200 ease-out motion-reduce:transition-none',
+          'focus-within:translate-y-0',
+          visible ? 'translate-y-0' : 'translate-y-full',
+        ].join(' ')}
+        aria-hidden={!visible || undefined}
         data-testid="floating-action-bar"
+        data-visible={visible ? 'true' : 'false'}
       >
         {/* Actions secondaires a gauche */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => void handleShare()}
             disabled={!isOnline}
-            className="text-muted-foreground transition-colors hover:text-foreground p-1 disabled:opacity-40"
+            className="inline-flex items-center justify-center h-11 w-11 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-share"
             aria-label="Partager"
             title={isOnline ? 'Partager' : 'Non disponible hors-ligne'}
@@ -114,7 +148,7 @@ export function FloatingActionBar({
               setShowTag(false)
             }}
             disabled={!isOnline}
-            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+            className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-note"
             aria-label="Ajouter une note"
             title={isOnline ? undefined : 'Non disponible hors-ligne'}
@@ -128,7 +162,7 @@ export function FloatingActionBar({
               setShowNote(false)
             }}
             disabled={!isOnline}
-            className="font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+            className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-tag"
             aria-label="Ajouter un tag"
             title={isOnline ? undefined : 'Non disponible hors-ligne'}
@@ -153,12 +187,12 @@ export function FloatingActionBar({
           type="button"
           onClick={handleArchive}
           disabled={isPending || !isOnline}
-          className="font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
+          className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
           data-testid="action-archive"
           aria-label="Archiver cet article"
           title={isOnline ? undefined : 'Non disponible hors-ligne'}
         >
-          {isPending ? '...' : 'Archiver'}
+          Archiver
         </button>
       </div>
     </>

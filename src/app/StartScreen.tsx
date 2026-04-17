@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { FlowPreview } from './FlowPreview'
 
 type FeaturedArticle = {
   title: string | null
@@ -59,7 +60,6 @@ const COPY = {
     body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
     cta: "Commencer - c'est gratuit",
-    noSpam: 'Sans engagement.',
     examplesTitle: 'Exemples de veille',
     examplesSubtitle: 'Cliquez sur un thème pour voir à quoi ressemble votre sélection du jour.',
     feedTitle: 'Dans le flux ce matin',
@@ -74,7 +74,6 @@ const COPY = {
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
     cta: "Get started - it's free",
-    noSpam: 'No commitment.',
     examplesTitle: 'Feed examples',
     examplesSubtitle: 'Click a topic to see what your daily selection looks like.',
     feedTitle: 'In the feed this morning',
@@ -139,7 +138,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
 
   return (
     <main className="min-h-full flex flex-col items-center justify-center px-4 py-6 md:py-16 bg-background">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl">
         {/* Bandeau éditorial */}
         <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
           <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
@@ -170,23 +169,31 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           </div>
         </div>
 
-        {/* Hero */}
-        <div className="space-y-6 mb-14">
-          <h1 className="font-ui text-7xl md:text-9xl font-bold tracking-tight text-accent leading-none">
-            Distil
-          </h1>
-          <p className="font-ui text-xl font-bold text-accent leading-snug">{t.tagline}</p>
-          <p className="font-body text-base text-muted-foreground leading-relaxed">{t.body}</p>
-          <p className="font-ui text-sm text-muted-foreground/70">{t.format}</p>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
-            <Link
-              href="/login"
-              className="font-ui text-sm bg-foreground text-background px-6 py-3 hover:bg-accent hover:text-background transition-colors"
-            >
-              {t.cta}
-            </Link>
-            <p className="font-ui text-xs text-muted-foreground/60">{t.noSpam}</p>
+        {/* Hero : 1 col mobile, 2 cols lg+ (copy a gauche, flux live a droite) */}
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-14 lg:items-start mb-14">
+          <div className="space-y-6">
+            <h1 className="font-ui text-4xl md:text-5xl font-bold tracking-tight text-accent leading-none">
+              Distil
+            </h1>
+            <p className="font-ui text-3xl md:text-5xl lg:text-6xl font-bold text-foreground leading-[1.05] tracking-tight">
+              {t.tagline}
+            </p>
+            <p className="font-body text-lg md:text-xl text-muted-foreground leading-relaxed">
+              {t.body}
+            </p>
+            <p className="font-ui text-sm text-muted-foreground/70">{t.format}</p>
+            <div className="pt-2">
+              <Link
+                href="/login"
+                className="inline-flex font-ui text-sm bg-foreground text-background px-6 py-3 hover:bg-accent hover:text-background transition-colors"
+              >
+                {t.cta}
+              </Link>
+            </div>
           </div>
+          <aside className="hidden lg:block mt-8 lg:mt-0">
+            <FlowPreview articles={articles} lang={lang} />
+          </aside>
         </div>
 
         {/* Exemples de veille */}
@@ -215,8 +222,8 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           </div>
         </div>
 
-        {/* Aperçu du flux */}
-        <div>
+        {/* Apercu du flux (masque sur lg+ car deja visible dans FlowPreview du hero) */}
+        <div className="lg:hidden">
           <div className="border-t-2 border-foreground pt-3 mb-0">
             <div className="flex items-baseline justify-between">
               <p className="font-ui text-[13px] text-foreground font-medium">{t.feedTitle}</p>

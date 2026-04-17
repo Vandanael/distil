@@ -16,7 +16,7 @@ export async function keepArticle(articleId: string): Promise<void> {
     .eq('id', articleId)
     .eq('user_id', user.id)
 
-  revalidatePath('/rejected')
+  revalidatePath('/library')
   revalidatePath('/feed')
 }
 

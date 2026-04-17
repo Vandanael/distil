@@ -11,9 +11,9 @@ test.describe('Transparence du scoring', () => {
     await expect(page).toHaveURL(/\/feed/)
   })
 
-  test('la page rejetes affiche les scores des articles filtres', async ({ page }) => {
-    await page.goto('/rejected')
-    await expect(page).toHaveURL(/\/rejected/)
+  test('la section filtres affiche les scores des articles filtres', async ({ page }) => {
+    await page.goto('/library?tab=filtered')
+    await expect(page).toHaveURL(/\/library/)
 
     const cards = page.getByTestId(/^rejected-card-/)
     const count = await cards.count()
@@ -22,7 +22,7 @@ test.describe('Transparence du scoring', () => {
       // Pas d'erreur si 0 badges (articles sans score), on verifie juste l'absence d'erreur
       await expect(page.getByTestId('rejected-articles')).toBeVisible()
     } else {
-      await expect(page.getByText('Aucun article rejet')).toBeVisible()
+      await expect(page.getByText('Aucun article filtre')).toBeVisible()
     }
   })
 

@@ -4,15 +4,15 @@ Veille intelligente et read-later personnel. Distil capte, filtre et organise l'
 
 ## Stack
 
-|                 |                                                           |
-| --------------- | --------------------------------------------------------- |
-| Framework       | Next.js 16 App Router, TypeScript strict                  |
-| Style           | Tailwind v4, shadcn/ui retokenisé                         |
-| Base de données | Supabase (Postgres + pgvector + Auth)                     |
-| Scoring         | Gemini 2.5 Flash                                          |
-| Embeddings      | Voyage AI (voyage-3)                                      |
-| Email           | Resend                                                    |
-| Deploy          | Netlify                                                   |
+|                 |                                          |
+| --------------- | ---------------------------------------- |
+| Framework       | Next.js 16 App Router, TypeScript strict |
+| Style           | Tailwind v4, shadcn/ui retokenisé        |
+| Base de données | Supabase (Postgres + pgvector + Auth)    |
+| Scoring         | Gemini 2.5 Flash                         |
+| Embeddings      | Voyage AI (voyage-3)                     |
+| Email           | Resend                                   |
+| Deploy          | Netlify                                  |
 
 ## Démarrage
 

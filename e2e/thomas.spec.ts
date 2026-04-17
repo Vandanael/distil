@@ -1,50 +1,34 @@
 /**
- * Parcours Thomas - ML engineer, onboarding Wizard complet,
- * interets explicites, cap 5, serendipite 30%.
+ * Parcours Thomas - ML engineer, onboarding ecran unique avec sources,
+ * ajuste cap et serendipite dans les parametres avances.
  */
 import { test, expect } from '@playwright/test'
 import { loginAs } from './fixtures/auth'
 
-test.describe('Thomas - onboarding Wizard', () => {
-  test('wizard 5 etapes, cap 5, serendipite 30%, profil cree', async ({ page }) => {
+test.describe('Thomas - onboarding + parametres avances', () => {
+  test('saisit profile_text + sources, regle cap et serendipite, feed visible', async ({
+    page,
+  }) => {
     await loginAs(page, 'thomas-test@distil.local')
 
     await expect(page).toHaveURL(/\/onboarding/)
-    await page.getByTestId('card-wizard').click()
-    await expect(page).toHaveURL(/\/onboarding\/wizard/)
 
-    // Etape 1 : interets
-    await expect(page.getByTestId('wizard-step-1')).toBeVisible()
-    await page.getByTestId('interest-input').fill('machine learning')
-    await page.keyboard.press('Enter')
-    await page.getByTestId('interest-input').fill('sources primaires')
-    await page.keyboard.press('Enter')
-    await expect(page.getByTestId('interests-list')).toContainText('machine learning')
-    await page.getByTestId('wizard-next').click()
+    await page
+      .getByTestId('profile-text')
+      .fill('ML engineer, sources primaires uniquement, machine learning')
 
-    // Etape 2 : sources
-    await expect(page.getByTestId('wizard-step-2')).toBeVisible()
     await page.getByTestId('source-input').fill('arxiv.org')
     await page.keyboard.press('Enter')
-    await page.getByTestId('wizard-next').click()
+    await expect(page.getByTestId('sources-list')).toContainText('arxiv.org')
 
-    // Etape 3 : rythme - selectionner 5
-    await expect(page.getByTestId('wizard-step-3')).toBeVisible()
-    await page.getByTestId('cap-5').click()
-    await page.getByTestId('wizard-next').click()
-
-    // Etape 4 : serendipite - selectionner 30%
-    await expect(page.getByTestId('wizard-step-4')).toBeVisible()
-    await page.getByTestId('serendipity-30').click()
-    await page.getByTestId('wizard-next').click()
-
-    // Etape 5 : recap
-    await expect(page.getByTestId('wizard-step-5')).toBeVisible()
-    await expect(page.getByText('machine learning')).toBeVisible()
-    await expect(page.getByText('5')).toBeVisible()
-    await expect(page.getByText('30%')).toBeVisible()
-
-    await page.getByTestId('wizard-submit').click()
+    await page.getByTestId('submit-onboarding').click()
     await expect(page).toHaveURL(/\/feed/)
+
+    // Parametres avances : cap + serendipite
+    await page.goto('/profile')
+    await page.getByText('Parametres avances').click()
+
+    await page.getByTestId('daily-cap-select').selectOption('5')
+    await page.getByTestId('serendipity-select').selectOption('0.3')
   })
 })

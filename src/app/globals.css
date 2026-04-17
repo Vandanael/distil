@@ -187,18 +187,18 @@
   }
 }
 
-/* Styles prose article - definis ici pour eviter les arbitrary selectors Tailwind inline */
+/* Styles prose article - inspiration Medium : serif 19-21px, leading 1.6-1.7, colonne etroite */
 .article-prose {
-  @apply text-[17px] leading-[1.75];
+  @apply text-[18px] leading-[1.65] md:text-[20px] md:leading-[1.7] max-w-[65ch] mx-auto;
 }
 .article-prose h2 {
-  @apply font-ui text-2xl font-bold mt-10 mb-4;
+  @apply font-ui text-[26px] md:text-[30px] font-bold mt-12 mb-4 leading-[1.2];
 }
 .article-prose h3 {
-  @apply font-ui text-xl font-bold mt-8 mb-3;
+  @apply font-ui text-[22px] md:text-[24px] font-bold mt-10 mb-3 leading-[1.25];
 }
 .article-prose p {
-  @apply mb-5;
+  @apply mb-6;
 }
 .article-prose a {
   @apply text-accent no-underline;

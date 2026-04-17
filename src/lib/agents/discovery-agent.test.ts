@@ -1,5 +1,19 @@
 import { describe, it, expect } from 'vitest'
-import { dayOfYear, pickRotating } from './discovery-agent'
+import { dayOfYear, inferCategories, pickRotating } from './discovery-agent'
+import type { UserProfile } from './types'
+
+function makeProfile(partial: Partial<UserProfile>): UserProfile {
+  return {
+    profileText: null,
+    profileStructured: null,
+    sector: null,
+    interests: [],
+    pinnedSources: [],
+    dailyCap: 10,
+    serendipityQuota: 0.15,
+    ...partial,
+  }
+}
 
 describe('dayOfYear', () => {
   it('retourne 1 pour le 1er janvier UTC', () => {
@@ -52,5 +66,28 @@ describe('pickRotating', () => {
 
   it('gere un seed negatif', () => {
     expect(pickRotating(pool, 2, -1)).toEqual(['e', 'a'])
+  })
+})
+
+describe('inferCategories', () => {
+  it('matche le profil tech + cuisine + geopolitique + culture de Yvan', () => {
+    const cats = inferCategories(
+      makeProfile({
+        profileText:
+          "PM Senior dans la tech, j'aime les jeux video, la musique, la fantasy ou sf et la cuisine. J'aime aussi la geopolitique et les infos pratiques.",
+        interests: ['Product', 'games', 'music', 'cooking', 'tech'],
+      })
+    )
+    expect(cats).toEqual(
+      expect.arrayContaining(['tech', 'produit', 'cuisine', 'politique', 'culture'])
+    )
+  })
+
+  it('retourne [] si aucun mot cle ne matche', () => {
+    expect(inferCategories(makeProfile({ profileText: 'xyzzyvrt qwerty' }))).toEqual([])
+  })
+
+  it('ignore les accents dans les mots cles', () => {
+    expect(inferCategories(makeProfile({ interests: ['géopolitique'] }))).toContain('politique')
   })
 })

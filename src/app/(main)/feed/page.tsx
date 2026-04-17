@@ -1,30 +1,40 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ArticleCard } from './components/ArticleCard'
-import { BucketSection } from './components/BucketSection'
 import { EmptyFeed } from './components/EmptyFeed'
 import { FeedShell } from './components/FeedShell'
 import { FeedHeader } from './components/FeedHeader'
 import { DismissProvider } from './components/DismissContext'
 
-export default async function FeedPage() {
-  let articles: Array<{
-    id: string
-    title: string | null
-    site_name: string | null
-    excerpt: string | null
-    reading_time_minutes: number | null
-    score: number | null
-    justification: string | null
-    is_serendipity: boolean
-    origin: string
-    scored_at: string | null
-    word_count: number | null
-    og_image_url: string | null
-    status: string
-  }> = []
+type FeedArticle = {
+  id: string
+  title: string | null
+  site_name: string | null
+  excerpt: string | null
+  reading_time_minutes: number | null
+  score: number | null
+  justification: string | null
+  is_serendipity: boolean
+  origin: string
+  scored_at: string | null
+  word_count: number | null
+  og_image_url: string | null
+  status: string
+}
 
-  let showScores = true
+function sortByScoreDesc(a: FeedArticle, b: FeedArticle): number {
+  const sa = a.score ?? -1
+  const sb = b.score ?? -1
+  if (sb !== sa) return sb - sa
+  // Secondary : scored_at desc pour stabilite
+  const ta = a.scored_at ? new Date(a.scored_at).getTime() : 0
+  const tb = b.scored_at ? new Date(b.scored_at).getTime() : 0
+  return tb - ta
+}
+
+export default async function FeedPage() {
+  let articles: FeedArticle[] = []
+
   let lastRefreshAt: string | null = null
   let interests: string[] = []
   let rejectedCount = 0
@@ -38,11 +48,10 @@ export default async function FeedPage() {
     if (user) {
       const profileResult = await supabase
         .from('profiles')
-        .select('show_scores, daily_cap, interests')
+        .select('daily_cap, interests')
         .eq('id', user.id)
         .single()
 
-      showScores = profileResult.data?.show_scores ?? true
       const dailyCap = profileResult.data?.daily_cap ?? 10
       interests = profileResult.data?.interests ?? []
 
@@ -86,62 +95,75 @@ export default async function FeedPage() {
   const todayIso = new Date().toISOString()
   const topInterests = interests.slice(0, 3)
 
+  // Fil unique : essentiels trie par score desc, puis serendipity trie par score desc
+  const essentials = articles.filter((a) => !a.is_serendipity).sort(sortByScoreDesc)
+  const surprises = articles.filter((a) => a.is_serendipity).sort(sortByScoreDesc)
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-3 md:py-10 w-full">
+    <div className="max-w-[720px] mx-auto px-4 py-3 md:py-10 w-full">
       <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
 
       {/* Articles */}
       <DismissProvider>
-        <FeedShell className="space-y-8">
+        <FeedShell className="space-y-6">
           {articles.length === 0 ? (
             <EmptyFeed />
           ) : (
-            (() => {
-              const essentials = articles.filter((a) => !a.is_serendipity)
-              const surprises = articles.filter((a) => a.is_serendipity)
-              const hasBuckets = surprises.length > 0
+            <>
+              {essentials.map((a, i) => (
+                <ArticleCard
+                  key={a.id}
+                  id={a.id}
+                  staggerIndex={i}
+                  title={a.title}
+                  siteName={a.site_name}
+                  excerpt={a.excerpt}
+                  readingTimeMinutes={a.reading_time_minutes}
+                  score={a.score}
+                  justification={a.justification}
+                  isSerendipity={a.is_serendipity}
+                  origin={a.origin}
+                  scoredAt={a.scored_at}
+                  wordCount={a.word_count}
+                  ogImageUrl={a.og_image_url}
+                  isRead={a.status === 'read'}
+                />
+              ))}
 
-              if (!hasBuckets) {
-                return articles.map((a, i) => (
-                  <ArticleCard
-                    key={a.id}
-                    id={a.id}
-                    staggerIndex={i}
-                    title={a.title}
-                    siteName={a.site_name}
-                    excerpt={a.excerpt}
-                    readingTimeMinutes={a.reading_time_minutes}
-                    score={showScores ? a.score : null}
-                    justification={showScores ? a.justification : null}
-                    isSerendipity={a.is_serendipity}
-                    origin={a.origin}
-                    scoredAt={a.scored_at}
-                    wordCount={a.word_count}
-                    ogImageUrl={a.og_image_url}
-                    isRead={a.status === 'read'}
-                  />
-                ))
-              }
+              {surprises.length > 0 && (
+                <div
+                  className="flex items-center gap-3 py-2"
+                  data-testid="discovery-divider"
+                  aria-hidden="true"
+                >
+                  <span className="h-px flex-1 bg-border" />
+                  <span className="font-ui text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                    Découverte
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+              )}
 
-              return (
-                <>
-                  <BucketSection
-                    title="Essentiel"
-                    subtitle="A ne pas manquer"
-                    articles={essentials}
-                    showScores={showScores}
-                  />
-                  <div className="border-t border-border" />
-                  <BucketSection
-                    title="Decouverte"
-                    subtitle="Hors de vos habitudes"
-                    articles={surprises}
-                    showScores={showScores}
-                    staggerOffset={essentials.length}
-                  />
-                </>
-              )
-            })()
+              {surprises.map((a, i) => (
+                <ArticleCard
+                  key={a.id}
+                  id={a.id}
+                  staggerIndex={essentials.length + i}
+                  title={a.title}
+                  siteName={a.site_name}
+                  excerpt={a.excerpt}
+                  readingTimeMinutes={a.reading_time_minutes}
+                  score={a.score}
+                  justification={a.justification}
+                  isSerendipity={a.is_serendipity}
+                  origin={a.origin}
+                  scoredAt={a.scored_at}
+                  wordCount={a.word_count}
+                  ogImageUrl={a.og_image_url}
+                  isRead={a.status === 'read'}
+                />
+              ))}
+            </>
           )}
         </FeedShell>
       </DismissProvider>
@@ -149,7 +171,7 @@ export default async function FeedPage() {
       {rejectedCount > 0 && (
         <div className="mt-8 pt-4 border-t border-border">
           <Link
-            href="/rejected"
+            href="/library?tab=filtered"
             className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
           >
             {rejectedCount} article{rejectedCount > 1 ? 's' : ''} filtre

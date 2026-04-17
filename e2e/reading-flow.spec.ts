@@ -41,11 +41,11 @@ test.describe('Flow de lecture', () => {
     // La FloatingActionBar confirme l'archivage
     await expect(page.getByText('Archive')).toBeVisible({ timeout: 5000 })
 
-    // L'article est retrouvable dans /archive
+    // L'article est retrouvable dans /library?tab=saved
     if (articleUrl) {
       const articleId = articleUrl.split('/').pop()
-      await page.goto('/archive')
-      await expect(page).toHaveURL(/\/archive/)
+      await page.goto('/library?tab=saved')
+      await expect(page).toHaveURL(/\/library/)
       if (articleId) {
         await expect(page.getByTestId(`archive-card-${articleId}`)).toBeVisible({ timeout: 5000 })
       }

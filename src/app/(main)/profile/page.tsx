@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from './ProfileForm'
+import { AdvancedSettings } from './AdvancedSettings'
 import { TokensSection } from './TokensSection'
 import { PushSubscribe } from '@/components/PushSubscribe'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -36,7 +37,7 @@ export default async function ProfilePage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, show_scores, profile_structured, digest_email'
+      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, profile_structured, digest_email'
     )
     .eq('id', user.id)
     .single()
@@ -61,9 +62,6 @@ export default async function ProfilePage() {
           profile_text: profile.profile_text,
           interests: profile.interests ?? [],
           pinned_sources: profile.pinned_sources ?? [],
-          daily_cap: profile.daily_cap ?? 10,
-          serendipity_quota: profile.serendipity_quota ?? 0.15,
-          show_scores: profile.show_scores ?? true,
           language,
         }}
       />
@@ -98,7 +96,12 @@ export default async function ProfilePage() {
           </svg>
           Parametres avances
         </summary>
-        <div className="mt-6 space-y-8">
+        <div className="mt-6 space-y-10">
+          <AdvancedSettings
+            dailyCap={profile.daily_cap ?? 10}
+            serendipityQuota={profile.serendipity_quota ?? 0.15}
+          />
+
           <div className="space-y-4">
             <p className="font-ui text-xs text-accent">Sources RSS</p>
             <OPMLImport />

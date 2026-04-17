@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   title: 'Distil',
   description: 'Veille intelligente. Moins de bruit, mieux lu.',
   manifest: '/manifest.webmanifest',
+  // Beta privee : on coupe l'indexation le temps de tester en cercle ferme.
+  robots: { index: false, follow: false, nocache: true },
   icons: {
     icon: '/icon.svg',
     apple: '/icon-192.png',

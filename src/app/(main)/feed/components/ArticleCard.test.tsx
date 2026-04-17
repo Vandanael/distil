@@ -46,14 +46,27 @@ describe('ArticleCard', () => {
     expect(screen.getByText('4 min')).toBeTruthy()
   })
 
-  it('affiche le badge Decouverte si serendipity', () => {
+  it('affiche le tag Decouverte si serendipity', () => {
     renderCard({ ...BASE_PROPS, isSerendipity: true })
-    expect(screen.getByTestId('serendipity-badge-abc-123')).toBeTruthy()
+    const tag = screen.getByTestId('tag-abc-123')
+    expect(tag.textContent).toContain('Découverte')
   })
 
-  it('ne pas afficher le badge si pas serendipity', () => {
-    renderCard({ ...BASE_PROPS, isSerendipity: false })
-    expect(screen.queryByTestId('serendipity-badge-abc-123')).toBeNull()
+  it('affiche le tag Match fort si score >= 80', () => {
+    renderCard({ ...BASE_PROPS, score: 85 })
+    const tag = screen.getByTestId('tag-abc-123')
+    expect(tag.textContent).toContain('Match fort')
+  })
+
+  it('affiche le tag Match si score entre 60 et 79', () => {
+    renderCard({ ...BASE_PROPS, score: 70 })
+    const tag = screen.getByTestId('tag-abc-123')
+    expect(tag.textContent).toContain('Match')
+  })
+
+  it('n affiche pas de tag si score sous 60 sans serendipity', () => {
+    renderCard({ ...BASE_PROPS, score: 50, isSerendipity: false })
+    expect(screen.queryByTestId('tag-abc-123')).toBeNull()
   })
 
   it('affiche Sans titre si title null', () => {
@@ -89,8 +102,13 @@ describe('ArticleCard', () => {
     expect(btn.getAttribute('aria-label')).toBe('Masquer cet article')
   })
 
-  it('le score est toujours visible quand fourni', () => {
+  it('le tag est cliquable quand fourni', () => {
     renderCard({ ...BASE_PROPS, score: 82 })
-    expect(screen.getByTestId('score-abc-123')).toBeTruthy()
+    expect(screen.getByTestId('tag-abc-123')).toBeTruthy()
+  })
+
+  it('affiche la justification inline sous l excerpt', () => {
+    renderCard({ ...BASE_PROPS, justification: 'Correspond a votre profil ML.' })
+    expect(screen.getByTestId('justification-inline-abc-123')).toBeTruthy()
   })
 })

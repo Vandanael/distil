@@ -3,6 +3,19 @@ import { parseHTML } from 'linkedom'
 import sanitizeHtml from 'sanitize-html'
 import { fetchHtml } from './fetcher'
 
+// Hostnames autorises pour les iframes embarques (tweets, videos, code).
+// Tout iframe pointant ailleurs est supprime par sanitize-html.
+const ALLOWED_IFRAME_HOSTNAMES = [
+  'www.youtube.com',
+  'www.youtube-nocookie.com',
+  'youtube.com',
+  'player.vimeo.com',
+  'platform.twitter.com',
+  'codepen.io',
+  'codesandbox.io',
+  'gist.github.com',
+]
+
 const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [
     'p',
@@ -50,6 +63,7 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     'dd',
     'details',
     'summary',
+    'iframe',
   ],
   allowedAttributes: {
     '*': [
@@ -66,7 +80,65 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
       'target',
       'rel',
     ],
+    iframe: [
+      'src',
+      'width',
+      'height',
+      'allow',
+      'allowfullscreen',
+      'frameborder',
+      'loading',
+      'title',
+      'referrerpolicy',
+    ],
   },
+  allowedIframeHostnames: ALLOWED_IFRAME_HOSTNAMES,
+  allowedSchemesByTag: {
+    iframe: ['https'],
+  },
+  transformTags: {
+    iframe: (tagName, attribs) => ({
+      tagName,
+      attribs: { ...attribs, loading: 'lazy', referrerpolicy: 'no-referrer' },
+    }),
+  },
+}
+
+// Promeut les attributs lazy-load (data-src, data-original, data-srcset) vers
+// src/srcset natifs pour que sanitize-html puisse les conserver. Beaucoup de
+// sites (Medium, Substack, NYT) servent un placeholder dans src et la vraie
+// image dans data-src ; sans ca les images sont cassees.
+const LAZY_SRC_ATTRS = ['data-src', 'data-original', 'data-lazy-src', 'data-delayed-url']
+const LAZY_SRCSET_ATTRS = ['data-srcset', 'data-lazy-srcset']
+
+function promoteLazyImages(root: Element): void {
+  const imgs = root.querySelectorAll('img')
+  for (const img of Array.from(imgs)) {
+    for (const attr of LAZY_SRC_ATTRS) {
+      const v = img.getAttribute(attr)
+      if (v) {
+        img.setAttribute('src', v)
+        break
+      }
+    }
+    for (const attr of LAZY_SRCSET_ATTRS) {
+      const v = img.getAttribute(attr)
+      if (v) {
+        img.setAttribute('srcset', v)
+        break
+      }
+    }
+  }
+  const sources = root.querySelectorAll('source')
+  for (const source of Array.from(sources)) {
+    for (const attr of LAZY_SRCSET_ATTRS) {
+      const v = source.getAttribute(attr)
+      if (v) {
+        source.setAttribute('srcset', v)
+        break
+      }
+    }
+  }
 }
 
 type ParsedArticle = {
@@ -98,6 +170,9 @@ export function parseHtml(html: string, url: string): ParsedArticle {
     writable: true,
     configurable: true,
   })
+
+  // Promeut les attributs lazy avant Readability pour qu'il conserve les images
+  promoteLazyImages(document.documentElement as unknown as Element)
 
   const reader = new Readability(document as unknown as Document)
   const article = reader.parse()

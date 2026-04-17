@@ -18,7 +18,7 @@ export async function archiveArticle(articleId: string): Promise<void> {
     .eq('user_id', user.id)
 
   revalidatePath('/feed')
-  revalidatePath('/archive')
+  revalidatePath('/library')
 }
 
 export async function saveHighlight(
@@ -45,7 +45,7 @@ export async function saveHighlight(
     .select('id')
     .single()
 
-  revalidatePath('/highlights')
+  revalidatePath('/library')
   return data?.id ?? null
 }
 
@@ -67,7 +67,7 @@ export async function saveNote(
     highlight_id: highlightId ?? null,
   })
 
-  revalidatePath('/archive')
+  revalidatePath('/library')
 }
 
 export async function dismissArticle(

@@ -31,12 +31,12 @@ test.describe('Navigation desktop (header)', () => {
     await expect(page).toHaveURL(/\/feed/)
   })
 
-  test('Feed → Archives via header', async ({ page }) => {
+  test('Feed → Bibliothèque via header', async ({ page }) => {
     await page
       .getByRole('navigation', { name: 'Navigation principale' })
-      .getByRole('link', { name: 'Archives' })
+      .getByRole('link', { name: 'Bibliothèque' })
       .click()
-    await expect(page).toHaveURL(/\/archive/)
+    await expect(page).toHaveURL(/\/library/)
   })
 
   test('Feed → Recherche via header', async ({ page }) => {
@@ -71,10 +71,10 @@ test.describe('Navigation mobile (BottomNav)', () => {
     await expect(page).toHaveURL(/\/search/)
   })
 
-  test('Feed → Archives via BottomNav', async ({ page }) => {
+  test('Feed → Bibliothèque via BottomNav', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Navigation principale' })
-    await nav.getByRole('link', { name: 'Archives' }).click()
-    await expect(page).toHaveURL(/\/archive/)
+    await nav.getByRole('link', { name: 'Bibliothèque' }).click()
+    await expect(page).toHaveURL(/\/library/)
   })
 
   test('BottomNav masque sur la page article', async ({ page }) => {

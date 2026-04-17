@@ -65,13 +65,13 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
   }
 
   return (
-    <div className="border-t-2 border-foreground mb-8 pt-3 space-y-1">
+    <div className="border-t-2 border-foreground mb-10 pt-4 space-y-2">
       <div className="flex items-center justify-between">
-        <span className="font-ui text-xs text-muted-foreground capitalize">{formattedDate}</span>
+        <span className="font-ui text-sm text-muted-foreground capitalize">{formattedDate}</span>
         <div className="flex items-center gap-2">
           {refreshInfo && (
             <span
-              className={`font-ui text-xs ${refreshInfo.isStale ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}
+              className={`font-ui text-sm ${refreshInfo.isStale ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}
             >
               {refreshInfo.label}
             </span>
@@ -101,15 +101,15 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
         </div>
       </div>
       <div className="flex items-baseline justify-between gap-4">
-        <h1 className="font-ui text-[13px] text-foreground">
+        <h1 className="font-ui text-base md:text-lg font-semibold text-foreground">
           {t.feed.title}
           {topInterests.length > 0 && (
-            <span className="text-muted-foreground"> - {topInterests.join(', ')}</span>
+            <span className="font-normal text-muted-foreground"> - {topInterests.join(', ')}</span>
           )}
         </h1>
         <Link
           href="/profile"
-          className="font-ui text-xs text-muted-foreground/70 hover:text-accent transition-colors shrink-0"
+          className="font-ui text-sm text-muted-foreground/70 hover:text-accent transition-colors shrink-0"
         >
           {t.feed.configure}
         </Link>

@@ -65,4 +65,43 @@ describe('parseHtml', () => {
     const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
     expect(result.contentHtml.length).toBeGreaterThan(0)
   })
+
+  it('promeut data-src vers src pour les images lazy-loaded', async () => {
+    const html = `<!DOCTYPE html><html><head><title>T</title></head><body>
+      <article>
+        <h1>Titre</h1>
+        <p>${'Texte de contexte '.repeat(60)}</p>
+        <img src="data:image/gif;base64,R0lGODlh" data-src="https://cdn.example.com/real.jpg" alt="photo">
+        <p>${'Plus de texte '.repeat(60)}</p>
+      </article>
+    </body></html>`
+    const result = await parseHtml(html, 'https://example.com/article')
+    expect(result.contentHtml).toContain('https://cdn.example.com/real.jpg')
+  })
+
+  it('conserve les iframe YouTube (hostname allowlistes)', async () => {
+    const html = `<!DOCTYPE html><html><head><title>T</title></head><body>
+      <article>
+        <h1>Video</h1>
+        <p>${'Contexte '.repeat(60)}</p>
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315" allowfullscreen></iframe>
+        <p>${'Suite '.repeat(60)}</p>
+      </article>
+    </body></html>`
+    const result = await parseHtml(html, 'https://example.com/video')
+    expect(result.contentHtml).toContain('youtube.com/embed/dQw4w9WgXcQ')
+  })
+
+  it('supprime les iframe hors allowlist', async () => {
+    const html = `<!DOCTYPE html><html><head><title>T</title></head><body>
+      <article>
+        <h1>Suspect</h1>
+        <p>${'Contexte '.repeat(60)}</p>
+        <iframe src="https://evil.example.com/tracker"></iframe>
+        <p>${'Suite '.repeat(60)}</p>
+      </article>
+    </body></html>`
+    const result = await parseHtml(html, 'https://example.com/suspect')
+    expect(result.contentHtml).not.toContain('evil.example.com')
+  })
 })

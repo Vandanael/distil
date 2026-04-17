@@ -5,11 +5,7 @@ const FETCH_TIMEOUT_MS = 10_000
 const USER_AGENT = 'Mozilla/5.0 (compatible; Distil/1.0; +https://distil.app)'
 const MAX_REDIRECTS = 5
 
-const BLOCKED_HOSTNAMES = new Set([
-  'localhost',
-  'metadata.google.internal',
-  'metadata',
-])
+const BLOCKED_HOSTNAMES = new Set(['localhost', 'metadata.google.internal', 'metadata'])
 
 function isPrivateIPv4(ip: string): boolean {
   const parts = ip.split('.')

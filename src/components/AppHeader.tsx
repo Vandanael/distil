@@ -9,7 +9,7 @@ import { useLocale } from '@/lib/i18n/context'
 
 const NAV_KEYS: Record<string, keyof ReturnType<typeof useLocale>['t']['nav']> = {
   '/feed': 'feed',
-  '/archive': 'archive',
+  '/library': 'library',
   '/search': 'search',
   '/profile': 'profile',
 }

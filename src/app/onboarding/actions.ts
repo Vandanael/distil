@@ -6,7 +6,6 @@ import { redirect } from 'next/navigation'
 export type ProfileInput = {
   method: 'express' | 'wizard'
   profile_text?: string
-  sector?: string
   interests?: string[]
   pinned_sources?: string[]
   daily_cap?: number
@@ -26,7 +25,6 @@ export async function createProfile(input: ProfileInput) {
   const { error } = await supabase.from('profiles').upsert({
     id: user.id,
     profile_text: input.profile_text ?? null,
-    sector: input.sector ?? null,
     interests: input.interests ?? [],
     pinned_sources: input.pinned_sources ?? [],
     daily_cap: input.daily_cap ?? 10,
