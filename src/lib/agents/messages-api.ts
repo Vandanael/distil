@@ -1,7 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ArticleCandidate, ScoringFunctionResult, UserProfile } from './types'
 import { buildSystemPrompt, buildUserPrompt } from './prompts'
-import { scoreWithGroq } from './groq-api'
 import { scoreWithGemini } from './gemini-api'
 
 const MODEL = 'claude-haiku-4-5-20251001'
@@ -23,17 +22,21 @@ export async function scoreWithMessagesApi(
   archivedTags: string[] = [],
   negativeExamples: string[] = []
 ): Promise<ScoringFunctionResult> {
-  // Groq (gratuit, 14k req/jour, Llama 3.1 70B)
-  if (process.env.GROQ_API_KEY) {
-    return scoreWithGroq(profile, candidates, archivedTags, negativeExamples)
-  }
+  const errors: string[] = []
 
-  // Gemini Flash (gratuit avec billing activé)
+  // Fallback chain : Gemini -> Anthropic
   if (process.env.GOOGLE_AI_API_KEY) {
-    return scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
+    try {
+      return await scoreWithGemini(profile, candidates, archivedTags, negativeExamples)
+    } catch (err) {
+      errors.push(`gemini: ${err instanceof Error ? err.message : String(err)}`)
+    }
   }
 
-  // Fallback : Anthropic Haiku
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error(`Scoring indisponible, aucun provider fonctionnel. ${errors.join('; ')}`)
+  }
+
   const { assertBudget, recordProviderCall } = await import('@/lib/api-budget')
   await assertBudget('anthropic')
 
@@ -62,7 +65,7 @@ export async function scoreWithMessagesApi(
     throw new Error(`Messages API: JSON invalide: ${match[0].slice(0, 100)}`)
   }
 
-  recordProviderCall('anthropic')
+  await recordProviderCall('anthropic')
 
   return {
     scored: parsed.scored.map((item) => ({

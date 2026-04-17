@@ -53,48 +53,6 @@ export function serializeSelection(
   }
 }
 
-/**
- * Retrouve un Range a partir d'un ancrage stocke.
- * Retourne null si l'ancrage ne peut pas etre resolu.
- */
-export function anchorHighlight(anchor: HighlightAnchor, container: HTMLElement): Range | null {
-  // Trouver l'element parent via le selecteur CSS
-  let parentEl: Element | null = null
-  try {
-    parentEl = container.querySelector(anchor.cssSelector)
-  } catch {
-    // Selecteur invalide, fallback sur le container
-  }
-  if (!parentEl) parentEl = container
-
-  const parentText = parentEl.textContent ?? ''
-
-  // Verifier la coherence par contexte
-  const expectedPrefix = parentText.slice(
-    Math.max(0, anchor.textOffset - CONTEXT_LENGTH),
-    anchor.textOffset
-  )
-
-  if (anchor.prefixContext && !expectedPrefix.endsWith(anchor.prefixContext.slice(-10))) {
-    // Contexte incompatible, ancrage orphelin
-    return null
-  }
-
-  // Trouver le noeud texte et l'offset
-  const result = findTextNode(parentEl, anchor.textOffset, anchor.textContent.length)
-  if (!result) return null
-
-  const range = document.createRange()
-  try {
-    range.setStart(result.startNode, result.startOffset)
-    range.setEnd(result.endNode, result.endOffset)
-  } catch {
-    return null
-  }
-
-  return range
-}
-
 // --- Helpers ---
 
 function buildCssSelector(el: HTMLElement, root: HTMLElement): string {
@@ -135,47 +93,4 @@ function findTextOffset(container: Node, targetNode: Node, offsetInNode: number)
     node = walker.nextNode()
   }
   return offset
-}
-
-type TextNodeResult = {
-  startNode: Node
-  startOffset: number
-  endNode: Node
-  endOffset: number
-}
-
-function findTextNode(
-  container: Element,
-  textOffset: number,
-  length: number
-): TextNodeResult | null {
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
-  let accumulated = 0
-
-  let startNode: Node | null = null
-  let startOffset = 0
-  let endNode: Node | null = null
-  let endOffset = 0
-
-  let node = walker.nextNode()
-  while (node) {
-    const nodeLength = node.textContent?.length ?? 0
-
-    if (!startNode && accumulated + nodeLength > textOffset) {
-      startNode = node
-      startOffset = textOffset - accumulated
-    }
-
-    if (startNode && accumulated + nodeLength >= textOffset + length) {
-      endNode = node
-      endOffset = textOffset + length - accumulated
-      break
-    }
-
-    accumulated += nodeLength
-    node = walker.nextNode()
-  }
-
-  if (!startNode || !endNode) return null
-  return { startNode, startOffset, endNode, endOffset }
 }

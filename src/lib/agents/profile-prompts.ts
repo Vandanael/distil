@@ -15,8 +15,6 @@ Regles :
 
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.`
 
-export const PROFILE_PROMPT_VERSION = '2026-04-14.1'
-
 export function buildProfileUserPrompt(context: {
   profileText: string | null
   sector: string | null

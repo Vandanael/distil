@@ -27,7 +27,7 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 | Framework       | Next.js 16 App Router, TypeScript strict                     |
 | Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut) |
 | Base de donnees | Supabase : Postgres + pgvector + Auth                        |
-| IA / agents     | Claude Messages API (Anthropic) - Haiku pour scoring         |
+| IA / agents     | Gemini Flash (scoring + ranking), Anthropic Haiku (fallback) |
 | Embeddings      | Voyage voyage-3                                              |
 | Tests           | Vitest (unit), Playwright (E2E)                              |
 | Observabilite   | Netlify function logs + Supabase logs                        |

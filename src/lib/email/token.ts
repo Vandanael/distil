@@ -7,7 +7,7 @@ function getSecret(): string {
 }
 
 export function signUnsubscribeToken(userId: string): string {
-  const sig = createHmac('sha256', getSecret()).update(userId).digest('hex').slice(0, 16)
+  const sig = createHmac('sha256', getSecret()).update(userId).digest('hex').slice(0, 32)
   const payload = Buffer.from(userId).toString('base64url')
   return `${payload}.${sig}`
 }
@@ -18,7 +18,7 @@ export function verifyUnsubscribeToken(token: string): string | null {
   const [payload, sig] = parts
   try {
     const userId = Buffer.from(payload, 'base64url').toString('utf-8')
-    const expected = createHmac('sha256', getSecret()).update(userId).digest('hex').slice(0, 16)
+    const expected = createHmac('sha256', getSecret()).update(userId).digest('hex').slice(0, 32)
     const sigBuf = Buffer.from(sig)
     const expBuf = Buffer.from(expected)
     if (sigBuf.length !== expBuf.length) return null

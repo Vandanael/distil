@@ -90,6 +90,16 @@ export function ReadingView({
     }
   }, [id])
 
+  // Forcer target="_blank" sur tous les liens du contenu article (DOMPurify strip l'attribut sur les anciens articles)
+  useEffect(() => {
+    if (!contentRef.current) return
+    const links = contentRef.current.querySelectorAll<HTMLAnchorElement>('a[href]')
+    links.forEach((link) => {
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+    })
+  }, [contentHtml])
+
   // Raccourci clavier h : focus sur le contenu pour faciliter la selection et le highlight
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

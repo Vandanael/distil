@@ -3,7 +3,7 @@
  * Extraites du prompt pour etre reutilisables cote client (badge feed).
  */
 
-export const REFERENCE_DOMAINS = new Set([
+const REFERENCE_DOMAINS = new Set([
   'arxiv.org',
   'nature.com',
   'pubmed.ncbi.nlm.nih.gov',

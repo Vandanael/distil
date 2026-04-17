@@ -1,12 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
 import { RANKING_SYSTEM_PROMPT, buildRankingUserPrompt } from './ranking-prompts'
 import { parseUrl } from '@/lib/parsing/readability'
+import type { ServiceClient } from '@/lib/supabase/types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
 
 const MODEL = 'gemini-3-flash'
 const FALLBACK_MODEL = 'gemini-2.5-flash'
@@ -25,7 +23,7 @@ type LlmResponse = {
 }
 
 async function loadUserProfile(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string
 ): Promise<{
   staticProfile: string | null
@@ -92,7 +90,7 @@ async function callRankingLlm(
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Aucun JSON dans la reponse')
 
-  recordProviderCall('gemini')
+  await recordProviderCall('gemini')
   return JSON.parse(match[0]) as LlmResponse
 }
 
@@ -133,7 +131,7 @@ function cosineFallback(candidates: RankingCandidate[]): {
 }
 
 async function persistRanking(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string,
   date: string,
   essential: RankedItem[],
@@ -161,48 +159,50 @@ async function persistRanking(
     )
   }
 
-  // Promote to articles table, then enrich with full content via Readability
-  for (const item of allRanked) {
-    const candidate = candidateMap.get(item.itemId)
-    if (!candidate) continue
+  // Promote to articles table, then enrich with full content via Readability.
+  // Parsing en parallele (fetch deja protege par timeout 10s dans fetcher.ts).
+  await Promise.allSettled(
+    allRanked.map(async (item) => {
+      const candidate = candidateMap.get(item.itemId)
+      if (!candidate) return
 
-    const articleRow: Record<string, unknown> = {
-      user_id: userId,
-      item_id: item.itemId,
-      url: candidate.url,
-      title: candidate.title,
-      author: candidate.author,
-      site_name: candidate.siteName,
-      published_at: candidate.publishedAt,
-      content_text: candidate.contentPreview,
-      word_count: candidate.wordCount,
-      score: item.q1 * 10,
-      justification: item.justification,
-      is_serendipity: item.bucket === 'surprise',
-      status: 'accepted',
-      origin: 'agent',
-      scored_at: new Date().toISOString(),
-    }
+      const articleRow: Record<string, unknown> = {
+        user_id: userId,
+        item_id: item.itemId,
+        url: candidate.url,
+        title: candidate.title,
+        author: candidate.author,
+        site_name: candidate.siteName,
+        published_at: candidate.publishedAt,
+        content_text: candidate.contentPreview,
+        word_count: candidate.wordCount,
+        score: item.q1 * 10,
+        justification: item.justification,
+        is_serendipity: item.bucket === 'surprise',
+        status: 'accepted',
+        origin: 'agent',
+        scored_at: new Date().toISOString(),
+      }
 
-    // Best-effort : fetch + parse le contenu complet de l'article
-    try {
-      const parsed = await parseUrl(candidate.url)
-      articleRow.content_html = parsed.contentHtml
-      articleRow.content_text = parsed.contentText
-      articleRow.excerpt = parsed.excerpt
-      articleRow.reading_time_minutes = parsed.readingTimeMinutes
-      articleRow.og_image_url = parsed.ogImageUrl
-      articleRow.word_count = parsed.wordCount
-      if (parsed.author) articleRow.author = parsed.author
-    } catch {
-      // Paywall, timeout, JS-only - on insere quand meme sans content_html
-    }
+      try {
+        const parsed = await parseUrl(candidate.url)
+        articleRow.content_html = parsed.contentHtml
+        articleRow.content_text = parsed.contentText
+        articleRow.excerpt = parsed.excerpt
+        articleRow.reading_time_minutes = parsed.readingTimeMinutes
+        articleRow.og_image_url = parsed.ogImageUrl
+        articleRow.word_count = parsed.wordCount
+        if (parsed.author) articleRow.author = parsed.author
+      } catch {
+        // Paywall, timeout, JS-only - on insere quand meme sans content_html
+      }
 
-    await supabase.from('articles').upsert(articleRow, { onConflict: 'user_id,item_id' })
-  }
+      await supabase.from('articles').upsert(articleRow, { onConflict: 'user_id,item_id' })
+    })
+  )
 }
 
-async function rankForUser(supabase: AnySupabaseClient, userId: string): Promise<RankingResult> {
+async function rankForUser(supabase: ServiceClient, userId: string): Promise<RankingResult> {
   const start = Date.now()
   const today = new Date().toISOString().slice(0, 10)
 
@@ -337,11 +337,13 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
     throw new Error(`Impossible de charger les profils: ${error?.message}`)
   }
 
-  const results: RankingResult[] = []
-  for (const profile of profiles) {
-    const result = await rankForUser(supabase, profile.id)
-    results.push(result)
-  }
+  // Ranking en parallele par profil. Chaque rankForUser gere son propre budget
+  // (assertBudget + recordProviderCall) et ses propres erreurs.
+  const settled = await Promise.allSettled(
+    profiles.map((profile) => rankForUser(supabase, profile.id))
+  )
 
-  return results
+  return settled
+    .filter((r): r is PromiseFulfilledResult<RankingResult> => r.status === 'fulfilled')
+    .map((r) => r.value)
 }

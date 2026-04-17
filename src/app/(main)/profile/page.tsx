@@ -7,10 +7,11 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { listApiTokens } from './token-actions'
 import { signOut } from './actions'
 import { OPMLImport } from './OPMLImport'
+import { DigestToggle } from './DigestToggle'
 
 export default async function ProfilePage() {
   if (
-    process.env.DEV_BYPASS_AUTH === 'true' ||
+    (process.env.NODE_ENV === 'development' && process.env.DEV_BYPASS_AUTH === 'true') ||
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {
@@ -35,7 +36,7 @@ export default async function ProfilePage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, show_scores, profile_structured'
+      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, show_scores, profile_structured, digest_email'
     )
     .eq('id', user.id)
     .single()
@@ -108,6 +109,7 @@ export default async function ProfilePage() {
             <ThemeToggle />
           </div>
 
+          <DigestToggle enabled={profile.digest_email ?? false} />
           <PushSubscribe />
           <TokensSection tokens={tokens} />
         </div>

@@ -1,8 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { ServiceClient } from '@/lib/supabase/types'
 import type { RankingCandidate } from './ranking-types'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = SupabaseClient<any, any, any>
 
 const DEFAULT_LIMIT = 40
 const LOOKBACK_HOURS = 48
@@ -12,7 +9,7 @@ const LOOKBACK_HOURS = 48
  * Returns top N candidates from the last 48h that the user hasn't seen yet.
  */
 export async function prefilterCandidates(
-  supabase: AnySupabaseClient,
+  supabase: ServiceClient,
   userId: string,
   profileEmbedding: number[],
   limit: number = DEFAULT_LIMIT

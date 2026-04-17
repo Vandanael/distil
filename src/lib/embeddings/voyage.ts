@@ -71,7 +71,7 @@ export async function generateEmbeddingBatch(texts: string[]): Promise<number[][
   }
 
   const data: VoyageResponse = (await response.json()) as VoyageResponse
-  recordProviderCall('voyage')
+  await recordProviderCall('voyage')
 
   // Retourne les embeddings dans l'ordre original
   return data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding)

@@ -58,12 +58,15 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      // 5 meilleurs articles acceptes non lus, tries par score
+      // 5 meilleurs articles acceptes, non lus, non archives, jamais envoyes dans un digest
       const { data: articles } = await supabase
         .from('articles')
         .select('id, title, site_name, excerpt, score, reading_time_minutes')
         .eq('user_id', profile.id)
         .eq('status', 'accepted')
+        .is('read_at', null)
+        .is('archived_at', null)
+        .is('digest_sent_at', null)
         .order('score', { ascending: false, nullsFirst: false })
         .limit(5)
 
@@ -85,6 +88,15 @@ export async function POST(req: NextRequest) {
         html,
         text,
       })
+
+      // Marquer les articles envoyes pour ne pas les re-envoyer demain
+      await supabase
+        .from('articles')
+        .update({ digest_sent_at: new Date().toISOString() })
+        .in(
+          'id',
+          articles.map((a) => a.id)
+        )
 
       results.push({ userId: profile.id, sent: true, error: null })
     } catch (err) {

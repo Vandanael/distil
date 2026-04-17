@@ -58,11 +58,14 @@ export async function POST(request: Request) {
 
   const { user_id: userId, id: tokenId } = tokenRow
 
-  // Rate limit : 5 sauvegardes par minute par user
+  // Rate limit : 5 sauvegardes bookmarklet par minute par user.
+  // Filtre sur origin='bookmarklet' pour ne pas compter les articles inseres
+  // par les crons (refresh, scoring) qui peuvent arriver en rafale.
   const { count: recentCount } = await supabase
     .from('articles')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
+    .eq('origin', 'bookmarklet')
     .gte('created_at', new Date(Date.now() - 60_000).toISOString())
 
   if ((recentCount ?? 0) >= 5) {
@@ -174,19 +177,36 @@ export async function POST(request: Request) {
   }
 
   // Scorer l'article
-  const result = await runScoringAgent({
-    profile: userProfile,
-    candidates: [candidate],
-    runId: 'bookmarklet',
-  })
+  let scored:
+    | {
+        score: number
+        justification: string
+        isSerendipity: boolean
+        rejectionReason: string | null
+        accepted: boolean
+      }
+    | undefined
+  try {
+    const result = await runScoringAgent({
+      profile: userProfile,
+      candidates: [candidate],
+      runId: 'bookmarklet',
+    })
+    scored = result.scored[0]
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json(
+      { error: `Scoring echoue: ${message}` },
+      { status: 500, headers: CORS_HEADERS }
+    )
+  }
 
-  const scored = result.scored[0]
   if (!scored) {
     return NextResponse.json({ error: 'Scoring echoue' }, { status: 500, headers: CORS_HEADERS })
   }
 
   // Persister
-  const { data: inserted } = await supabase
+  const { data: inserted, error: insertError } = await supabase
     .from('articles')
     .insert({
       user_id: userId,
@@ -211,6 +231,23 @@ export async function POST(request: Request) {
     })
     .select('id')
     .single()
+
+  if (insertError) {
+    // Race avec le check de doublon ligne 98 : l'index unique (user_id,url) a tranche.
+    if (insertError.code === '23505') {
+      const { data: race } = await supabase
+        .from('articles')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('url', url)
+        .single()
+      return NextResponse.json(
+        { error: 'already_exists', articleId: race?.id ?? null },
+        { status: 409, headers: CORS_HEADERS }
+      )
+    }
+    return NextResponse.json({ error: insertError.message }, { status: 500, headers: CORS_HEADERS })
+  }
 
   // Embedding best-effort
   if (inserted && process.env.VOYAGE_API_KEY && parsed.contentText) {
