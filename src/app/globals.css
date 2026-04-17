@@ -230,3 +230,40 @@
 .article-prose img {
   @apply max-w-full h-auto;
 }
+.article-prose em {
+  @apply italic;
+}
+.article-prose del {
+  @apply line-through text-muted-foreground;
+}
+.article-prose mark {
+  @apply bg-accent/20 text-foreground px-0.5;
+}
+.article-prose code {
+  @apply font-mono text-[0.9em] bg-muted px-1 py-0.5 text-foreground;
+}
+.article-prose pre {
+  @apply bg-muted p-4 overflow-x-auto my-6 text-sm font-mono;
+}
+.article-prose pre code {
+  @apply bg-transparent p-0;
+}
+.article-prose table {
+  @apply w-full border-collapse my-6 text-sm;
+}
+.article-prose th {
+  @apply border border-border px-3 py-2 text-left font-semibold bg-muted;
+}
+.article-prose td {
+  @apply border border-border px-3 py-2 align-top;
+}
+.article-prose sup,
+.article-prose sub {
+  @apply text-[0.75em] leading-none;
+}
+.article-prose details {
+  @apply border border-border p-4 my-4;
+}
+.article-prose summary {
+  @apply cursor-pointer font-semibold;
+}
