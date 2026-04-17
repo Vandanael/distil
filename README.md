@@ -63,7 +63,7 @@ src/
       articles/   # bookmarklet (save/signal)
   lib/
     agents/       # scoring LLM (Groq > Gemini > Haiku), discovery RSS
-    parsing/      # Readability + DOMPurify
+    parsing/      # Readability + sanitize-html
     email/        # templates digest + tokens HMAC
     hooks/        # swipe to dismiss, keyboard nav, dismiss with undo
     embeddings/   # Voyage AI
@@ -75,7 +75,7 @@ e2e/              # tests Playwright par persona
 ## Pipeline de scoring
 
 1. **Discovery** -- flux RSS des sources du profil (130 sources indexées)
-2. **Parse** -- Readability + DOMPurify, max 20 articles par run
+2. **Parse** -- Readability + sanitize-html, max 20 articles par run
 3. **Score** -- LLM évalue 0-100 selon le profil, avec signaux positifs (archivés récemment) et négatifs (rejetés comme hors-sujet)
 4. **Store** -- articles acceptés stockés avec embeddings vectoriels
 
