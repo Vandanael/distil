@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { dayOfYear, inferCategories, pickRotating } from './discovery-agent'
+import {
+  dayOfYear,
+  ensureMinCategories,
+  inferCategories,
+  MIN_CATEGORIES,
+  pickRotating,
+} from './discovery-agent'
 import type { UserProfile } from './types'
 
 function makeProfile(partial: Partial<UserProfile>): UserProfile {
@@ -89,5 +95,43 @@ describe('inferCategories', () => {
 
   it('ignore les accents dans les mots cles', () => {
     expect(inferCategories(makeProfile({ interests: ['géopolitique'] }))).toContain('politique')
+  })
+})
+
+describe('ensureMinCategories', () => {
+  it('ne modifie pas une liste qui atteint deja le plancher', () => {
+    const input = ['tech', 'produit', 'ia', 'culture'] as const
+    const result = ensureMinCategories([...input], 42)
+    expect(result).toEqual(input)
+  })
+
+  it('complete jusqu a MIN_CATEGORIES si la liste est trop courte', () => {
+    const result = ensureMinCategories(['tech'], 1)
+    expect(result.length).toBeGreaterThanOrEqual(MIN_CATEGORIES)
+    expect(result[0]).toBe('tech')
+  })
+
+  it('complete une liste vide jusqu au plancher', () => {
+    const result = ensureMinCategories([], 1)
+    expect(result.length).toBe(MIN_CATEGORIES)
+  })
+
+  it('n introduit pas de doublon avec les categories inferees', () => {
+    const input = ['politique', 'cuisine']
+    const result = ensureMinCategories(input as never, 1)
+    const unique = new Set(result)
+    expect(unique.size).toBe(result.length)
+  })
+
+  it('est deterministe sur un meme seed', () => {
+    const a = ensureMinCategories(['tech'], 123)
+    const b = ensureMinCategories(['tech'], 123)
+    expect(a).toEqual(b)
+  })
+
+  it('produit des completions differentes sur des seeds differents', () => {
+    const a = ensureMinCategories(['tech'], 1)
+    const b = ensureMinCategories(['tech'], 5)
+    expect(a).not.toEqual(b)
   })
 })

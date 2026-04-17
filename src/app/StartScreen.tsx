@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { PublicFooter } from '@/components/PublicFooter'
 import { FlowPreview } from './FlowPreview'
 
 type FeaturedArticle = {
@@ -60,6 +61,21 @@ const COPY = {
     body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
     cta: "Commencer - c'est gratuit",
+    loginNav: 'Connexion',
+    howTitle: 'Comment ca marche',
+    howSteps: [
+      { n: '01', t: 'On capte', d: 'Vos sources, vos centres d\u2019interet, votre rythme.' },
+      {
+        n: '02',
+        t: 'On filtre',
+        d: 'Chaque matin, l\u2019IA elimine le bruit en comparant chaque article a votre profil.',
+      },
+      {
+        n: '03',
+        t: 'On sert',
+        d: 'Une page propre, lisible, sans notification ni scroll infini.',
+      },
+    ],
     examplesTitle: 'Exemples de veille',
     examplesSubtitle: 'Cliquez sur un thème pour voir à quoi ressemble votre sélection du jour.',
     feedTitle: 'Dans le flux ce matin',
@@ -74,6 +90,21 @@ const COPY = {
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
     cta: "Get started - it's free",
+    loginNav: 'Sign in',
+    howTitle: 'How it works',
+    howSteps: [
+      { n: '01', t: 'We capture', d: 'Your sources, your interests, your rhythm.' },
+      {
+        n: '02',
+        t: 'We filter',
+        d: 'Each morning, the AI removes the noise by comparing every article to your profile.',
+      },
+      {
+        n: '03',
+        t: 'We serve',
+        d: 'A clean, readable page. No notifications, no infinite scroll.',
+      },
+    ],
     examplesTitle: 'Feed examples',
     examplesSubtitle: 'Click a topic to see what your daily selection looks like.',
     feedTitle: 'In the feed this morning',
@@ -137,12 +168,21 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
   })
 
   return (
-    <main className="min-h-full flex flex-col items-center justify-center px-4 py-6 md:py-16 bg-background">
-      <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl">
+    <main className="min-h-full flex flex-col px-4 py-6 md:py-16 bg-background">
+      <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-1">
         {/* Bandeau éditorial */}
         <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
           <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
           <div className="flex items-center gap-1">
+            <Link
+              href="/login"
+              className="font-ui text-xs px-2 py-0.5 text-muted-foreground hover:text-accent transition-colors"
+            >
+              {t.loginNav}
+            </Link>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
+              |
+            </span>
             <button
               onClick={() => setLang('fr')}
               aria-pressed={lang === 'fr'}
@@ -196,6 +236,24 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           </aside>
         </div>
 
+        {/* Comment ca marche - 3 etapes */}
+        <section className="mb-14">
+          <div className="border-t border-border pt-6 mb-6">
+            <p className="font-ui text-[13px] text-foreground font-medium">{t.howTitle}</p>
+          </div>
+          <ol className="grid gap-6 md:grid-cols-3">
+            {t.howSteps.map((step) => (
+              <li key={step.n} className="space-y-2">
+                <p className="font-ui text-xs tabular-nums text-accent">{step.n}</p>
+                <h3 className="font-ui text-lg font-bold text-foreground leading-snug">{step.t}</h3>
+                <p className="font-body text-[14px] text-muted-foreground leading-relaxed">
+                  {step.d}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
         {/* Exemples de veille */}
         <div className="mb-14">
           <div className="border-t border-border pt-6 mb-6">
@@ -243,6 +301,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           )}
         </div>
       </div>
+      <PublicFooter lang={lang} />
     </main>
   )
 }
