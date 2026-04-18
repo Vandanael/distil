@@ -6,9 +6,28 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
+const ERROR_MESSAGES: Record<string, string> = {
+  no_code: 'Lien de connexion invalide. Veuillez reessayer.',
+  exchange_failed:
+    'Echec de la connexion. Veuillez reessayer. Si le probleme persiste, ouvrez une issue sur GitHub.',
+  supabase_not_configured: 'Service temporairement indisponible. Reessayez dans quelques instants.',
+}
+
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
+  )
+}
+
+function LoginPageInner() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const urlErrorCode = searchParams.get('error')
+  const urlError = urlErrorCode ? (ERROR_MESSAGES[urlErrorCode] ?? null) : null
+  const displayError = error ?? urlError
 
   async function handleGoogle() {
     setError(null)

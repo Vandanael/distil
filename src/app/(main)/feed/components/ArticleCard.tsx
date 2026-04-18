@@ -9,6 +9,7 @@ import { useSwipeActions } from '@/lib/hooks/useSwipeActions'
 import { useLocale } from '@/lib/i18n/context'
 import { isReferenceDomain } from '@/lib/agents/sources'
 import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
+import { scoreColorClass } from '@/lib/utils'
 import { useDismissContext } from './DismissContext'
 
 type Props = {
@@ -447,7 +448,7 @@ export function ArticleCard({
                     {score !== null && (
                       <span
                         data-testid={`score-${id}`}
-                        className="font-ui text-2xl font-semibold tabular-nums text-foreground"
+                        className={`font-ui text-2xl font-semibold tabular-nums ${scoreColorClass(score)}`}
                       >
                         {Math.round(score)}
                         <span className="text-sm text-muted-foreground font-normal">%</span>

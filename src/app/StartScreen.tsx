@@ -57,7 +57,8 @@ const PERSONA_EXAMPLES = [
 
 const COPY = {
   fr: {
-    tagline: 'Votre veille quotidienne, sans le bruit.',
+    taglineLead: 'Votre veille quotidienne,',
+    taglineTail: 'sans le bruit.',
     body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
     cta: "Commencer - c'est gratuit",
@@ -77,7 +78,8 @@ const COPY = {
       },
     ],
     examplesTitle: 'Exemples de veille',
-    examplesSubtitle: 'Cliquez sur un thème pour voir à quoi ressemble votre sélection du jour.',
+    examplesSubtitle: "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
+    feedEyebrow: 'Chapitre III · Aperçu',
     feedTitle: 'Dans le flux ce matin',
     feedSub: 'Extrait de veilles actives',
     feedEmpty: 'Distil analyse le web en ce moment. Revenez dans quelques minutes.',
@@ -86,7 +88,8 @@ const COPY = {
     noTitle: 'Sans titre',
   },
   en: {
-    tagline: 'Your daily briefing, without the noise.',
+    taglineLead: 'Your daily briefing,',
+    taglineTail: 'without the noise.',
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
     cta: "Get started - it's free",
@@ -106,7 +109,8 @@ const COPY = {
       },
     ],
     examplesTitle: 'Feed examples',
-    examplesSubtitle: 'Click a topic to see what your daily selection looks like.',
+    examplesSubtitle: "Pick a topic to preview today's selection.",
+    feedEyebrow: 'Chapter III · Preview',
     feedTitle: 'In the feed this morning',
     feedSub: 'From active feeds',
     feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',
@@ -119,32 +123,34 @@ const COPY = {
 function ArticlePreview({ article, lang }: { article: FeaturedArticle; lang: 'fr' | 'en' }) {
   const t = COPY[lang]
   const inner = (
-    <div>
+    <div className="space-y-2">
       {article.site_name && (
-        <div className="mb-1.5">
-          <span className="font-ui text-[13px] text-muted-foreground">{article.site_name}</span>
-        </div>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          {article.site_name}
+        </p>
       )}
-      <h3 className="font-ui text-xl font-bold leading-snug text-foreground group-hover:text-accent transition-colors duration-150">
+      <h3 className="font-display text-[22px] leading-[1.15] text-foreground group-hover:text-accent transition-colors">
         {article.title ?? t.noTitle}
       </h3>
       {article.excerpt && (
-        <p className="font-body text-[15px] text-muted-foreground line-clamp-2 leading-relaxed mt-1">
+        <p className="font-body text-[15px] text-muted-foreground line-clamp-2 leading-[1.55]">
           {article.excerpt}
         </p>
       )}
       {article.score !== null && (
-        <p className="font-ui text-[13px] text-muted-foreground mt-2">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground pt-1">
           {article.is_serendipity && <span className="text-accent mr-2">{t.serendipity}</span>}
           {t.relevance}{' '}
-          <span className="font-semibold tabular-nums">{Math.round(article.score)}%</span>
+          <span className={`tabular-nums font-semibold ${scoreColorClass(article.score)}`}>
+            {Math.round(article.score)}
+          </span>
         </p>
       )}
     </div>
   )
 
   return (
-    <div className="py-5 border-b border-border last:border-0">
+    <li className="py-6 border-b border-border last:border-0">
       {article.url ? (
         <a href={article.url} target="_blank" rel="noopener noreferrer" className="group block">
           {inner}
@@ -152,7 +158,7 @@ function ArticlePreview({ article, lang }: { article: FeaturedArticle; lang: 'fr
       ) : (
         <div>{inner}</div>
       )}
-    </div>
+    </li>
   )
 }
 
@@ -166,6 +172,14 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
     month: 'long',
     year: 'numeric',
   })
+  const issueNumber = Math.max(
+    1,
+    Math.floor(
+      (Date.now() - new Date('2026-01-01T00:00:00Z').getTime()) / (1000 * 60 * 60 * 24),
+    ),
+  )
+    .toString()
+    .padStart(3, '0')
 
   return (
     <main className="min-h-full flex flex-col px-4 py-6 md:py-16 bg-background">
@@ -207,31 +221,106 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             </span>
             <ThemeToggle />
           </div>
-        </div>
+        </header>
 
         {/* Hero : 1 col mobile, 2 cols lg+ (copy a gauche, flux live a droite) */}
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-14 lg:items-start mb-14">
-          <div className="space-y-6">
-            <h1 className="font-ui text-4xl md:text-5xl font-bold tracking-tight text-accent leading-none">
-              Distil
+        <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-16 xl:gap-24 lg:items-start mb-14 md:mb-20">
+          {/* Aplat top-right full-bleed (desktop) : porte le flux live */}
+          <div
+            aria-hidden
+            className="hidden lg:block pointer-events-none absolute -inset-y-6 left-[55%] right-[calc(50%-50vw)] bg-accent/[0.07]"
+          />
+          <div className="relative space-y-8 md:space-y-10">
+            <h1
+              data-rise
+              style={{ ['--rise-delay' as string]: '1' }}
+              className="font-display text-foreground text-[3.5rem] sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] leading-[0.92] tracking-[-0.02em] text-balance"
+            >
+              {t.taglineLead}{' '}
+              <em className="not-italic">
+                <span className="italic text-accent whitespace-nowrap">{t.taglineTail}</span>
+              </em>
             </h1>
-            <p className="font-ui text-3xl md:text-5xl lg:text-6xl font-bold text-foreground leading-[1.05] tracking-tight">
-              {t.tagline}
-            </p>
-            <p className="font-body text-lg md:text-xl text-muted-foreground leading-relaxed">
+            <p
+              data-rise
+              style={{ ['--rise-delay' as string]: '2' }}
+              className="font-body text-lg md:text-xl text-muted-foreground leading-[1.55] max-w-[44ch] text-pretty"
+            >
               {t.body}
             </p>
-            <p className="font-ui text-sm text-muted-foreground/70">{t.format}</p>
-            <div className="pt-2">
+            <p
+              data-rise
+              style={{ ['--rise-delay' as string]: '3' }}
+              className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              {t.format}
+            </p>
+            {articles[0] && (
+              <div
+                data-rise
+                style={{ ['--rise-delay' as string]: '4' }}
+                className="lg:hidden border-t border-border pt-4"
+              >
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent mb-2 flex items-center gap-2">
+                  <BrandGlyph size={12} />
+                  {t.proofEyebrow}
+                </p>
+                {articles[0].url ? (
+                  <a
+                    href={articles[0].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block"
+                  >
+                    {articles[0].site_name && (
+                      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1">
+                        {articles[0].site_name}
+                      </p>
+                    )}
+                    <h3 className="font-display text-[22px] leading-[1.2] text-foreground group-hover:text-accent transition-colors">
+                      {articles[0].title ?? t.noTitle}
+                    </h3>
+                    {articles[0].score !== null && (
+                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground pt-1">
+                        {articles[0].is_serendipity && (
+                          <span className="text-accent mr-2">{t.serendipity}</span>
+                        )}
+                        {t.relevance}{' '}
+                        <span
+                          className={`tabular-nums font-semibold ${scoreColorClass(articles[0].score)}`}
+                        >
+                          {Math.round(articles[0].score)}
+                        </span>
+                      </p>
+                    )}
+                  </a>
+                ) : (
+                  <h3 className="font-display text-[22px] leading-[1.2] text-foreground">
+                    {articles[0].title ?? t.noTitle}
+                  </h3>
+                )}
+              </div>
+            )}
+            <div data-rise style={{ ['--rise-delay' as string]: '5' }} className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex font-ui text-sm bg-foreground text-background px-6 py-3 hover:bg-accent hover:text-background transition-colors"
+                className="group inline-flex items-center gap-3 font-ui text-[15px] md:text-[16px] uppercase tracking-[0.08em] bg-foreground text-background px-6 py-3.5 md:px-7 md:py-4 hover:bg-accent focus-visible:bg-accent transition-colors"
               >
                 {t.cta}
+                <span
+                  className="font-mono text-base transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                >
+                  →
+                </span>
               </Link>
             </div>
           </div>
-          <aside className="hidden lg:block mt-8 lg:mt-0">
+          <aside
+            data-rise
+            style={{ ['--rise-delay' as string]: '6' }}
+            className="relative hidden lg:block mt-0"
+          >
             <FlowPreview articles={articles} lang={lang} />
           </aside>
         </div>
@@ -261,45 +350,113 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             <p className="font-body text-[13px] text-muted-foreground mt-0.5">
               {t.examplesSubtitle}
             </p>
+            <h2 className="font-display text-5xl md:text-7xl text-foreground leading-[0.95] tracking-[-0.01em] text-balance">
+              {t.howTitle}
+            </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-            {PERSONA_EXAMPLES.map((p) => (
-              <Link
-                key={p.slug}
-                href={`/demo/${p.slug}`}
-                className="group border border-border p-3 space-y-1 hover:border-accent/60 transition-colors block"
+          <ol className="grid gap-12 md:gap-0 md:grid-cols-3">
+            {t.howSteps.map((step, i) => (
+              <li
+                key={step.n}
+                className={`relative space-y-4 md:px-8 first:md:pl-0 last:md:pr-0 ${i > 0 ? 'md:border-l md:border-border' : ''}`}
               >
-                <p className="font-ui text-sm font-medium text-foreground leading-snug group-hover:text-accent transition-colors">
-                  {p.label[lang]}
+                <p className="font-mono text-[13px] tabular-nums text-accent tracking-[0.15em]">
+                  {step.n}
                 </p>
-                <p className="font-body text-xs text-muted-foreground leading-snug">
-                  {p.description[lang]}
+                <h3 className="font-display text-3xl md:text-4xl text-foreground leading-[1.05] tracking-[-0.01em]">
+                  {step.t}
+                </h3>
+                <p className="font-body text-[16px] md:text-[17px] text-muted-foreground leading-[1.55] max-w-[32ch] text-pretty">
+                  {step.d}
                 </p>
-              </Link>
+              </li>
             ))}
-          </div>
-        </div>
+          </ol>
+        </section>
 
-        {/* Apercu du flux (masque sur lg+ car deja visible dans FlowPreview du hero) */}
-        <div className="lg:hidden">
-          <div className="border-t-2 border-foreground pt-3 mb-0">
-            <div className="flex items-baseline justify-between">
-              <p className="font-ui text-[13px] text-foreground font-medium">{t.feedTitle}</p>
-              {articles.length > 0 && (
-                <p className="font-ui text-xs text-muted-foreground/60">{t.feedSub}</p>
-              )}
+        {/* Chapitre II : Demonstration (aplat bas-gauche full-bleed, inversion) */}
+        <section className="relative mb-20 md:mb-28">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 left-[calc(50%-50vw)] bg-foreground"
+          />
+          <div className="relative py-12 md:py-20 pr-0 md:pr-4">
+            <div className="relative border-t border-background/20 pt-8 md:pt-10 mb-10 md:mb-14">
+              <span
+                aria-hidden
+                className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-foreground px-2 text-accent inline-flex"
+              >
+                <BrandGlyph size={14} />
+              </span>
+              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-background/60 mb-5">
+                {t.examplesEyebrow}
+              </p>
+              <h2 className="font-display text-5xl md:text-7xl text-background leading-[0.95] tracking-[-0.01em] mb-6 text-balance">
+                {t.examplesTitle}
+              </h2>
+              <p className="font-body text-[17px] md:text-lg text-background/70 leading-[1.55] max-w-[48ch] text-pretty">
+                {t.examplesSubtitle}
+              </p>
             </div>
+            <ul className="divide-y divide-background/15 border-t border-b border-background/15">
+              {PERSONA_EXAMPLES.map((p, i) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/demo/${p.slug}`}
+                    className="group flex items-baseline gap-6 md:gap-10 py-5 md:py-6 hover:bg-background/[0.04] transition-colors"
+                  >
+                    <span className="font-mono text-[12px] tabular-nums text-accent tracking-[0.15em] shrink-0 w-10 md:w-14">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="flex-1 flex flex-col md:flex-row md:items-baseline md:gap-8 gap-1 min-w-0">
+                      <span className="font-display text-2xl md:text-3xl text-background leading-tight group-hover:text-accent transition-colors md:w-60 shrink-0">
+                        {p.label[lang]}
+                      </span>
+                      <span className="font-body text-[14px] md:text-[15px] text-background/70 leading-snug flex-1">
+                        {p.description[lang]}
+                      </span>
+                    </span>
+                    <span
+                      className="font-mono text-background/60 group-hover:text-accent group-hover:translate-x-1 transition-all shrink-0"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Chapitre III : Apercu (mobile seulement ; desktop l'a deja dans le hero) */}
+        <section className="lg:hidden mb-8">
+          <div className="relative border-t border-border pt-8 mb-8">
+            <span
+              aria-hidden
+              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+            >
+              <BrandGlyph size={14} />
+            </span>
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
+              {t.feedEyebrow}
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] text-balance">
+              {t.feedTitle}
+            </h2>
           </div>
           {articles.length > 0 ? (
-            <div>
+            <ul>
               {articles.map((article, i) => (
                 <ArticlePreview key={article.url ?? String(i)} article={article} lang={lang} />
               ))}
-            </div>
+            </ul>
           ) : (
-            <p className="font-body text-[13px] text-muted-foreground italic py-4">{t.feedEmpty}</p>
+            <p className="font-body text-[15px] text-muted-foreground italic py-4">
+              {t.feedEmpty}
+            </p>
           )}
-        </div>
+        </section>
       </div>
       <PublicFooter lang={lang} />
     </main>

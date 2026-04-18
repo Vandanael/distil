@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Geist } from 'next/font/google'
-// Playfair Display : titres d'articles en lecture (font-heading)
-// Geist : tout le reste - UI, body, titres cartes, labels, logo
+import { Instrument_Serif, Geist, Geist_Mono } from 'next/font/google'
+// Instrument Serif : titres hero / chapitres / lecture (font-display, font-heading)
+// Geist Sans : corps, UI, labels, logo (font-body, font-ui, font-sans)
+// Geist Mono : metadonnees, chiffres de chapitre, dates (font-mono)
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import { cookies } from 'next/headers'
@@ -9,16 +10,20 @@ import { LocaleProvider } from '@/lib/i18n/context'
 import type { Locale } from '@/lib/i18n/translations'
 import './globals.css'
 
-/* Titres d'articles en lecture : Playfair Display */
-const playfair = Playfair_Display({
-  variable: '--font-playfair',
+const instrumentSerif = Instrument_Serif({
+  variable: '--font-instrument',
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
 })
 
-/* Corps + UI : Geist sans-serif */
 const geist = Geist({
   variable: '--font-geist',
+  subsets: ['latin'],
+})
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
   subsets: ['latin'],
 })
 
@@ -31,7 +36,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
   icons: {
     icon: '/icon.svg',
-    apple: '/icon-192.png',
+    apple: '/icon.svg',
   },
   appleWebApp: {
     capable: true,
@@ -56,7 +61,7 @@ export default async function RootLayout({
   return (
     <html
       lang={initialLocale}
-      className={`${playfair.variable} ${geist.variable} h-full antialiased`}
+      className={`${instrumentSerif.variable} ${geist.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

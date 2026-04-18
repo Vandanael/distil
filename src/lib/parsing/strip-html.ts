@@ -6,6 +6,7 @@ import { parseHTML } from 'linkedom'
  */
 export function stripHtml(html: string): string {
   if (!html) return ''
-  const { document } = parseHTML(`<body>${html}</body>`)
-  return (document.body.textContent ?? '').replace(/\s+/g, ' ').trim()
+  // linkedom >=0.18 exige un document complet ; le wrap <body> seul produit un body vide.
+  const { document } = parseHTML(`<!doctype html><html><body>${html}</body></html>`)
+  return (document.body?.textContent ?? '').replace(/\s+/g, ' ').trim()
 }

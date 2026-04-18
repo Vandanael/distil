@@ -35,6 +35,14 @@ export async function GET(request: NextRequest) {
 
   const { error } = await supabase.auth.exchangeCodeForSession(code)
   if (error) {
+    // Log cote serveur (Netlify function logs) pour diagnostic beta.
+    // Ne pas exposer au client : message peut fuiter des details internes Supabase.
+    console.error('[auth/callback] exchangeCodeForSession failed', {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      name: error.name,
+    })
     return NextResponse.redirect(`${origin}/login?error=exchange_failed`)
   }
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { scoreColorClass } from '@/lib/utils'
+
 type FeaturedArticle = {
   title: string | null
   url: string | null
@@ -11,14 +13,14 @@ type FeaturedArticle = {
 
 const COPY = {
   fr: {
-    header: 'Ce matin dans Distil',
+    header: "L'Édition du jour",
     relevance: 'Pertinence',
     discovery: 'Découverte',
     noTitle: 'Sans titre',
     empty: 'Le flux arrive.',
   },
   en: {
-    header: 'This morning in Distil',
+    header: "Today's Edition",
     relevance: 'Relevance',
     discovery: 'Discovery',
     noTitle: 'No title',
@@ -36,39 +38,47 @@ export function FlowPreview({ articles, lang }: Props) {
   })
 
   return (
-    <div className="border border-border bg-card p-6 space-y-5">
-      <div className="flex items-baseline justify-between border-b border-border pb-3">
-        <p className="font-ui text-[13px] font-semibold text-foreground">{t.header}</p>
-        <p className="font-ui text-xs text-muted-foreground capitalize">{today}</p>
+    <div className="border-l border-border pl-8 space-y-6">
+      <div className="space-y-1">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          {today}
+        </p>
+        <h2 className="font-display text-3xl italic text-foreground leading-none">{t.header}</h2>
       </div>
       {articles.length === 0 ? (
-        <p className="font-body text-sm text-muted-foreground italic py-6 text-center">{t.empty}</p>
+        <p className="font-body text-sm text-muted-foreground italic py-4">{t.empty}</p>
       ) : (
-        <div className="space-y-5">
+        <ul className="space-y-6">
           {articles.slice(0, 3).map((article, i) => {
             const inner = (
               <div className="space-y-1.5">
                 {article.site_name && (
-                  <p className="font-ui text-xs text-muted-foreground">{article.site_name}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                    {article.site_name}
+                  </p>
                 )}
-                <h3 className="font-ui text-[15px] font-bold leading-snug text-foreground group-hover:text-accent transition-colors">
+                <h3 className="font-display text-[19px] leading-[1.2] text-foreground group-hover:text-accent transition-colors">
                   {article.title ?? t.noTitle}
                 </h3>
                 {article.score !== null && (
-                  <p className="font-ui text-[11px] text-muted-foreground">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground pt-0.5">
                     {article.is_serendipity && (
-                      <span className="text-accent mr-1.5">{t.discovery}</span>
+                      <span className="text-accent mr-2">{t.discovery}</span>
                     )}
                     {t.relevance}{' '}
-                    <span className="font-semibold tabular-nums">{Math.round(article.score)}%</span>
+                    <span
+                      className={`tabular-nums font-semibold ${scoreColorClass(article.score)}`}
+                    >
+                      {Math.round(article.score)}
+                    </span>
                   </p>
                 )}
               </div>
             )
             return (
-              <div
+              <li
                 key={article.url ?? String(i)}
-                className="pb-5 border-b border-border last:border-0 last:pb-0"
+                className="pb-6 border-b border-border last:border-0 last:pb-0"
               >
                 {article.url ? (
                   <a
@@ -82,10 +92,10 @@ export function FlowPreview({ articles, lang }: Props) {
                 ) : (
                   inner
                 )}
-              </div>
+              </li>
             )
           })}
-        </div>
+        </ul>
       )}
     </div>
   )

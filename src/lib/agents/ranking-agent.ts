@@ -57,12 +57,22 @@ async function loadUserProfile(
   const interests = p?.interests as string[] | null | undefined
   if (interests && interests.length > 0) fallbackParts.push(`Interets: ${interests.join(', ')}`)
 
+  // pgvector renvoie l'embedding en string JSON via PostgREST, pas en number[].
+  // On parse explicitement pour que le downstream recoive un vrai tableau.
+  let embedding: number[] | null = null
+  if (p?.embedding != null) {
+    embedding =
+      typeof p.embedding === 'string'
+        ? (JSON.parse(p.embedding) as number[])
+        : (p.embedding as unknown as number[])
+  }
+
   return {
     staticProfile: pt?.static_profile ?? null,
     longTermProfile: pt?.long_term_profile ?? null,
     shortTermProfile: pt?.short_term_profile ?? null,
     fallbackText: fallbackParts.length > 0 ? fallbackParts.join('. ') : null,
-    embedding: p?.embedding ?? null,
+    embedding,
   }
 }
 
@@ -204,7 +214,15 @@ async function persistRanking(
         // Paywall, timeout, JS-only - on insere quand meme sans content_html
       }
 
-      await supabase.from('articles').upsert(articleRow, { onConflict: 'user_id,item_id' })
+      // L'index UNIQUE sur articles(user_id, item_id) est partiel (WHERE item_id IS NOT NULL) :
+      // Supabase upsert onConflict ne peut pas matcher un index partial → fail silencieux.
+      // On fait delete-then-insert explicite par (user_id, item_id) qui est safe et idempotent.
+      await supabase
+        .from('articles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('item_id', item.itemId)
+      await supabase.from('articles').insert(articleRow)
     })
   )
 }

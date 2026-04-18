@@ -8,8 +8,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist);
-  --font-mono: var(--font-geist);
-  --font-heading: var(--font-playfair);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-instrument);
+  --font-heading: var(--font-instrument);
   --font-body: var(--font-geist);
   --font-ui: var(--font-geist);
   --color-ring: var(--ring);
@@ -28,6 +29,7 @@
   --color-popover: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-match-strong: var(--match-strong);
   /* Radius 0 - coins francs, identite editoriale */
   --radius-sm: 0rem;
   --radius-md: 0rem;
@@ -68,6 +70,7 @@
   --border: #d4cfc5;
   --input: #d4cfc5;
   --ring: #d94e1f; /* focus ring = orange */
+  --match-strong: #2d6a4f; /* vert emeraude : signal "match fort" score >= 80 */
   --radius: 0rem; /* coins francs */
 }
 
@@ -91,6 +94,7 @@
   --border: #2a4a38; /* vert-gris fonce (correction : etait bleu #1e3a5f) */
   --input: #2a4a38; /* idem */
   --ring: #e8693d;
+  --match-strong: #7fbf9e; /* vert emeraude clair : lisible sur fond sombre */
 }
 
 @layer base {
@@ -156,6 +160,29 @@
 
 @media (prefers-reduced-motion: reduce) {
   [data-article-card] {
+    animation: none;
+  }
+}
+
+/* Editorial rise : entree elements publics (masthead, hero, chapitres) */
+@keyframes editorial-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-rise] {
+  animation: editorial-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--rise-delay, 0) * 90ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rise] {
     animation: none;
   }
 }
