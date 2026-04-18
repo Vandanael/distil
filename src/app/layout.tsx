@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
   icons: {
     icon: '/icon.svg',
-    apple: '/icon-192.png',
+    apple: '/icon.svg',
   },
   appleWebApp: {
     capable: true,
