@@ -72,7 +72,11 @@ export async function generateEmbeddingBatch(
   }
 
   if (!response.ok) {
-    throw new EmbeddingError(`Voyage AI erreur ${response.status}`, response.status)
+    const body = await response.text().catch(() => '')
+    throw new EmbeddingError(
+      `Voyage AI erreur ${response.status}: ${body.slice(0, 300)}`,
+      response.status
+    )
   }
 
   const data: VoyageResponse = (await response.json()) as VoyageResponse
