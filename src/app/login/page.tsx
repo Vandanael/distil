@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -46,26 +45,25 @@ function LoginPageInner() {
 
   return (
     <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
-      <div className="fixed top-4 left-5">
+      <div className="fixed top-3 left-3">
         <Link
           href="/"
-          className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
+          className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
         >
           ← Accueil
         </Link>
       </div>
-      <div className="fixed top-4 right-5">
+      <div className="fixed top-3 right-3">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-sm space-y-10">
         {/* Masthead */}
         <div className="space-y-5">
-          <h1 className="font-display text-6xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground">
-            <span className="italic text-accent">Distil</span>
+          <h1 className="font-ui text-5xl md:text-7xl font-bold tracking-tight text-accent">
+            Distil
           </h1>
-          <p className="font-body text-lg leading-[1.55] text-muted-foreground text-pretty">
-            Votre veille quotidienne,{' '}
-            <em className="italic text-foreground">sans le bruit.</em>
+          <p className="font-body text-lg leading-relaxed text-muted-foreground">
+            Votre veille quotidienne, sans le bruit.
           </p>
         </div>
 
@@ -104,14 +102,14 @@ function LoginPageInner() {
             votre email et ne publie rien en votre nom.
           </p>
 
-          {displayError && (
+          {error && (
             <p
               id="login-error"
               role="alert"
               aria-live="polite"
-              className="font-ui text-xs text-destructive border-l-2 border-destructive pl-3 py-1"
+              className="font-ui text-xs text-destructive border-l-2 border-destructive pl-3"
             >
-              {displayError}
+              {error}
             </p>
           )}
         </div>

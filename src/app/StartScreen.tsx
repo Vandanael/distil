@@ -4,8 +4,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PublicFooter } from '@/components/PublicFooter'
-import { BrandGlyph } from '@/components/BrandGlyph'
-import { scoreColorClass } from '@/lib/utils'
 import { FlowPreview } from './FlowPreview'
 
 type FeaturedArticle = {
@@ -63,17 +61,15 @@ const COPY = {
     taglineTail: 'sans le bruit.',
     body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
-    proofEyebrow: 'En ce moment dans le flux',
-    cta: 'Commencer',
+    cta: "Commencer - c'est gratuit",
     loginNav: 'Connexion',
-    howEyebrow: 'Chapitre I · La Méthode',
-    howTitle: 'Comment ça marche',
+    howTitle: 'Comment ca marche',
     howSteps: [
-      { n: '01', t: 'On capte', d: "Vos sources, vos centres d'intérêt, votre rythme." },
+      { n: '01', t: 'On capte', d: 'Vos sources, vos centres d\u2019interet, votre rythme.' },
       {
         n: '02',
         t: 'On filtre',
-        d: "Chaque matin, l'IA élimine le bruit en comparant chaque article à votre profil.",
+        d: 'Chaque matin, l\u2019IA elimine le bruit en comparant chaque article a votre profil.',
       },
       {
         n: '03',
@@ -81,7 +77,6 @@ const COPY = {
         d: 'Une page propre, lisible, sans notification ni scroll infini.',
       },
     ],
-    examplesEyebrow: 'Chapitre II · Démonstration',
     examplesTitle: 'Exemples de veille',
     examplesSubtitle: "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
     feedEyebrow: 'Chapitre III · Aperçu',
@@ -97,10 +92,8 @@ const COPY = {
     taglineTail: 'without the noise.',
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
-    proofEyebrow: 'Right now in the feed',
-    cta: 'Get started',
+    cta: "Get started - it's free",
     loginNav: 'Sign in',
-    howEyebrow: 'Chapter I · The Method',
     howTitle: 'How it works',
     howSteps: [
       { n: '01', t: 'We capture', d: 'Your sources, your interests, your rhythm.' },
@@ -115,7 +108,6 @@ const COPY = {
         d: 'A clean, readable page. No notifications, no infinite scroll.',
       },
     ],
-    examplesEyebrow: 'Chapter II · Demonstration',
     examplesTitle: 'Feed examples',
     examplesSubtitle: "Pick a topic to preview today's selection.",
     feedEyebrow: 'Chapter III · Preview',
@@ -190,63 +182,44 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
     .padStart(3, '0')
 
   return (
-    <main className="min-h-full flex flex-col px-5 md:px-8 py-5 md:py-10 bg-background">
+    <main className="min-h-full flex flex-col px-4 py-6 md:py-16 bg-background">
       <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-1">
-        {/* Masthead editorial */}
-        <header
-          data-rise
-          style={{ ['--rise-delay' as string]: '0' }}
-          className="border-t-2 border-foreground pt-3 mb-12 md:mb-20"
-        >
-          <div className="flex items-center justify-between gap-4 h-8">
-            <div className="flex items-center gap-3 md:gap-5 min-w-0 h-full">
-              <span className="font-display text-2xl md:text-3xl leading-none italic text-accent">
-                Distil
-              </span>
-              <span
-                className="hidden sm:inline text-border text-[12px] leading-none"
-                aria-hidden="true"
-              >
-                |
-              </span>
-              <span className="hidden sm:inline font-mono text-[12px] tracking-wider uppercase text-muted-foreground truncate leading-none">
-                No {issueNumber} · {today}
-              </span>
-            </div>
-            <div className="flex items-center gap-1 shrink-0 h-full">
-              <Link
-                href="/login"
-                className="inline-flex items-center h-full font-mono text-[12px] uppercase tracking-wider px-2 text-muted-foreground hover:text-accent transition-colors"
-              >
-                {t.loginNav}
-              </Link>
-              <span className="text-border text-[12px] leading-none" aria-hidden="true">
-                |
-              </span>
-              <button
-                onClick={() => setLang('fr')}
-                aria-pressed={lang === 'fr'}
-                aria-label="Français"
-                className={`inline-flex items-center h-full font-mono text-[12px] uppercase tracking-wider px-2 transition-colors ${lang === 'fr' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                FR
-              </button>
-              <span className="text-border text-[12px] leading-none" aria-hidden="true">
-                ·
-              </span>
-              <button
-                onClick={() => setLang('en')}
-                aria-pressed={lang === 'en'}
-                aria-label="English"
-                className={`inline-flex items-center h-full font-mono text-[12px] uppercase tracking-wider px-2 transition-colors ${lang === 'en' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                EN
-              </button>
-              <span className="text-border text-[12px] leading-none" aria-hidden="true">
-                |
-              </span>
-              <ThemeToggle />
-            </div>
+        {/* Bandeau éditorial */}
+        <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
+          <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
+          <div className="flex items-center gap-1">
+            <Link
+              href="/login"
+              className="font-ui text-xs px-2 py-0.5 text-muted-foreground hover:text-accent transition-colors"
+            >
+              {t.loginNav}
+            </Link>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
+              |
+            </span>
+            <button
+              onClick={() => setLang('fr')}
+              aria-pressed={lang === 'fr'}
+              aria-label="Français"
+              className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'fr' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
+            >
+              FR
+            </button>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
+              |
+            </span>
+            <button
+              onClick={() => setLang('en')}
+              aria-pressed={lang === 'en'}
+              aria-label="English"
+              className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'en' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
+            >
+              EN
+            </button>
+            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
+              |
+            </span>
+            <ThemeToggle />
           </div>
         </header>
 
@@ -352,17 +325,30 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           </aside>
         </div>
 
-        {/* Chapitre I : La Methode */}
-        <section className="mb-20 md:mb-28">
-          <div className="relative border-t border-border pt-8 md:pt-10 mb-10 md:mb-14">
-            <span
-              aria-hidden
-              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
-            >
-              <BrandGlyph size={14} />
-            </span>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
-              {t.howEyebrow}
+        {/* Comment ca marche - 3 etapes */}
+        <section className="mb-14">
+          <div className="border-t border-border pt-6 mb-6">
+            <p className="font-ui text-[13px] text-foreground font-medium">{t.howTitle}</p>
+          </div>
+          <ol className="grid gap-6 md:grid-cols-3">
+            {t.howSteps.map((step) => (
+              <li key={step.n} className="space-y-2">
+                <p className="font-ui text-xs tabular-nums text-accent">{step.n}</p>
+                <h3 className="font-ui text-lg font-bold text-foreground leading-snug">{step.t}</h3>
+                <p className="font-body text-[14px] text-muted-foreground leading-relaxed">
+                  {step.d}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Exemples de veille */}
+        <div className="mb-14">
+          <div className="border-t border-border pt-6 mb-6">
+            <p className="font-ui text-[13px] text-foreground font-medium">{t.examplesTitle}</p>
+            <p className="font-body text-[13px] text-muted-foreground mt-0.5">
+              {t.examplesSubtitle}
             </p>
             <h2 className="font-display text-5xl md:text-7xl text-foreground leading-[0.95] tracking-[-0.01em] text-balance">
               {t.howTitle}

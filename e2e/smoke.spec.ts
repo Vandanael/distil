@@ -19,7 +19,10 @@ test('la homepage publique expose le lien Connexion et le bloc Comment ca marche
   await expect(login).toBeVisible()
   await expect(login).toHaveAttribute('href', '/login')
 
-  await expect(page.getByText('Comment ça marche')).toBeVisible()
+  await expect(page.getByText('Comment ca marche')).toBeVisible()
+  await expect(page.getByText('01')).toBeVisible()
+  await expect(page.getByText('02')).toBeVisible()
+  await expect(page.getByText('03')).toBeVisible()
   await expect(page.getByText('On capte')).toBeVisible()
   await expect(page.getByText('On filtre')).toBeVisible()
   await expect(page.getByText('On sert')).toBeVisible()
