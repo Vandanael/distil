@@ -1,5 +1,7 @@
 'use client'
 
+import { scoreColorClass } from '@/lib/utils'
+
 type FeaturedArticle = {
   title: string | null
   url: string | null
@@ -64,7 +66,9 @@ export function FlowPreview({ articles, lang }: Props) {
                       <span className="text-accent mr-2">{t.discovery}</span>
                     )}
                     {t.relevance}{' '}
-                    <span className="tabular-nums text-foreground">
+                    <span
+                      className={`tabular-nums font-semibold ${scoreColorClass(article.score)}`}
+                    >
                       {Math.round(article.score)}
                     </span>
                   </p>

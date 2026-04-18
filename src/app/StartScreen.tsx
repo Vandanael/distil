@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PublicFooter } from '@/components/PublicFooter'
 import { BrandGlyph } from '@/components/BrandGlyph'
+import { scoreColorClass } from '@/lib/utils'
 import { FlowPreview } from './FlowPreview'
 
 type FeaturedArticle = {
@@ -148,7 +149,9 @@ function ArticlePreview({ article, lang }: { article: FeaturedArticle; lang: 'fr
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground pt-1">
           {article.is_serendipity && <span className="text-accent mr-2">{t.serendipity}</span>}
           {t.relevance}{' '}
-          <span className="tabular-nums text-foreground">{Math.round(article.score)}</span>
+          <span className={`tabular-nums font-semibold ${scoreColorClass(article.score)}`}>
+            {Math.round(article.score)}
+          </span>
         </p>
       )}
     </div>
@@ -195,51 +198,51 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           style={{ ['--rise-delay' as string]: '0' }}
           className="border-t-2 border-foreground pt-3 mb-12 md:mb-20"
         >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-baseline gap-3 md:gap-5 min-w-0">
-              <span className="flex items-baseline gap-1.5 md:gap-2 text-accent">
-                <BrandGlyph size={20} className="self-center shrink-0" />
-                <span className="font-display text-2xl md:text-3xl leading-none italic">
-                  Distil
-                </span>
+          <div className="flex items-center justify-between gap-4 h-8">
+            <div className="flex items-center gap-3 md:gap-5 min-w-0 h-full">
+              <span className="font-display text-2xl md:text-3xl leading-none italic text-accent">
+                Distil
               </span>
-              <span className="hidden sm:inline text-border" aria-hidden="true">
+              <span
+                className="hidden sm:inline text-border text-[12px] leading-none"
+                aria-hidden="true"
+              >
                 |
               </span>
-              <span className="hidden sm:inline font-mono text-[11px] tracking-wider uppercase text-muted-foreground truncate">
+              <span className="hidden sm:inline font-mono text-[12px] tracking-wider uppercase text-muted-foreground truncate leading-none">
                 No {issueNumber} · {today}
               </span>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1 shrink-0 h-full">
               <Link
                 href="/login"
-                className="font-mono text-[11px] uppercase tracking-wider px-2 py-0.5 text-muted-foreground hover:text-accent transition-colors"
+                className="inline-flex items-center h-full font-mono text-[12px] uppercase tracking-wider px-2 text-muted-foreground hover:text-accent transition-colors"
               >
                 {t.loginNav}
               </Link>
-              <span className="text-border" aria-hidden="true">
+              <span className="text-border text-[12px] leading-none" aria-hidden="true">
                 |
               </span>
               <button
                 onClick={() => setLang('fr')}
                 aria-pressed={lang === 'fr'}
                 aria-label="Français"
-                className={`font-mono text-[11px] uppercase tracking-wider px-2 py-0.5 transition-colors ${lang === 'fr' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`inline-flex items-center h-full font-mono text-[12px] uppercase tracking-wider px-2 transition-colors ${lang === 'fr' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 FR
               </button>
-              <span className="text-border" aria-hidden="true">
+              <span className="text-border text-[12px] leading-none" aria-hidden="true">
                 ·
               </span>
               <button
                 onClick={() => setLang('en')}
                 aria-pressed={lang === 'en'}
                 aria-label="English"
-                className={`font-mono text-[11px] uppercase tracking-wider px-2 py-0.5 transition-colors ${lang === 'en' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`inline-flex items-center h-full font-mono text-[12px] uppercase tracking-wider px-2 transition-colors ${lang === 'en' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 EN
               </button>
-              <span className="text-border" aria-hidden="true">
+              <span className="text-border text-[12px] leading-none" aria-hidden="true">
                 |
               </span>
               <ThemeToggle />
@@ -248,8 +251,13 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
         </header>
 
         {/* Hero : 1 col mobile, 2 cols lg+ (copy a gauche, flux live a droite) */}
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-16 xl:gap-24 lg:items-start mb-14 md:mb-20">
-          <div className="space-y-8 md:space-y-10">
+        <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-16 xl:gap-24 lg:items-start mb-14 md:mb-20">
+          {/* Aplat top-right full-bleed (desktop) : porte le flux live */}
+          <div
+            aria-hidden
+            className="hidden lg:block pointer-events-none absolute -inset-y-6 left-[55%] right-[calc(50%-50vw)] bg-accent/[0.07]"
+          />
+          <div className="relative space-y-8 md:space-y-10">
             <h1
               data-rise
               style={{ ['--rise-delay' as string]: '1' }}
@@ -305,7 +313,9 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
                           <span className="text-accent mr-2">{t.serendipity}</span>
                         )}
                         {t.relevance}{' '}
-                        <span className="tabular-nums text-foreground">
+                        <span
+                          className={`tabular-nums font-semibold ${scoreColorClass(articles[0].score)}`}
+                        >
                           {Math.round(articles[0].score)}
                         </span>
                       </p>
@@ -321,11 +331,11 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             <div data-rise style={{ ['--rise-delay' as string]: '5' }} className="pt-2">
               <Link
                 href="/login"
-                className="group inline-flex items-center gap-3 font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
+                className="group inline-flex items-center gap-3 font-ui text-[15px] md:text-[16px] uppercase tracking-[0.08em] bg-foreground text-background px-6 py-3.5 md:px-7 md:py-4 hover:bg-accent focus-visible:bg-accent transition-colors"
               >
                 {t.cta}
                 <span
-                  className="font-mono transition-transform group-hover:translate-x-1"
+                  className="font-mono text-base transition-transform group-hover:translate-x-1"
                   aria-hidden="true"
                 >
                   →
@@ -336,7 +346,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           <aside
             data-rise
             style={{ ['--rise-delay' as string]: '6' }}
-            className="hidden lg:block mt-0"
+            className="relative hidden lg:block mt-0"
           >
             <FlowPreview articles={articles} lang={lang} />
           </aside>
@@ -378,53 +388,59 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           </ol>
         </section>
 
-        {/* Chapitre II : Demonstration */}
-        <section className="mb-20 md:mb-28">
-          <div className="relative border-t border-border pt-8 md:pt-10 mb-10 md:mb-14">
-            <span
-              aria-hidden
-              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
-            >
-              <BrandGlyph size={14} />
-            </span>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
-              {t.examplesEyebrow}
-            </p>
-            <h2 className="font-display text-5xl md:text-7xl text-foreground leading-[0.95] tracking-[-0.01em] mb-6 text-balance">
-              {t.examplesTitle}
-            </h2>
-            <p className="font-body text-[17px] md:text-lg text-muted-foreground leading-[1.55] max-w-[48ch] text-pretty">
-              {t.examplesSubtitle}
-            </p>
-          </div>
-          <ul className="divide-y divide-border border-t border-b border-border">
-            {PERSONA_EXAMPLES.map((p, i) => (
-              <li key={p.slug}>
-                <Link
-                  href={`/demo/${p.slug}`}
-                  className="group flex items-baseline gap-6 md:gap-10 py-5 md:py-6 hover:bg-card/60 transition-colors"
-                >
-                  <span className="font-mono text-[12px] tabular-nums text-accent tracking-[0.15em] shrink-0 w-10 md:w-14">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="flex-1 flex flex-col md:flex-row md:items-baseline md:gap-8 gap-1 min-w-0">
-                    <span className="font-display text-2xl md:text-3xl text-foreground leading-tight group-hover:text-accent transition-colors md:w-60 shrink-0">
-                      {p.label[lang]}
-                    </span>
-                    <span className="font-body text-[14px] md:text-[15px] text-muted-foreground leading-snug flex-1">
-                      {p.description[lang]}
-                    </span>
-                  </span>
-                  <span
-                    className="font-mono text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all shrink-0"
-                    aria-hidden="true"
+        {/* Chapitre II : Demonstration (aplat bas-gauche full-bleed, inversion) */}
+        <section className="relative mb-20 md:mb-28">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 left-[calc(50%-50vw)] bg-foreground"
+          />
+          <div className="relative py-12 md:py-20 pr-0 md:pr-4">
+            <div className="relative border-t border-background/20 pt-8 md:pt-10 mb-10 md:mb-14">
+              <span
+                aria-hidden
+                className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-foreground px-2 text-accent inline-flex"
+              >
+                <BrandGlyph size={14} />
+              </span>
+              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-background/60 mb-5">
+                {t.examplesEyebrow}
+              </p>
+              <h2 className="font-display text-5xl md:text-7xl text-background leading-[0.95] tracking-[-0.01em] mb-6 text-balance">
+                {t.examplesTitle}
+              </h2>
+              <p className="font-body text-[17px] md:text-lg text-background/70 leading-[1.55] max-w-[48ch] text-pretty">
+                {t.examplesSubtitle}
+              </p>
+            </div>
+            <ul className="divide-y divide-background/15 border-t border-b border-background/15">
+              {PERSONA_EXAMPLES.map((p, i) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/demo/${p.slug}`}
+                    className="group flex items-baseline gap-6 md:gap-10 py-5 md:py-6 hover:bg-background/[0.04] transition-colors"
                   >
-                    →
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                    <span className="font-mono text-[12px] tabular-nums text-accent tracking-[0.15em] shrink-0 w-10 md:w-14">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="flex-1 flex flex-col md:flex-row md:items-baseline md:gap-8 gap-1 min-w-0">
+                      <span className="font-display text-2xl md:text-3xl text-background leading-tight group-hover:text-accent transition-colors md:w-60 shrink-0">
+                        {p.label[lang]}
+                      </span>
+                      <span className="font-body text-[14px] md:text-[15px] text-background/70 leading-snug flex-1">
+                        {p.description[lang]}
+                      </span>
+                    </span>
+                    <span
+                      className="font-mono text-background/60 group-hover:text-accent group-hover:translate-x-1 transition-all shrink-0"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
 
         {/* Chapitre III : Apercu (mobile seulement ; desktop l'a deja dans le hero) */}

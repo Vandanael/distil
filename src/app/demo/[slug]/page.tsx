@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { scoreColorClass } from '@/lib/utils'
 
 const PERSONAS: Record<string, { label: string; description: string; email: string }> = {
   pm: {
@@ -105,7 +106,9 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
             title={article.justification ?? undefined}
           >
             Pertinence{' '}
-            <span className="font-semibold tabular-nums">{Math.round(article.score)}%</span>
+            <span className={`font-semibold tabular-nums ${scoreColorClass(article.score)}`}>
+              {Math.round(article.score)}%
+            </span>
           </span>
         </div>
       )}

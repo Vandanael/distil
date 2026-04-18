@@ -29,6 +29,7 @@
   --color-popover: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-match-strong: var(--match-strong);
   /* Radius 0 - coins francs, identite editoriale */
   --radius-sm: 0rem;
   --radius-md: 0rem;
@@ -69,6 +70,7 @@
   --border: #d4cfc5;
   --input: #d4cfc5;
   --ring: #d94e1f; /* focus ring = orange */
+  --match-strong: #2d6a4f; /* vert emeraude : signal "match fort" score >= 80 */
   --radius: 0rem; /* coins francs */
 }
 
@@ -92,6 +94,7 @@
   --border: #2a4a38; /* vert-gris fonce (correction : etait bleu #1e3a5f) */
   --input: #2a4a38; /* idem */
   --ring: #e8693d;
+  --match-strong: #7fbf9e; /* vert emeraude clair : lisible sur fond sombre */
 }
 
 @layer base {
