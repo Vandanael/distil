@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PublicFooter } from '@/components/PublicFooter'
+import { BrandGlyph } from '@/components/BrandGlyph'
 
 export const metadata = {
   title: 'A propos - Distil',
@@ -20,9 +21,12 @@ export default function AboutPage() {
             <div className="flex items-baseline gap-3 md:gap-5 min-w-0">
               <Link
                 href="/"
-                className="font-display text-2xl md:text-3xl leading-none text-accent italic hover:opacity-80 transition-opacity"
+                className="flex items-baseline gap-1.5 md:gap-2 text-accent hover:opacity-80 transition-opacity"
               >
-                Distil
+                <BrandGlyph size={20} className="self-center shrink-0" />
+                <span className="font-display text-2xl md:text-3xl leading-none italic">
+                  Distil
+                </span>
               </Link>
               <span className="hidden sm:inline text-border" aria-hidden="true">
                 |
@@ -47,6 +51,11 @@ export default function AboutPage() {
         </header>
 
         {/* Hero */}
+        <BrandGlyph
+          size={96}
+          className="text-accent mb-8 md:mb-10"
+          title="Distil"
+        />
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 md:mb-10 text-balance">
           Veille intelligente,{' '}
           <em className="italic text-accent">lecture souveraine.</em>
@@ -57,7 +66,13 @@ export default function AboutPage() {
         </p>
 
         {/* Mission */}
-        <section className="border-t border-border pt-8 mb-14">
+        <section className="relative border-t border-border pt-8 mb-14">
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+          >
+            <BrandGlyph size={14} />
+          </span>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-6">
             Chapitre I · Mission
           </p>
@@ -93,7 +108,13 @@ export default function AboutPage() {
         </section>
 
         {/* Contact */}
-        <section className="border-t border-border pt-8 mb-14">
+        <section className="relative border-t border-border pt-8 mb-14">
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+          >
+            <BrandGlyph size={14} />
+          </span>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-6">
             Chapitre II · Contact
           </p>
@@ -112,7 +133,13 @@ export default function AboutPage() {
         </section>
 
         {/* Mentions legales */}
-        <section className="border-t border-border pt-8 mb-14">
+        <section className="relative border-t border-border pt-8 mb-14">
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+          >
+            <BrandGlyph size={14} />
+          </span>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-6">
             Chapitre III · Mentions legales
           </p>

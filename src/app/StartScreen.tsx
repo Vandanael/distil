@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PublicFooter } from '@/components/PublicFooter'
+import { BrandGlyph } from '@/components/BrandGlyph'
 import { FlowPreview } from './FlowPreview'
 
 type FeaturedArticle = {
@@ -194,8 +195,11 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-baseline gap-3 md:gap-5 min-w-0">
-              <span className="font-display text-2xl md:text-3xl leading-none text-accent italic">
-                Distil
+              <span className="flex items-baseline gap-1.5 md:gap-2 text-accent">
+                <BrandGlyph size={20} className="self-center shrink-0" />
+                <span className="font-display text-2xl md:text-3xl leading-none italic">
+                  Distil
+                </span>
               </span>
               <span className="hidden sm:inline text-border" aria-hidden="true">
                 |
@@ -294,7 +298,13 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
 
         {/* Chapitre I : La Methode */}
         <section className="mb-20 md:mb-28">
-          <div className="border-t border-border pt-8 md:pt-10 mb-10 md:mb-14">
+          <div className="relative border-t border-border pt-8 md:pt-10 mb-10 md:mb-14">
+            <span
+              aria-hidden
+              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+            >
+              <BrandGlyph size={14} />
+            </span>
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
               {t.howEyebrow}
             </p>
@@ -324,7 +334,13 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
 
         {/* Chapitre II : Demonstration */}
         <section className="mb-20 md:mb-28">
-          <div className="border-t border-border pt-8 md:pt-10 mb-10 md:mb-14">
+          <div className="relative border-t border-border pt-8 md:pt-10 mb-10 md:mb-14">
+            <span
+              aria-hidden
+              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+            >
+              <BrandGlyph size={14} />
+            </span>
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
               {t.examplesEyebrow}
             </p>
@@ -367,7 +383,13 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
 
         {/* Chapitre III : Apercu (mobile seulement ; desktop l'a deja dans le hero) */}
         <section className="lg:hidden mb-8">
-          <div className="border-t border-border pt-8 mb-8">
+          <div className="relative border-t border-border pt-8 mb-8">
+            <span
+              aria-hidden
+              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
+            >
+              <BrandGlyph size={14} />
+            </span>
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
               {t.feedEyebrow}
             </p>
