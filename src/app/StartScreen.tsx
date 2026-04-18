@@ -62,6 +62,7 @@ const COPY = {
     taglineTail: 'sans le bruit.',
     body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
+    proofEyebrow: 'En ce moment dans le flux',
     cta: 'Commencer',
     loginNav: 'Connexion',
     howEyebrow: 'Chapitre I · La Méthode',
@@ -95,6 +96,7 @@ const COPY = {
     taglineTail: 'without the noise.',
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
+    proofEyebrow: 'Right now in the feed',
     cta: 'Get started',
     loginNav: 'Sign in',
     howEyebrow: 'Chapter I · The Method',
@@ -272,7 +274,51 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             >
               {t.format}
             </p>
-            <div data-rise style={{ ['--rise-delay' as string]: '4' }} className="pt-2">
+            {articles[0] && (
+              <div
+                data-rise
+                style={{ ['--rise-delay' as string]: '4' }}
+                className="lg:hidden border-t border-border pt-4"
+              >
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent mb-2 flex items-center gap-2">
+                  <BrandGlyph size={12} />
+                  {t.proofEyebrow}
+                </p>
+                {articles[0].url ? (
+                  <a
+                    href={articles[0].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block"
+                  >
+                    {articles[0].site_name && (
+                      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1">
+                        {articles[0].site_name}
+                      </p>
+                    )}
+                    <h3 className="font-display text-[22px] leading-[1.2] text-foreground group-hover:text-accent transition-colors">
+                      {articles[0].title ?? t.noTitle}
+                    </h3>
+                    {articles[0].score !== null && (
+                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground pt-1">
+                        {articles[0].is_serendipity && (
+                          <span className="text-accent mr-2">{t.serendipity}</span>
+                        )}
+                        {t.relevance}{' '}
+                        <span className="tabular-nums text-foreground">
+                          {Math.round(articles[0].score)}
+                        </span>
+                      </p>
+                    )}
+                  </a>
+                ) : (
+                  <h3 className="font-display text-[22px] leading-[1.2] text-foreground">
+                    {articles[0].title ?? t.noTitle}
+                  </h3>
+                )}
+              </div>
+            )}
+            <div data-rise style={{ ['--rise-delay' as string]: '5' }} className="pt-2">
               <Link
                 href="/login"
                 className="group inline-flex items-center gap-3 font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
@@ -289,7 +335,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
           </div>
           <aside
             data-rise
-            style={{ ['--rise-delay' as string]: '5' }}
+            style={{ ['--rise-delay' as string]: '6' }}
             className="hidden lg:block mt-0"
           >
             <FlowPreview articles={articles} lang={lang} />
