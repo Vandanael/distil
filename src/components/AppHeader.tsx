@@ -29,7 +29,10 @@ export function AppHeader() {
         .trim()}
     >
       <div className="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
-        <Link href="/feed" className="font-ui text-xl font-bold tracking-tight text-accent">
+        <Link
+          href="/feed"
+          className="font-display italic text-2xl leading-none text-accent hover:opacity-80 transition-opacity"
+        >
           Distil
         </Link>
 

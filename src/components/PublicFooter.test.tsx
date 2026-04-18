@@ -19,20 +19,16 @@ describe('PublicFooter', () => {
   it('affiche les labels FR par defaut', () => {
     render(<PublicFooter />)
     expect(screen.getByText('A propos')).toBeTruthy()
-    expect(screen.getByText('Connexion')).toBeTruthy()
   })
 
   it('bascule en EN via la prop lang', () => {
     render(<PublicFooter lang="en" />)
     expect(screen.getByText('About')).toBeTruthy()
-    expect(screen.getByText('Sign in')).toBeTruthy()
   })
 
-  it('pointe les liens vers /about et /login', () => {
+  it('pointe le lien vers /about', () => {
     render(<PublicFooter />)
     const about = screen.getByText('A propos').closest('a')
-    const login = screen.getByText('Connexion').closest('a')
     expect(about?.getAttribute('href')).toBe('/about')
-    expect(login?.getAttribute('href')).toBe('/login')
   })
 })

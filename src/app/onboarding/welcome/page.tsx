@@ -63,7 +63,9 @@ export default function WelcomePage() {
       <div className="w-full max-w-sm space-y-10">
         {/* Logo */}
         <div className="space-y-4">
-          <h1 className="font-ui text-5xl font-bold tracking-tight text-accent">Distil</h1>
+          <h1 className="font-display text-6xl md:text-7xl italic leading-[0.95] tracking-[-0.01em] text-accent">
+            Distil
+          </h1>
         </div>
 
         {/* Message */}
@@ -81,7 +83,7 @@ export default function WelcomePage() {
         <button
           type="button"
           onClick={() => router.push('/feed')}
-          className="font-ui text-sm text-accent hover:underline transition-opacity"
+          className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
         >
           Voir mon feed maintenant &rarr;
         </button>

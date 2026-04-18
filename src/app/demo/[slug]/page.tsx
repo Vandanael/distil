@@ -205,7 +205,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
               <ThemeToggle />
               <Link
                 href="/"
-                className="font-ui text-xs text-muted-foreground/60 hover:text-accent transition-colors shrink-0"
+                className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors shrink-0"
               >
                 ← Accueil
               </Link>
@@ -219,7 +219,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
             <Link
               key={s}
               href={`/demo/${s}`}
-              className="font-ui text-xs text-muted-foreground border border-border px-3 py-1.5 hover:border-accent/60 hover:text-foreground transition-colors"
+              className="font-ui text-xs text-muted-foreground border border-border px-3 py-1.5 hover:border-accent hover:text-foreground transition-colors"
             >
               {PERSONAS[s].label}
             </Link>
@@ -248,7 +248,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
             href="/login"
             className="inline-block font-ui text-sm bg-foreground text-background px-6 py-3 hover:bg-accent hover:text-background transition-colors"
           >
-            Créer mon profil - c&apos;est gratuit
+            Créer mon profil
           </Link>
         </div>
       </div>
