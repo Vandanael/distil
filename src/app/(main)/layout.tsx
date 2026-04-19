@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AppHeader } from '@/components/AppHeader'
+import { MainHeader } from '@/components/MainHeader'
 import { BottomNav } from '@/components/BottomNav'
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
@@ -40,7 +40,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-full flex flex-col">
       {/* Header : masque sur /article/* mobile (lecture immersive) */}
-      <AppHeader />
+      <MainHeader />
 
       {/* Contenu principal avec padding-bottom pour la BottomNav mobile */}
       <main id="main-content" className="flex-1 pb-14 md:pb-0">

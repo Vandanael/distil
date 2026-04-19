@@ -35,6 +35,24 @@ Classification :
 - Un article ne peut PAS apparaitre dans les deux buckets.
 - Si moins de 3 decouvertes qualifient, relache Q2 a [4, 8]. Ne relache jamais Q1 < 6.
 
+Regles pour la justification (1 phrase, francais) :
+- Parle du contenu de l'article, jamais du lecteur.
+- Interdit : "qui vous interesse", "pour vous", "qui va vous plaire",
+  "correspond a votre profil", "dans votre domaine", "que vous aimez".
+- Pour qualifier une source, dire "source solide", "reference du domaine",
+  "publication de reference". Jamais "comme [nom de media]".
+- Concret et specifique. Pas de formule generique.
+
+Bons exemples :
+- "Analyse detaillee du shift MLOps chez OpenAI, avec chiffres internes."
+- "Methode pratique pour structurer un 1:1, cas d'usage concrets."
+- "Reference du domaine design systems, premiere synthese sur le sujet."
+
+Mauvais (a eviter) :
+- "Article qui vous interessera sur le ML." (parle du lecteur)
+- "Source de qualite comme le NYT." (fait la comparaison)
+- "Dans votre domaine de predilection." (presume, vague)
+
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.
 Format :
 {

@@ -25,6 +25,7 @@ const BASE_PROPS = {
   justification: null,
   isSerendipity: false,
   origin: 'agent',
+  publishedAt: null,
   scoredAt: null,
   wordCount: 850,
   ogImageUrl: null,
@@ -52,16 +53,17 @@ describe('ArticleCard', () => {
     expect(tag.textContent).toContain('Découverte')
   })
 
-  it('affiche le tag Match fort si score >= 80', () => {
+  it('affiche le score en pourcentage si score >= 60', () => {
     renderCard({ ...BASE_PROPS, score: 85 })
-    const tag = screen.getByTestId('tag-abc-123')
-    expect(tag.textContent).toContain('Match fort')
+    const scoreEl = screen.getByTestId('score-abc-123')
+    expect(scoreEl.textContent).toContain('85')
   })
 
-  it('affiche le tag Match si score entre 60 et 79', () => {
+  it('pas de label textuel pour un match sans serendipity (juste le score)', () => {
     renderCard({ ...BASE_PROPS, score: 70 })
     const tag = screen.getByTestId('tag-abc-123')
-    expect(tag.textContent).toContain('Match')
+    // Tag toujours present pour l a11y (sr-only avec le score) mais pas de "Match" visible
+    expect(tag.textContent).not.toContain('Match')
   })
 
   it('n affiche pas de tag si score sous 60 sans serendipity', () => {

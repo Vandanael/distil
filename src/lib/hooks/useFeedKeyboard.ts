@@ -4,10 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 type UseFeedKeyboardOptions = {
   onDismiss: (articleId: string) => void
+  onArchive: (articleId: string) => void
   onNavigate: (articleId: string) => void
 }
 
-export function useFeedKeyboard({ onDismiss, onNavigate }: UseFeedKeyboardOptions) {
+export function useFeedKeyboard({ onDismiss, onArchive, onNavigate }: UseFeedKeyboardOptions) {
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const prevFocusedRef = useRef<Element | null>(null)
 
@@ -80,13 +81,23 @@ export function useFeedKeyboard({ onDismiss, onNavigate }: UseFeedKeyboardOption
           }
           break
         }
-        case 'd': {
+        case 'd':
+        case 'ArrowLeft': {
           if (focusedIndex < 0 || focusedIndex >= count) return
           const articleId = cards[focusedIndex].getAttribute('data-article-id')
           if (articleId) {
             e.preventDefault()
             onDismiss(articleId)
-            // Apres dismiss, clamp l'index
+            setFocusedIndex((prev) => Math.min(prev, count - 2))
+          }
+          break
+        }
+        case 'ArrowRight': {
+          if (focusedIndex < 0 || focusedIndex >= count) return
+          const articleId = cards[focusedIndex].getAttribute('data-article-id')
+          if (articleId) {
+            e.preventDefault()
+            onArchive(articleId)
             setFocusedIndex((prev) => Math.min(prev, count - 2))
           }
           break
@@ -100,7 +111,7 @@ export function useFeedKeyboard({ onDismiss, onNavigate }: UseFeedKeyboardOption
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [focusedIndex, getCards, onDismiss, onNavigate])
+  }, [focusedIndex, getCards, onDismiss, onArchive, onNavigate])
 
   return { focusedIndex }
 }

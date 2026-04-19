@@ -22,6 +22,7 @@ type Props = {
   justification: string | null
   isSerendipity: boolean
   origin: string
+  publishedAt: string | null
   scoredAt: string | null
   wordCount: number | null
   ogImageUrl: string | null
@@ -45,6 +46,25 @@ function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string
   return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' })
 }
 
+function formatPublishedDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return null
+  const isFr = locale === 'fr'
+  const diffMs = Date.now() - date.getTime()
+  const diffH = Math.floor(diffMs / (1000 * 60 * 60))
+  if (diffH < 24) return isFr ? "aujourd'hui" : 'today'
+  if (diffH < 48) return isFr ? 'hier' : 'yesterday'
+  // Absolu : "17 avril" si meme annee, sinon "17 avril 2024"
+  const now = new Date()
+  const sameYear = date.getFullYear() === now.getFullYear()
+  return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+    ...(sameYear ? {} : { year: 'numeric' }),
+  })
+}
+
 export function ArticleCard({
   id,
   title,
@@ -55,6 +75,7 @@ export function ArticleCard({
   justification,
   isSerendipity,
   origin,
+  publishedAt,
   scoredAt,
   wordCount,
   ogImageUrl,
@@ -65,24 +86,26 @@ export function ArticleCard({
   const { locale, t } = useLocale()
   const { dismissedIds } = useDismissContext()
   const [dismissed, setDismissed] = useState(false)
-  const [showScorePopover, setShowScorePopover] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
   const [surprisedUsefulSent, setSurprisedUsefulSent] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
-  const scorePopoverRef = useRef<HTMLDivElement>(null)
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
-  const relativeDate = formatRelativeDate(scoredAt, locale)
+  const retrievedRelative = formatRelativeDate(scoredAt, locale)
+  const publishedLabel = formatPublishedDate(publishedAt, locale)
+  const retrievedLabel = retrievedRelative
+    ? locale === 'fr'
+      ? `recupere ${retrievedRelative}`
+      : `fetched ${retrievedRelative}`
+    : null
   const isPaywall = wordCount === 0
   const tag: RelevanceTag | null = scoreToTag(score, isSerendipity)
-  const tagLabel: string | null = tag
-    ? tag === 'match_strong'
-      ? t.article.tagMatchStrong
-      : tag === 'match'
-        ? t.article.tagMatch
-        : t.article.tagDiscovery
-    : null
+  // Seule "Decouverte" garde un label (categorie editoriale distincte). Pour les matchs,
+  // le score % et sa couleur encodent deja la force : le mot "Match" est redondant.
+  const tagLabel: string | null = tag === 'discovery' ? t.article.tagDiscovery : null
+  const hasSubScores =
+    subScores && (subScores.q1 !== null || subScores.q2 !== null || subScores.q3 !== null)
   // Les 3 premieres cartes sont potentiellement above-the-fold
   const isAboveFold = staggerIndex < 3
 
@@ -91,56 +114,6 @@ export function ArticleCard({
       if (undoRef.current) clearTimeout(undoRef.current)
     }
   }, [])
-
-  useEffect(() => {
-    if (!showScorePopover) return
-    const popover = scorePopoverRef.current
-    if (!popover) return
-
-    const focusable = popover.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-    const first = focusable[0]
-    const last = focusable[focusable.length - 1]
-    first?.focus()
-
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setShowScorePopover(false)
-        return
-      }
-      if (e.key !== 'Tab') return
-      if (focusable.length === 0) {
-        e.preventDefault()
-        return
-      }
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault()
-          last?.focus()
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault()
-          first?.focus()
-        }
-      }
-    }
-
-    function onOutside(e: MouseEvent) {
-      if (popover && !popover.contains(e.target as Node)) {
-        setShowScorePopover(false)
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown)
-    document.addEventListener('mousedown', onOutside)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-      document.removeEventListener('mousedown', onOutside)
-      ;(document.querySelector(`[data-testid="tag-${id}"]`) as HTMLElement | null)?.focus()
-    }
-  }, [showScorePopover, id])
 
   const {
     handlers: swipeHandlers,
@@ -337,14 +310,16 @@ export function ArticleCard({
               )}
             </span>
           )}
-          {siteName && relativeDate && <span>·</span>}
-          {relativeDate && <span className="font-ui">{relativeDate}</span>}
-          {readingTimeMinutes && (
-            <>
-              <span>·</span>
-              <span className="font-ui">{readingTimeMinutes} min</span>
-            </>
+          {siteName && (publishedLabel || retrievedLabel) && <span>·</span>}
+          {publishedLabel && <span className="font-ui">{publishedLabel}</span>}
+          {publishedLabel && retrievedLabel && <span>·</span>}
+          {retrievedLabel && (
+            <span className="font-ui text-muted-foreground/70">{retrievedLabel}</span>
           )}
+          {readingTimeMinutes && (publishedLabel || retrievedLabel || siteName) && (
+            <span>·</span>
+          )}
+          {readingTimeMinutes && <span className="font-ui">{readingTimeMinutes} min</span>}
           {!isPaywall && wordCount != null && wordCount > 0 && (
             <>
               <span>·</span>
@@ -378,14 +353,6 @@ export function ArticleCard({
                 {excerpt}
               </p>
             )}
-            {justification && (
-              <p
-                className="font-body text-sm text-muted-foreground/80 italic line-clamp-1 mt-2"
-                data-testid={`justification-inline-${id}`}
-              >
-                {justification}
-              </p>
-            )}
           </div>
 
           {ogImageUrl && !imageError && (
@@ -404,102 +371,76 @@ export function ArticleCard({
           )}
         </div>
 
-        {/* Ligne 5 : tag qualitatif + actions */}
-        <div className="flex items-center gap-3 mt-3">
-          {tag && tagLabel && (
-            <div className="relative" ref={scorePopoverRef}>
-              <button
-                type="button"
-                data-testid={`tag-${id}`}
-                aria-label={`${tagLabel}. ${t.article.tagDetails}`}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setShowScorePopover((v) => !v)
-                }}
-                className={`font-ui text-sm inline-flex items-center gap-1 transition-colors ${tag === 'discovery' ? 'text-accent hover:text-accent/80' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                <span className={tag === 'match_strong' ? 'font-semibold' : ''}>{tagLabel}</span>
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  className={`transition-transform ${showScorePopover ? 'rotate-180' : ''}`}
+        {/* Bloc relevance deplie par defaut : transparence algo */}
+        {tag && (
+          <div className="mt-4 pt-3 border-t border-border/60 space-y-2">
+            <div className="flex items-baseline justify-between gap-3">
+              {tagLabel ? (
+                <span
+                  data-testid={`tag-${id}`}
+                  className="font-ui text-sm text-accent"
                 >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-              {showScorePopover && (
-                <div
-                  role="dialog"
-                  aria-label={t.article.relevance}
-                  aria-modal="true"
-                  className="absolute left-0 bottom-7 z-20 border border-border bg-background shadow-sm w-64 p-3 space-y-2 animate-in fade-in slide-in-from-bottom-1 duration-150"
-                  onClick={(e) => e.preventDefault()}
+                  {tagLabel}
+                </span>
+              ) : (
+                <span data-testid={`tag-${id}`} className="sr-only">
+                  {Math.round(score ?? 0)}%
+                </span>
+              )}
+              {score !== null && (
+                <span
+                  data-testid={`score-${id}`}
+                  className={`font-ui text-lg font-semibold tabular-nums ml-auto ${scoreColorClass(score)}`}
                 >
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-ui text-sm font-semibold text-foreground">
-                      {tagLabel}
-                    </span>
-                    {score !== null && (
-                      <span
-                        data-testid={`score-${id}`}
-                        className={`font-ui text-2xl font-semibold tabular-nums ${scoreColorClass(score)}`}
-                      >
-                        {Math.round(score)}
-                        <span className="text-sm text-muted-foreground font-normal">%</span>
-                      </span>
-                    )}
-                  </div>
-                  {justification && (
-                    <p className="font-body text-sm text-muted-foreground leading-relaxed">
-                      {justification}
-                    </p>
-                  )}
-                  {subScores &&
-                    (subScores.q1 !== null || subScores.q2 !== null || subScores.q3 !== null) && (
-                      <dl
-                        data-testid={`sub-scores-${id}`}
-                        className="grid grid-cols-3 gap-2 pt-2 border-t border-border/60 font-ui text-xs text-muted-foreground"
-                      >
-                        <div className="flex flex-col">
-                          <dt>{t.article.subScoreQ1}</dt>
-                          <dd className="text-sm font-semibold text-foreground tabular-nums">
-                            {subScores.q1 ?? '—'}
-                            <span className="text-muted-foreground font-normal">/10</span>
-                          </dd>
-                        </div>
-                        <div className="flex flex-col">
-                          <dt>{t.article.subScoreQ2}</dt>
-                          <dd className="text-sm font-semibold text-foreground tabular-nums">
-                            {subScores.q2 ?? '—'}
-                            <span className="text-muted-foreground font-normal">/10</span>
-                          </dd>
-                        </div>
-                        <div className="flex flex-col">
-                          <dt>{t.article.subScoreQ3}</dt>
-                          <dd className="text-sm font-semibold text-foreground tabular-nums">
-                            {subScores.q3 ?? '—'}
-                            <span className="text-muted-foreground font-normal">/10</span>
-                          </dd>
-                        </div>
-                      </dl>
-                    )}
-                  {isSerendipity && (
-                    <p className="font-ui text-sm text-accent">{t.article.serendipityDetail}</p>
-                  )}
-                </div>
+                  {Math.round(score)}
+                  <span className="text-xs text-muted-foreground font-normal">%</span>
+                </span>
               )}
             </div>
-          )}
+            {justification && (
+              <p
+                data-testid={`justification-inline-${id}`}
+                className="font-body text-sm text-muted-foreground leading-relaxed"
+              >
+                {justification}
+              </p>
+            )}
+            {hasSubScores && (
+              <dl
+                data-testid={`sub-scores-${id}`}
+                className="flex flex-wrap gap-x-5 gap-y-1 font-ui text-xs text-muted-foreground"
+              >
+                <div className="flex items-baseline gap-1.5">
+                  <dt>{t.article.subScoreQ1}</dt>
+                  <dd className="font-semibold text-foreground tabular-nums">
+                    {subScores!.q1 ?? '—'}
+                    <span className="text-muted-foreground font-normal">/10</span>
+                  </dd>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <dt>{t.article.subScoreQ2}</dt>
+                  <dd className="font-semibold text-foreground tabular-nums">
+                    {subScores!.q2 ?? '—'}
+                    <span className="text-muted-foreground font-normal">/10</span>
+                  </dd>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <dt>{t.article.subScoreQ3}</dt>
+                  <dd className="font-semibold text-foreground tabular-nums">
+                    {subScores!.q3 ?? '—'}
+                    <span className="text-muted-foreground font-normal">/10</span>
+                  </dd>
+                </div>
+              </dl>
+            )}
+            {isSerendipity && (
+              <p className="font-ui text-sm text-accent">{t.article.serendipityDetail}</p>
+            )}
+          </div>
+        )}
 
-          {/* Actions a droite */}
+        {/* Ligne actions */}
+        <div className="flex items-center gap-3 mt-3">
           <div className="ml-auto flex items-center gap-1">
             {isSerendipity && (
               <button

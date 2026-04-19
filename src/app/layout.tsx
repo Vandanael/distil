@@ -34,10 +34,6 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   // Beta privee : on coupe l'indexation le temps de tester en cercle ferme.
   robots: { index: false, follow: false, nocache: true },
-  icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

@@ -17,6 +17,7 @@ type FeedArticle = {
   justification: string | null
   is_serendipity: boolean
   origin: string
+  published_at: string | null
   scored_at: string | null
   word_count: number | null
   og_image_url: string | null
@@ -66,7 +67,7 @@ export default async function FeedPage() {
         supabase
           .from('articles')
           .select(
-            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, scored_at, word_count, og_image_url, status'
+            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, published_at, scored_at, word_count, og_image_url, status'
           )
           .eq('user_id', user.id)
           .in('status', ['accepted', 'read'])
@@ -122,14 +123,18 @@ export default async function FeedPage() {
   const surprises = articles.filter((a) => a.is_serendipity).sort(sortByScoreDesc)
 
   return (
-    <div className="max-w-[720px] mx-auto px-4 py-3 md:py-10 w-full">
-      <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
+    <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3 md:py-10 w-full">
+      <div className="lg:max-w-[720px]">
+        <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
+      </div>
 
-      {/* Articles */}
+      {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
       <DismissProvider>
-        <FeedShell className="space-y-6">
+        <FeedShell className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2">
           {articles.length === 0 ? (
-            <EmptyFeed />
+            <div className="lg:col-span-2">
+              <EmptyFeed />
+            </div>
           ) : (
             <>
               {essentials.map((a, i) => (
@@ -145,6 +150,7 @@ export default async function FeedPage() {
                   justification={a.justification}
                   isSerendipity={a.is_serendipity}
                   origin={a.origin}
+                  publishedAt={a.published_at}
                   scoredAt={a.scored_at}
                   wordCount={a.word_count}
                   ogImageUrl={a.og_image_url}
@@ -155,7 +161,7 @@ export default async function FeedPage() {
 
               {surprises.length > 0 && (
                 <div
-                  className="flex items-center gap-3 py-2"
+                  className="flex items-center gap-3 py-2 lg:col-span-2 lg:mt-4"
                   data-testid="discovery-divider"
                   aria-hidden="true"
                 >
@@ -180,6 +186,7 @@ export default async function FeedPage() {
                   justification={a.justification}
                   isSerendipity={a.is_serendipity}
                   origin={a.origin}
+                  publishedAt={a.published_at}
                   scoredAt={a.scored_at}
                   wordCount={a.word_count}
                   ogImageUrl={a.og_image_url}
@@ -193,7 +200,7 @@ export default async function FeedPage() {
       </DismissProvider>
 
       {rejectedCount > 0 && (
-        <div className="mt-8 pt-4 border-t border-border">
+        <div className="mt-8 pt-4 border-t border-border lg:max-w-[720px]">
           <Link
             href="/library?tab=filtered"
             className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"

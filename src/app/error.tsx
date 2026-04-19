@@ -38,10 +38,10 @@ export default function GlobalError({
         </header>
 
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
-          Erreur technique
+          Erreur
         </p>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 text-balance">
-          Quelque chose <em className="italic text-accent">s&apos;est casse.</em>
+          Incident <em className="italic text-accent">technique.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-12 text-pretty max-w-[48ch]">
           L&apos;incident a ete signale. Vous pouvez reessayer ou revenir a l&apos;accueil.
