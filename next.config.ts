@@ -1,8 +1,17 @@
 import type { NextConfig } from 'next'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// Force le workspace root sur le repo : evite que Next infere /home/yvanf
+// a cause d'un package-lock.json orphelin dans le home.
+const projectRoot = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig: NextConfig = {
   devIndicators: false,
   compress: true,
+  turbopack: {
+    root: projectRoot,
+  },
   async headers() {
     return [
       {
