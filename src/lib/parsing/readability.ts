@@ -2,6 +2,7 @@ import { Readability } from '@mozilla/readability'
 import { parseHTML } from 'linkedom'
 import sanitizeHtml from 'sanitize-html'
 import { fetchHtml } from './fetcher'
+import { decodeHtmlEntities } from './strip-html'
 
 // Hostnames autorises pour les iframes embarques (tweets, videos, code).
 // Tout iframe pointant ailleurs est supprime par sanitize-html.
@@ -193,13 +194,13 @@ export function parseHtml(html: string, url: string): ParsedArticle {
 
   return {
     url,
-    title: article.title ?? null,
-    author: article.byline ?? null,
-    siteName: article.siteName ?? null,
+    title: article.title ? decodeHtmlEntities(article.title) : null,
+    author: article.byline ? decodeHtmlEntities(article.byline) : null,
+    siteName: article.siteName ? decodeHtmlEntities(article.siteName) : null,
     publishedAt: article.publishedTime ?? null,
     contentHtml: sanitizeHtml(article.content ?? '', SANITIZE_OPTIONS),
     contentText,
-    excerpt: article.excerpt ?? null,
+    excerpt: article.excerpt ? decodeHtmlEntities(article.excerpt) : null,
     wordCount,
     readingTimeMinutes,
     ogImageUrl,

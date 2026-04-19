@@ -1,7 +1,7 @@
 import Parser from 'rss-parser'
 import { createHash } from 'crypto'
 import { createClient } from '@supabase/supabase-js'
-import { stripHtml } from '@/lib/parsing/strip-html'
+import { decodeHtmlEntities, stripHtml } from '@/lib/parsing/strip-html'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { Feed, IngestResult, IngestSummary } from './types'
 
@@ -86,12 +86,15 @@ async function fetchFeed(supabase: ServiceClient, feed: Feed): Promise<IngestRes
         )
         const contentText = stripHtml(rawContent)
 
+        const rawAuthor =
+          (rawItem['dc:creator'] as string | undefined) ?? item.creator ?? null
+
         return {
           feed_id: feed.id,
           guid: item.guid ?? null,
           url: itemUrl,
-          title: item.title ?? null,
-          author: (rawItem['dc:creator'] as string | undefined) ?? item.creator ?? null,
+          title: item.title ? decodeHtmlEntities(item.title) : null,
+          author: rawAuthor ? decodeHtmlEntities(rawAuthor) : null,
           published_at: item.isoDate ?? null,
           content_text: contentText.slice(0, 50_000), // Cap at 50k chars
           content_hash: hash,
