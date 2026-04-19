@@ -17,7 +17,7 @@ ALTER TABLE items
     setweight(to_tsvector('french', coalesce(content_text, '')), 'B')
   ) STORED;
 
-CREATE INDEX idx_items_search_vector
+CREATE INDEX IF NOT EXISTS idx_items_search_vector
   ON items USING gin (search_vector);
 
 -- 2. Telemetrie : nb keyword_hits force-injectes dans essential apres LLM.
@@ -30,9 +30,13 @@ ALTER TABLE ranking_runs
 --    ts_rank DESC. Cap par defaut monte a 60 pour laisser respirer le pool
 --    apres ponderation (les items faibles sortent, ceux qui restent sont
 --    mieux qualifies).
-DROP FUNCTION IF EXISTS prefilter_ranking_candidates(vector, UUID, TIMESTAMPTZ, INT, INT);
+--    CASCADE + drop des deux signatures possibles (legacy 00011 4-args +
+--    00024 5-args) pour que cette migration soit re-executable sans se
+--    heurter a "cannot change return type of existing function".
+DROP FUNCTION IF EXISTS prefilter_ranking_candidates(vector, UUID, TIMESTAMPTZ, INT) CASCADE;
+DROP FUNCTION IF EXISTS prefilter_ranking_candidates(vector, UUID, TIMESTAMPTZ, INT, INT) CASCADE;
 
-CREATE OR REPLACE FUNCTION prefilter_ranking_candidates(
+CREATE FUNCTION prefilter_ranking_candidates(
   user_embedding vector(1024),
   target_user_id UUID,
   cutoff_time TIMESTAMPTZ,
