@@ -8,6 +8,7 @@ import { DismissProvider } from './components/DismissContext'
 
 type FeedArticle = {
   id: string
+  item_id: string | null
   title: string | null
   site_name: string | null
   excerpt: string | null
@@ -21,6 +22,8 @@ type FeedArticle = {
   og_image_url: string | null
   status: string
 }
+
+type SubScores = { q1: number | null; q2: number | null; q3: number | null }
 
 function sortByScoreDesc(a: FeedArticle, b: FeedArticle): number {
   const sa = a.score ?? -1
@@ -38,6 +41,7 @@ export default async function FeedPage() {
   let lastRefreshAt: string | null = null
   let interests: string[] = []
   let rejectedCount = 0
+  const subScoresByItemId = new Map<string, SubScores>()
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const supabase = await createClient()
@@ -62,7 +66,7 @@ export default async function FeedPage() {
         supabase
           .from('articles')
           .select(
-            'id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, scored_at, word_count, og_image_url, status'
+            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, scored_at, word_count, og_image_url, status'
           )
           .eq('user_id', user.id)
           .in('status', ['accepted', 'read'])
@@ -88,6 +92,24 @@ export default async function FeedPage() {
       articles = articlesResult.data ?? []
       lastRefreshAt = lastRunResult.data?.completed_at ?? null
       rejectedCount = rejectedResult.count ?? 0
+
+      // Sous-scores Q1/Q2/Q3 : stockes dans daily_ranking, pas sur articles.
+      // Jointure cote appli via item_id pour alimenter le popover de pertinence.
+      const itemIds = articles.map((a) => a.item_id).filter((id): id is string => id !== null)
+      if (itemIds.length > 0) {
+        const { data: rankingRows } = await supabase
+          .from('daily_ranking')
+          .select('item_id, q1_relevance, q2_unexpected, q3_discovery')
+          .eq('user_id', user.id)
+          .in('item_id', itemIds)
+        for (const row of rankingRows ?? []) {
+          subScoresByItemId.set(row.item_id, {
+            q1: row.q1_relevance,
+            q2: row.q2_unexpected,
+            q3: row.q3_discovery,
+          })
+        }
+      }
     }
   }
 
@@ -127,6 +149,7 @@ export default async function FeedPage() {
                   wordCount={a.word_count}
                   ogImageUrl={a.og_image_url}
                   isRead={a.status === 'read'}
+                  subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
                 />
               ))}
 
@@ -161,6 +184,7 @@ export default async function FeedPage() {
                   wordCount={a.word_count}
                   ogImageUrl={a.og_image_url}
                   isRead={a.status === 'read'}
+                  subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
                 />
               ))}
             </>

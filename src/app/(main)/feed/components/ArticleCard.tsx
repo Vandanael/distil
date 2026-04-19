@@ -27,6 +27,7 @@ type Props = {
   ogImageUrl: string | null
   isRead?: boolean
   staggerIndex?: number
+  subScores?: { q1: number | null; q2: number | null; q3: number | null } | null
 }
 
 function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
@@ -59,6 +60,7 @@ export function ArticleCard({
   ogImageUrl,
   isRead = false,
   staggerIndex = 0,
+  subScores = null,
 }: Props) {
   const { locale, t } = useLocale()
   const { dismissedIds } = useDismissContext()
@@ -460,6 +462,35 @@ export function ArticleCard({
                       {justification}
                     </p>
                   )}
+                  {subScores &&
+                    (subScores.q1 !== null || subScores.q2 !== null || subScores.q3 !== null) && (
+                      <dl
+                        data-testid={`sub-scores-${id}`}
+                        className="grid grid-cols-3 gap-2 pt-2 border-t border-border/60 font-ui text-xs text-muted-foreground"
+                      >
+                        <div className="flex flex-col">
+                          <dt>{t.article.subScoreQ1}</dt>
+                          <dd className="text-sm font-semibold text-foreground tabular-nums">
+                            {subScores.q1 ?? '—'}
+                            <span className="text-muted-foreground font-normal">/10</span>
+                          </dd>
+                        </div>
+                        <div className="flex flex-col">
+                          <dt>{t.article.subScoreQ2}</dt>
+                          <dd className="text-sm font-semibold text-foreground tabular-nums">
+                            {subScores.q2 ?? '—'}
+                            <span className="text-muted-foreground font-normal">/10</span>
+                          </dd>
+                        </div>
+                        <div className="flex flex-col">
+                          <dt>{t.article.subScoreQ3}</dt>
+                          <dd className="text-sm font-semibold text-foreground tabular-nums">
+                            {subScores.q3 ?? '—'}
+                            <span className="text-muted-foreground font-normal">/10</span>
+                          </dd>
+                        </div>
+                      </dl>
+                    )}
                   {isSerendipity && (
                     <p className="font-ui text-sm text-accent">{t.article.serendipityDetail}</p>
                   )}

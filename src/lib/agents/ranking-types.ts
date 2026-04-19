@@ -27,6 +27,8 @@ export type RankingResult = {
   essential: RankedItem[]
   surprise: RankedItem[]
   fallback: boolean
+  modelUsed: string | null
+  candidatesCount: number
   error: string | null
   durationMs: number
 }

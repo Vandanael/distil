@@ -16,6 +16,12 @@ const FALLBACK_MODEL = 'gemini-2.5-flash'
 // et n'a le droit d'apparaitre dans aucun bucket. Garde-fou si le prompt rate.
 export const MIN_Q1_RELEVANCE = 6
 
+// Garde-fou anti-fuite cosine : un item que le LLM classe Q1 >= 7 alors que sa
+// distance au profil depasse ce seuil est incoherent (ex: Dezeen en Politique).
+// On le deplace dans surprise, ou on le drop si deja en surprise.
+export const MAX_ESSENTIAL_DISTANCE = 0.6
+export const HIGH_RELEVANCE_Q1 = 7
+
 type LlmRankedItem = {
   item_id: string
   q1: number
@@ -31,6 +37,36 @@ type LlmResponse = {
 
 export function enforceMinRelevance(items: LlmRankedItem[]): LlmRankedItem[] {
   return items.filter((item) => (item.q1 ?? 0) >= MIN_Q1_RELEVANCE)
+}
+
+export function applyCosineGuard(
+  essential: LlmRankedItem[],
+  surprise: LlmRankedItem[],
+  candidates: RankingCandidate[]
+): { essential: LlmRankedItem[]; surprise: LlmRankedItem[] } {
+  const distanceByItem = new Map(candidates.map((c) => [c.itemId, c.distance]))
+  const isFarClaim = (item: LlmRankedItem) => {
+    const distance = distanceByItem.get(item.item_id)
+    return (
+      item.q1 >= HIGH_RELEVANCE_Q1 && distance !== undefined && distance > MAX_ESSENTIAL_DISTANCE
+    )
+  }
+
+  const keptEssential: LlmRankedItem[] = []
+  const downgraded: LlmRankedItem[] = []
+  for (const item of essential) {
+    if (isFarClaim(item)) downgraded.push(item)
+    else keptEssential.push(item)
+  }
+
+  // Items deja en surprise mais avec Q1 >= 7 et distance > seuil : drop (pas de
+  // deuxieme chance, ils pretendent etre pertinents tout en etant loin du profil).
+  const keptSurprise = surprise.filter((item) => !isFarClaim(item))
+
+  return {
+    essential: keptEssential,
+    surprise: [...keptSurprise, ...downgraded],
+  }
 }
 
 async function loadUserProfile(
@@ -249,6 +285,8 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       essential: [],
       surprise: [],
       fallback: false,
+      modelUsed: null,
+      candidatesCount: 0,
       error: "Deja classe aujourd'hui",
       durationMs: Date.now() - start,
     }
@@ -263,6 +301,8 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       essential: [],
       surprise: [],
       fallback: false,
+      modelUsed: null,
+      candidatesCount: 0,
       error: "Pas d'embedding profil disponible",
       durationMs: Date.now() - start,
     }
@@ -277,6 +317,8 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       essential: [],
       surprise: [],
       fallback: false,
+      modelUsed: null,
+      candidatesCount: 0,
       error: 'Aucun candidat disponible',
       durationMs: Date.now() - start,
     }
@@ -295,6 +337,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
   let essential: RankedItem[] = []
   let surprise: RankedItem[] = []
   let fallback = false
+  let modelUsed: string | null = null
   let rankError: string | null = null
 
   try {
@@ -302,39 +345,45 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     let llmResult: LlmResponse
     try {
       llmResult = await callRankingLlm(userPrompt, MODEL, userId)
+      modelUsed = MODEL
     } catch {
       llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL, userId)
+      modelUsed = FALLBACK_MODEL
     }
 
-    // Garde-fou : on purge les Q1 < 6 avant slicing. Evite qu'un hors-sujet LLM
-    // (Dezeen en Politique, p.ex.) n'occupe une place dans essential ou surprise.
-    essential = enforceMinRelevance(llmResult.essential ?? [])
-      .slice(0, 5)
-      .map((item, i) => ({
-        itemId: item.item_id,
-        q1: item.q1,
-        q2: item.q2,
-        q3: item.q3,
-        justification: item.justification,
-        bucket: 'essential' as const,
-        rank: i + 1,
-      }))
+    // Garde-fou 1 : Q1 < 6 = hors-sujet, purge avant slicing.
+    // Garde-fou 2 : Q1 >= 7 avec distance cosine > 0.6 = LLM incoherent avec l'embedding,
+    // downgrade dans surprise ou drop si deja en surprise (scenario Dezeen/Politique).
+    const guarded = applyCosineGuard(
+      enforceMinRelevance(llmResult.essential ?? []),
+      enforceMinRelevance(llmResult.surprise ?? []),
+      candidates
+    )
 
-    surprise = enforceMinRelevance(llmResult.surprise ?? [])
-      .slice(0, 3)
-      .map((item, i) => ({
-        itemId: item.item_id,
-        q1: item.q1,
-        q2: item.q2,
-        q3: item.q3,
-        justification: item.justification,
-        bucket: 'surprise' as const,
-        rank: i + 1,
-      }))
+    essential = guarded.essential.slice(0, 5).map((item, i) => ({
+      itemId: item.item_id,
+      q1: item.q1,
+      q2: item.q2,
+      q3: item.q3,
+      justification: item.justification,
+      bucket: 'essential' as const,
+      rank: i + 1,
+    }))
+
+    surprise = guarded.surprise.slice(0, 3).map((item, i) => ({
+      itemId: item.item_id,
+      q1: item.q1,
+      q2: item.q2,
+      q3: item.q3,
+      justification: item.justification,
+      bucket: 'surprise' as const,
+      rank: i + 1,
+    }))
   } catch (err) {
     // Complete LLM failure : cosine fallback
     rankError = err instanceof Error ? err.message : String(err)
     fallback = true
+    modelUsed = 'cosine_fallback'
     const fb = cosineFallback(candidates)
     essential = fb.essential
     surprise = fb.surprise
@@ -348,6 +397,8 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     essential,
     surprise,
     fallback,
+    modelUsed,
+    candidatesCount: candidates.length,
     error: rankError,
     durationMs: Date.now() - start,
   }
@@ -378,7 +429,32 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
     profiles.map((profile) => rankForUser(supabase, profile.id))
   )
 
-  return settled
+  const results = settled
     .filter((r): r is PromiseFulfilledResult<RankingResult> => r.status === 'fulfilled')
     .map((r) => r.value)
+
+  // Telemetrie : 1 ligne par user par run, utile pour suivre fallback rate et latence
+  // sans attendre un bug reporte. Echec insert = non bloquant pour le ranking.
+  if (results.length > 0) {
+    await supabase
+      .from('ranking_runs')
+      .insert(
+        results.map((r) => ({
+          user_id: r.userId,
+          date: r.date,
+          model_used: r.modelUsed,
+          fallback: r.fallback,
+          candidates_count: r.candidatesCount,
+          essential_count: r.essential.length,
+          surprise_count: r.surprise.length,
+          duration_ms: r.durationMs,
+          error: r.error,
+        }))
+      )
+      .then(({ error }) => {
+        if (error) console.error('[ranking] ranking_runs insert failed', error.message)
+      })
+  }
+
+  return results
 }

@@ -579,6 +579,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ranking_runs: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          model_used: string | null
+          fallback: boolean
+          candidates_count: number
+          essential_count: number
+          surprise_count: number
+          duration_ms: number
+          error: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          date: string
+          model_used?: string | null
+          fallback?: boolean
+          candidates_count?: number
+          essential_count?: number
+          surprise_count?: number
+          duration_ms?: number
+          error?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          date?: string
+          model_used?: string | null
+          fallback?: boolean
+          candidates_count?: number
+          essential_count?: number
+          surprise_count?: number
+          duration_ms?: number
+          error?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       api_budget_log: {
         Row: {
           date: string
