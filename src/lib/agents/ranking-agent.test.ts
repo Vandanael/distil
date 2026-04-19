@@ -3,12 +3,18 @@ import {
   enforceMinRelevance,
   MIN_Q1_RELEVANCE,
   applyCosineGuard,
+  injectReservedKeywordSlots,
   MAX_ESSENTIAL_DISTANCE,
   HIGH_RELEVANCE_Q1,
+  RESERVED_KEYWORD_SLOTS,
 } from './ranking-agent'
-import type { RankingCandidate } from './ranking-types'
+import type { RankedItem, RankingCandidate } from './ranking-types'
 
-function candidate(itemId: string, distance: number): RankingCandidate {
+function candidate(
+  itemId: string,
+  distance: number,
+  overrides: Partial<RankingCandidate> = {}
+): RankingCandidate {
   return {
     itemId,
     url: `https://example.test/${itemId}`,
@@ -20,6 +26,22 @@ function candidate(itemId: string, distance: number): RankingCandidate {
     wordCount: 0,
     distance,
     unpopScore: 0,
+    isKeywordHit: false,
+    matchedKeywords: [],
+    keywordRank: 0,
+    ...overrides,
+  }
+}
+
+function ranked(itemId: string, rank: number): RankedItem {
+  return {
+    itemId,
+    q1: 8,
+    q2: 5,
+    q3: 5,
+    justification: '',
+    bucket: 'essential',
+    rank,
   }
 }
 
@@ -102,5 +124,159 @@ describe('applyCosineGuard', () => {
   it('constantes documentees', () => {
     expect(MAX_ESSENTIAL_DISTANCE).toBe(0.6)
     expect(HIGH_RELEVANCE_Q1).toBe(7)
+  })
+})
+
+describe('injectReservedKeywordSlots', () => {
+  it("force les top keyword_hits dans essential quand aucun n'est promu", () => {
+    const essential = [
+      ranked('e1', 1),
+      ranked('e2', 2),
+      ranked('e3', 3),
+      ranked('e4', 4),
+      ranked('e5', 5),
+    ]
+    const candidates = [
+      candidate('e1', 0.1),
+      candidate('e2', 0.2),
+      candidate('e3', 0.3),
+      candidate('e4', 0.4),
+      candidate('e5', 0.5),
+      candidate('k1', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.9 }),
+      candidate('k2', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.7 }),
+      candidate('k3', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.5 }),
+    ]
+    const out = injectReservedKeywordSlots(essential, [], candidates)
+    expect(out.forceInjected).toBe(RESERVED_KEYWORD_SLOTS)
+    const ids = out.essential.map((r) => r.itemId)
+    // Les 2 derniers non-keyword ejectes, les 2 top keyword_hits injectes.
+    expect(ids).toContain('k1')
+    expect(ids).toContain('k2')
+    expect(ids).not.toContain('e4')
+    expect(ids).not.toContain('e5')
+    expect(out.essential).toHaveLength(5)
+    // rank reatribue
+    expect(out.essential.map((r) => r.rank)).toEqual([1, 2, 3, 4, 5])
+  })
+
+  it('ne fait rien si 2 keyword_hits sont deja dans essential', () => {
+    const essential = [
+      ranked('k1', 1),
+      ranked('k2', 2),
+      ranked('e3', 3),
+      ranked('e4', 4),
+      ranked('e5', 5),
+    ]
+    const candidates = [
+      candidate('k1', 0.1, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.9 }),
+      candidate('k2', 0.2, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.8 }),
+      candidate('e3', 0.3),
+      candidate('e4', 0.4),
+      candidate('e5', 0.5),
+      candidate('k3', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.7 }),
+    ]
+    const out = injectReservedKeywordSlots(essential, [], candidates)
+    expect(out.forceInjected).toBe(0)
+    expect(out.essential).toEqual(essential)
+  })
+
+  it('ne double-injecte pas un keyword_hit deja present dans surprise', () => {
+    const essential = [ranked('e1', 1)]
+    const surprise = [ranked('k1', 1)]
+    const candidates = [
+      candidate('e1', 0.1),
+      candidate('k1', 0.5, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.9 }),
+      candidate('k2', 0.5, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.8 }),
+    ]
+    const out = injectReservedKeywordSlots(essential, surprise, candidates)
+    // k1 est deja en surprise donc ne compte pas comme slot a combler (existingKwEssential=0)
+    // mais on ne le re-injecte pas : on prend k2 (le prochain non-promu).
+    const ids = out.essential.map((r) => r.itemId)
+    expect(ids).toContain('k2')
+    expect(ids).not.toContain('k1')
+  })
+
+  it('respecte slotsNeeded si 1 keyword_hit est deja dans essential', () => {
+    // essential deja a 5 : ejection de e5 pour placer k2 (1 slot manquant).
+    const essential = [
+      ranked('k1', 1),
+      ranked('e2', 2),
+      ranked('e3', 3),
+      ranked('e4', 4),
+      ranked('e5', 5),
+    ]
+    const candidates = [
+      candidate('k1', 0.1, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.9 }),
+      candidate('e2', 0.2),
+      candidate('e3', 0.3),
+      candidate('e4', 0.4),
+      candidate('e5', 0.5),
+      candidate('k2', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.7 }),
+    ]
+    const out = injectReservedKeywordSlots(essential, [], candidates)
+    expect(out.forceInjected).toBe(1)
+    expect(out.essential).toHaveLength(5)
+    const ids = out.essential.map((r) => r.itemId)
+    expect(ids).toContain('k1')
+    expect(ids).toContain('k2')
+    expect(ids).toContain('e2')
+    expect(ids).not.toContain('e5')
+  })
+
+  it("aucun keyword_hit disponible = pas d'injection", () => {
+    const essential = [ranked('e1', 1), ranked('e2', 2)]
+    const candidates = [candidate('e1', 0.1), candidate('e2', 0.2)]
+    const out = injectReservedKeywordSlots(essential, [], candidates)
+    expect(out.forceInjected).toBe(0)
+    expect(out.essential).toEqual(essential)
+  })
+
+  it('tri par keywordRank decroissant pour choisir les injections', () => {
+    const essential = [
+      ranked('e1', 1),
+      ranked('e2', 2),
+      ranked('e3', 3),
+      ranked('e4', 4),
+      ranked('e5', 5),
+    ]
+    const candidates = [
+      candidate('e1', 0.1),
+      candidate('e2', 0.2),
+      candidate('e3', 0.3),
+      candidate('e4', 0.4),
+      candidate('e5', 0.5),
+      candidate('low', 0.9, { isKeywordHit: true, matchedKeywords: ['x'], keywordRank: 0.1 }),
+      candidate('mid', 0.9, { isKeywordHit: true, matchedKeywords: ['x'], keywordRank: 0.5 }),
+      candidate('top', 0.9, { isKeywordHit: true, matchedKeywords: ['x'], keywordRank: 0.9 }),
+    ]
+    const out = injectReservedKeywordSlots(essential, [], candidates)
+    const ids = out.essential.map((r) => r.itemId)
+    expect(ids).toContain('top')
+    expect(ids).toContain('mid')
+    expect(ids).not.toContain('low')
+  })
+
+  it('constante RESERVED_KEYWORD_SLOTS documentee', () => {
+    expect(RESERVED_KEYWORD_SLOTS).toBe(2)
+  })
+
+  it("grandit essential jusqu'a 5 au lieu d'ejecter quand l'essential LLM est petit", () => {
+    // LLM retourne 2 essentials + 2 keyword_hits a injecter -> 4 items au final,
+    // pas 2. L'ejection ne se declenche que si essential est deja sature.
+    const essential = [ranked('e1', 1), ranked('e2', 2)]
+    const candidates = [
+      candidate('e1', 0.1),
+      candidate('e2', 0.2),
+      candidate('k1', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.9 }),
+      candidate('k2', 0.9, { isKeywordHit: true, matchedKeywords: ['llm'], keywordRank: 0.7 }),
+    ]
+    const out = injectReservedKeywordSlots(essential, [], candidates)
+    expect(out.forceInjected).toBe(2)
+    expect(out.essential).toHaveLength(4)
+    const ids = out.essential.map((r) => r.itemId)
+    expect(ids).toContain('e1')
+    expect(ids).toContain('e2')
+    expect(ids).toContain('k1')
+    expect(ids).toContain('k2')
   })
 })

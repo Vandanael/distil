@@ -20,10 +20,8 @@ export default function AboutPage() {
           Veille intelligente, <em className="italic text-accent">lecture sereine.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-20 md:mb-24 text-pretty">
-          <span className="text-accent">Distil</span>
-          {' '}
-          capte, filtre et organise l&apos;information en ligne pour qu&apos;elle reste au service
-          du jugement humain.
+          <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information
+          en ligne pour qu&apos;elle reste au service du jugement humain.
         </p>
 
         {/* Capture produit */}

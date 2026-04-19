@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { splitInterestsFromCsv } from '@/lib/keywords'
 import { updateProfile } from './actions'
 
 type ProfileData = {
@@ -40,10 +41,7 @@ export function ProfileForm({ profile }: Props) {
       try {
         await updateProfile({
           profile_text: profileText || undefined,
-          interests: interests
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
+          interests: splitInterestsFromCsv(interests),
           pinned_sources: newSources,
           language,
         })

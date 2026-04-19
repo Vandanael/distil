@@ -46,6 +46,9 @@ export async function prefilterCandidates(
       wordCount: item.word_count ?? 0,
       distance: 1.0,
       unpopScore: 0.5,
+      isKeywordHit: false,
+      matchedKeywords: [],
+      keywordRank: 0,
     }))
   }
 
@@ -60,5 +63,8 @@ export async function prefilterCandidates(
     wordCount: (row.word_count as number) ?? 0,
     distance: row.distance as number,
     unpopScore: (row.unpop_score as number) ?? 0.5,
+    isKeywordHit: Boolean(row.is_keyword_hit),
+    matchedKeywords: Array.isArray(row.matched_keywords) ? (row.matched_keywords as string[]) : [],
+    keywordRank: typeof row.keyword_rank === 'number' ? row.keyword_rank : 0,
   }))
 }

@@ -5,6 +5,7 @@ import { EmptyFeed } from './components/EmptyFeed'
 import { FeedShell } from './components/FeedShell'
 import { FeedHeader } from './components/FeedHeader'
 import { DismissProvider } from './components/DismissContext'
+import { KeywordSection, type KeywordGroup } from './components/KeywordSection'
 
 type FeedArticle = {
   id: string
@@ -42,6 +43,7 @@ export default async function FeedPage() {
   let lastRefreshAt: string | null = null
   let interests: string[] = []
   let rejectedCount = 0
+  let keywordGroups: KeywordGroup[] = []
   const subScoresByItemId = new Map<string, SubScores>()
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -93,6 +95,38 @@ export default async function FeedPage() {
       articles = articlesResult.data ?? []
       lastRefreshAt = lastRunResult.data?.completed_at ?? null
       rejectedCount = rejectedResult.count ?? 0
+
+      // Section "Tous vos mots-cles" : items des 48h matchant un keyword de l'user
+      // et qui ne sont pas dans le feed (NOT EXISTS articles, cote RPC).
+      if (interests.length > 0) {
+        const cutoff = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString()
+        const { data: hitsRows } = await supabase.rpc('list_keyword_hits', {
+          target_user_id: user.id,
+          cutoff_time: cutoff,
+        })
+        if (hitsRows) {
+          const groupMap = new Map<string, KeywordGroup>()
+          for (const row of hitsRows) {
+            const existing = groupMap.get(row.keyword)
+            const hit = {
+              itemId: row.item_id,
+              url: row.url,
+              title: row.title,
+              siteName: row.site_name,
+              publishedAt: row.published_at,
+              wordCount: row.word_count,
+            }
+            if (existing) {
+              existing.hits.push(hit)
+            } else {
+              groupMap.set(row.keyword, { keyword: row.keyword, hits: [hit] })
+            }
+          }
+          keywordGroups = Array.from(groupMap.values()).sort(
+            (a, b) => b.hits.length - a.hits.length
+          )
+        }
+      }
 
       // Sous-scores Q1/Q2/Q3 : stockes dans daily_ranking, pas sur articles.
       // Jointure cote appli via item_id pour alimenter le popover de pertinence.
@@ -198,6 +232,8 @@ export default async function FeedPage() {
           )}
         </FeedShell>
       </DismissProvider>
+
+      <KeywordSection groups={keywordGroups} />
 
       {rejectedCount > 0 && (
         <div className="mt-8 pt-4 border-t border-border lg:max-w-[720px]">

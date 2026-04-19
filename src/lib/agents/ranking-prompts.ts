@@ -1,3 +1,4 @@
+import { isReferenceDomain } from './sources'
 import type { RankingCandidate } from './ranking-types'
 
 export const RANKING_SYSTEM_PROMPT = `Tu es l'agent de ranking de Distil, une veille intelligente.
@@ -34,6 +35,17 @@ Classification :
 - DECOUVERTE (top 3) : articles ou Q1 >= 6 ET Q2 entre 5 et 8 ET Q3 >= 7. Trie par Q3 decroissant.
 - Un article ne peut PAS apparaitre dans les deux buckets.
 - Si moins de 3 decouvertes qualifient, relache Q2 a [4, 8]. Ne relache jamais Q1 < 6.
+
+Articles [MATCH] :
+- Certains candidats sont prefixes [MATCH:kw1,kw2]. Ces articles ont ete explicitement demandes par le lecteur via un mot-cle declare dans son profil.
+- Evalue-les sur leur merite propre (Q1/Q2/Q3) sans biais.
+- Tu peux les exclure uniquement si Q1 < 6, c'est-a-dire si l'article ne tient pas la promesse du mot-cle (homonymie, sujet effleure, angle hors-sujet).
+- A Q1 >= 6, un article [MATCH] doit apparaitre dans essential ou surprise. Ne l'ignore pas silencieusement.
+
+Densite et sources de reference :
+- A Q1 egal, privilegie les articles de 800 mots ou plus : le format long est un marqueur de profondeur editoriale.
+- A Q1 egal, privilegie les candidats suffixes "ref" dans la ligne : ces sources sont des references etablies du domaine (arxiv, Nature, Le Monde, Stratechery, etc.).
+- Ces preferences departagent des ex aequo ; elles ne justifient jamais de garder un article Q1 < 6.
 
 Regles pour la justification (1 phrase, francais) :
 - Parle du contenu de l'article, jamais du lecteur.
@@ -93,8 +105,13 @@ export function buildRankingUserPrompt(
 
   for (const c of candidates) {
     const popularity = c.unpopScore > 0.7 ? 'rare' : c.unpopScore > 0.3 ? 'moyen' : 'commun'
+    const matchPrefix =
+      c.isKeywordHit && c.matchedKeywords.length > 0
+        ? `[MATCH:${c.matchedKeywords.join(',')}] `
+        : ''
+    const refSuffix = isReferenceDomain(c.siteName) ? ', ref' : ''
     lines.push(
-      `[${c.itemId}] | ${c.title ?? 'Sans titre'} | ${c.siteName ?? c.author ?? 'inconnu'} | ${c.contentPreview.replace(/\n/g, ' ').slice(0, 300)} | ${c.wordCount} mots | ${popularity}`
+      `${matchPrefix}[${c.itemId}] | ${c.title ?? 'Sans titre'} | ${c.siteName ?? c.author ?? 'inconnu'} | ${c.contentPreview.replace(/\n/g, ' ').slice(0, 300)} | ${c.wordCount} mots${refSuffix} | ${popularity}`
     )
   }
 
