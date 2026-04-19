@@ -96,6 +96,7 @@ const COPY = {
     editionsTodaySingular: 'édition filtrée ce matin',
     editionsTodayPlural: 'éditions filtrées ce matin',
     onboardingPromise: '1 minute, 2 questions, gratuit pendant la beta.',
+    previewCta: 'Voir les 2 questions',
   },
   en: {
     taglineLead: 'Your daily briefing,',
@@ -134,6 +135,7 @@ const COPY = {
     editionsTodaySingular: 'edition filtered this morning',
     editionsTodayPlural: 'editions filtered this morning',
     onboardingPromise: '1 minute, 2 questions, free during beta.',
+    previewCta: 'See the 2 questions',
   },
 }
 
@@ -167,9 +169,7 @@ export function StartScreen({
                 className="font-display text-foreground text-[3rem] sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] leading-[0.95] tracking-[-0.02em] text-balance"
               >
                 {t.taglineLead}{' '}
-                <em className="not-italic">
-                  <span className="italic text-accent whitespace-nowrap">{t.taglineTail}</span>
-                </em>
+                <span className="text-accent whitespace-nowrap">{t.taglineTail}</span>
               </h1>
               <p
                 data-rise
@@ -196,7 +196,15 @@ export function StartScreen({
                 >
                   {t.cta}
                 </Link>
-                <p className="font-ui text-[14px] text-subtle">{t.onboardingPromise}</p>
+                <p className="font-ui text-[14px] text-subtle">
+                  {t.onboardingPromise}{' '}
+                  <Link
+                    href="/onboarding/preview"
+                    className="underline underline-offset-[3px] decoration-border hover:decoration-accent hover:text-accent transition-colors"
+                  >
+                    {t.previewCta}
+                  </Link>
+                </p>
                 {editionsToday > 0 && (
                   <p className="font-ui text-[14px] text-subtle">
                     <span
@@ -258,7 +266,7 @@ export function StartScreen({
 
           {/* Methode : pitch vulgarise */}
           <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
-            <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-4 md:mb-5 text-balance max-w-[22ch]">
+            <h2 className="font-heading text-4xl md:text-5xl text-foreground leading-[1.1] tracking-tight mb-4 md:mb-5 text-balance max-w-[22ch]">
               {withBrand(t.howTitle)}
             </h2>
             <p className="font-body text-[17px] md:text-lg text-subtle leading-[1.55] mb-8 md:mb-10 max-w-[52ch] lg:max-w-[72ch] text-pretty">
@@ -273,7 +281,7 @@ export function StartScreen({
                   key={step.kicker}
                   className="space-y-4 md:space-y-5 md:border-l md:border-border md:pl-6 first:md:border-l-0 first:md:pl-0"
                 >
-                  <h3 className="font-display text-3xl md:text-4xl text-accent leading-[0.95] tracking-[-0.01em]">
+                  <h3 className="font-ui text-xl md:text-2xl font-semibold tracking-tight text-accent">
                     {step.kicker}
                   </h3>
                   <p className="font-body text-[17px] md:text-lg text-foreground leading-[1.55] text-pretty">
@@ -292,7 +300,7 @@ export function StartScreen({
             />
             <div className="relative">
               <div className="mb-6 md:mb-8">
-                <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-3 text-balance">
+                <h2 className="font-heading text-4xl md:text-5xl text-foreground leading-[1.1] tracking-tight mb-3 text-balance">
                   {t.examplesTitle}
                 </h2>
                 <p className="font-body text-[16px] md:text-[17px] text-subtle leading-[1.55] text-pretty">
@@ -309,7 +317,7 @@ export function StartScreen({
                       />
                       <span className="relative flex items-baseline gap-6 md:gap-10 py-4 md:py-5 px-4 md:px-6">
                         <span className="flex-1 flex flex-col md:flex-row md:items-baseline md:gap-8 gap-1 min-w-0">
-                          <span className="font-display text-2xl md:text-3xl text-foreground leading-tight group-hover:text-accent transition-colors md:w-64 shrink-0">
+                          <span className="font-ui text-xl md:text-2xl font-semibold text-foreground leading-tight tracking-tight group-hover:text-accent transition-colors md:w-64 shrink-0">
                             {p.label[locale]}
                           </span>
                           <span className="font-body text-[15px] md:text-[16px] text-subtle leading-snug flex-1">

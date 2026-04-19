@@ -4,6 +4,8 @@ import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { PublicHeader } from '@/components/PublicHeader'
 import { PublicFooter } from '@/components/PublicFooter'
 
@@ -13,6 +15,8 @@ const ERROR_MESSAGES: Record<string, string> = {
     'Echec de la connexion. Veuillez reessayer. Si le probleme persiste, ouvrez une issue sur GitHub.',
   supabase_not_configured: 'Service temporairement indisponible. Reessayez dans quelques instants.',
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function LoginPage() {
   return (
@@ -24,11 +28,15 @@ export default function LoginPage() {
 
 function LoginPageInner() {
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [magicLoading, setMagicLoading] = useState(false)
+  const [magicSent, setMagicSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const urlErrorCode = searchParams.get('error')
   const urlError = urlErrorCode ? (ERROR_MESSAGES[urlErrorCode] ?? null) : null
   const displayError = error ?? urlError
+  const loading = googleLoading || magicLoading
 
   async function handleGoogle() {
     setError(null)
@@ -44,6 +52,31 @@ function LoginPageInner() {
     }
   }
 
+  async function handleMagicLink(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const trimmed = email.trim()
+    if (!EMAIL_RE.test(trimmed)) {
+      setError('Adresse email invalide.')
+      return
+    }
+    setError(null)
+    setMagicLoading(true)
+    const supabase = createClient()
+    const { error: authError } = await supabase.auth.signInWithOtp({
+      email: trimmed,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        shouldCreateUser: true,
+      },
+    })
+    setMagicLoading(false)
+    if (authError) {
+      setError(authError.message)
+      return
+    }
+    setMagicSent(true)
+  }
+
   return (
     <main className="flex flex-1 flex-col bg-background">
       <div className="pt-5 md:pt-10">
@@ -52,8 +85,8 @@ function LoginPageInner() {
       <div className="flex-1 flex items-center justify-center px-5 md:px-8 py-12">
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-4">
-            <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-[-0.01em] text-foreground text-balance">
-              Connexion à <span className="italic text-accent">Distil</span>.
+            <h1 className="font-heading text-5xl md:text-7xl tracking-tight text-accent leading-[1.05]">
+              Distil
             </h1>
             <p className="font-body text-[16px] leading-[1.55] text-muted-foreground text-pretty">
               Votre veille quotidienne, <em className="italic text-foreground">sans le bruit.</em>
@@ -66,7 +99,7 @@ function LoginPageInner() {
               variant="outline"
               className="w-full h-11 font-ui gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
               onClick={handleGoogle}
-              disabled={googleLoading}
+              disabled={loading}
               aria-describedby="login-help"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -90,9 +123,54 @@ function LoginPageInner() {
               {googleLoading ? 'Redirection...' : 'Continuer avec Google'}
             </Button>
 
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="font-ui text-xs uppercase tracking-wider text-muted-foreground">
+                ou
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            {magicSent ? (
+              <p
+                role="status"
+                aria-live="polite"
+                className="font-ui text-[15px] text-foreground border-l-2 border-accent pl-3 py-2"
+              >
+                Lien envoye. Ouvrez votre boite mail et cliquez sur le lien pour vous connecter.
+              </p>
+            ) : (
+              <form onSubmit={handleMagicLink} className="space-y-3" noValidate>
+                <Label
+                  htmlFor="magic-email"
+                  className="font-ui text-xs uppercase tracking-wider text-muted-foreground"
+                >
+                  Recevoir un lien par email
+                </Label>
+                <Input
+                  id="magic-email"
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="vous@exemple.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  required
+                />
+                <Button
+                  type="submit"
+                  className="w-full h-11 font-ui disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={loading || !email.trim()}
+                >
+                  {magicLoading ? 'Envoi...' : 'Envoyer le lien'}
+                </Button>
+              </form>
+            )}
+
             <p id="login-help" className="font-ui text-xs text-muted-foreground leading-relaxed">
-              Connexion rapide et securisee via Google. Distil ne partage aucune donnee au-dela de
-              votre email et ne publie rien en votre nom.
+              Connexion rapide et securisee. Distil ne partage aucune donnee au-dela de votre email
+              et ne publie rien en votre nom.
             </p>
 
             {displayError && (
