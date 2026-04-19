@@ -6,39 +6,10 @@ import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Masthead } from '@/components/Masthead'
 import { scoreColorClass } from '@/lib/utils'
-
-const PERSONAS: Record<string, { label: string; description: string; email: string }> = {
-  pm: {
-    label: 'Politique & Monde',
-    description: 'Géopolitique, démocratie, actualité internationale',
-    email: 'test-pm@distil.app',
-  },
-  consultant: {
-    label: 'Cuisine & Gastronomie',
-    description: 'Techniques, chefs, restaurants, recettes',
-    email: 'test-consultant@distil.app',
-  },
-  dev: {
-    label: 'Tech & Numérique',
-    description: 'Actualité tech, outils, open source',
-    email: 'test-dev@distil.app',
-  },
-  chercheur: {
-    label: 'Sport & Bien-être',
-    description: 'Running, mental, nutrition, performance',
-    email: 'test-chercheur@distil.app',
-  },
-  ml: {
-    label: 'Culture & Société',
-    description: 'Cinéma, musique, littérature, idées',
-    email: 'test-ml@distil.app',
-  },
-}
-
-const SLUGS = Object.keys(PERSONAS)
+import { DEMO_ACCOUNTS, getDemoAccountBySlug } from '@/lib/demo-accounts'
 
 export function generateStaticParams() {
-  return SLUGS.map((slug) => ({ slug }))
+  return DEMO_ACCOUNTS.map((a) => ({ slug: a.slug }))
 }
 
 type Article = {
@@ -143,7 +114,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
 
 export default async function DemoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const persona = PERSONAS[slug]
+  const persona = getDemoAccountBySlug(slug)
   if (!persona) notFound()
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -156,29 +127,16 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    // Map email → ID stable (comptes créés par create-test-accounts.mjs)
-    const EMAIL_TO_ID: Record<string, string> = {
-      'test-pm@distil.app': '795c2637-7e43-4b74-82b1-560899cf62d7',
-      'test-consultant@distil.app': '17e9ac27-5bc3-403c-94e4-cb2d6db1e38c',
-      'test-dev@distil.app': 'a615fba9-490a-4dd9-a161-45f8c9b54943',
-      'test-chercheur@distil.app': 'e970bbf3-eb89-476a-bf68-250f53f6ec13',
-      'test-ml@distil.app': 'ce745cc5-266e-4293-a677-2cad575f1aef',
-    }
-    const userId = EMAIL_TO_ID[persona.email]
-    const user = userId ? { id: userId } : null
+    const { data } = await sb
+      .from('articles')
+      .select(
+        'id, title, site_name, excerpt, url, reading_time_minutes, score, justification, is_serendipity, status'
+      )
+      .eq('user_id', persona.id)
+      .order('score', { ascending: false })
+      .limit(20)
 
-    if (user) {
-      const { data } = await sb
-        .from('articles')
-        .select(
-          'id, title, site_name, excerpt, url, reading_time_minutes, score, justification, is_serendipity, status'
-        )
-        .eq('user_id', user.id)
-        .order('score', { ascending: false })
-        .limit(20)
-
-      articles = data ?? []
-    }
+    articles = data ?? []
   }
 
   const accepted = articles.filter((a) => a.status === 'accepted')
@@ -216,19 +174,19 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
           />
           <p className="mt-4 font-ui text-[15px] text-foreground">
             Exemple de veille
-            <span className="text-subtle"> - {persona.label}</span>
+            <span className="text-subtle"> - {persona.label.fr}</span>
           </p>
         </div>
 
         {/* Autres thèmes */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {SLUGS.filter((s) => s !== slug).map((s) => (
+          {DEMO_ACCOUNTS.filter((a) => a.slug !== slug).map((a) => (
             <Link
-              key={s}
-              href={`/demo/${s}`}
+              key={a.slug}
+              href={`/demo/${a.slug}`}
               className="font-ui text-[15px] text-subtle border border-border px-3 py-1.5 hover:border-accent hover:text-foreground transition-colors"
             >
-              {PERSONAS[s].label}
+              {a.label.fr}
             </Link>
           ))}
         </div>

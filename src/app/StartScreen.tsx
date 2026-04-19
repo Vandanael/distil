@@ -57,6 +57,7 @@ const COPY = {
     examplesTitle: 'Voir un exemple',
     examplesSubtitle: "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
     feedTitle: 'La veille du jour',
+    feedTitleFallback: 'Exemples éditoriaux',
     feedSub: 'Extrait de veilles actives',
     feedEmpty: 'Distil analyse le web en ce moment. Revenez dans quelques minutes.',
     serendipity: 'Découverte',
@@ -78,6 +79,7 @@ const COPY = {
     examplesTitle: 'See an example',
     examplesSubtitle: "Pick a topic to preview today's selection.",
     feedTitle: "Today's briefing",
+    feedTitleFallback: 'Editorial samples',
     feedSub: 'From active feeds',
     feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',
     serendipity: 'Discovery',
@@ -86,9 +88,16 @@ const COPY = {
   },
 }
 
-export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
+export function StartScreen({
+  articles,
+  isFallback = false,
+}: {
+  articles: FeaturedArticle[]
+  isFallback?: boolean
+}) {
   const [lang, setLang] = useState<'fr' | 'en'>('fr')
   const t = COPY[lang]
+  const feedHeading = isFallback ? t.feedTitleFallback : t.feedTitle
 
   const today = new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
     weekday: 'long',
@@ -196,7 +205,7 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             />
             <div className="relative border-t border-border pt-4 mb-3">
               <h2 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em]">
-                {t.feedTitle}
+                {feedHeading}
               </h2>
             </div>
             <div className="relative">

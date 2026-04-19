@@ -1,11 +1,13 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { DEMO_ACCOUNTS, HOME_FEATURED_SLUGS } from '@/lib/demo-accounts'
 import { StartScreen } from './StartScreen'
 
-// Fallback editorial : articles perennes pour que la homepage ne soit jamais
-// vide meme si les comptes demo ne sont pas seed ou si serviceKey est absent.
-// Choisi pour illustrer la diversite thematique (politique / culture / science).
+// Fallback editorial : articles perennes, n'apparaissent QUE si aucun article
+// score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
+// affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
+// cohabiter avec des articles scores et trahir la demo vide.
 const FALLBACK_ARTICLES: FeaturedArticle[] = [
   {
     title: 'The Atlantic - recent features in international affairs',
@@ -108,14 +110,11 @@ export default async function RootPage() {
   if (serviceKey) {
     const serviceClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
 
-    // IDs stables des comptes démo (créés par create-test-accounts.mjs)
-    const DEMO_USER_IDS = [
-      '795c2637-7e43-4b74-82b1-560899cf62d7', // test-pm (Politique & Monde)
-      '17e9ac27-5bc3-403c-94e4-cb2d6db1e38c', // test-consultant (Cuisine)
-      'a615fba9-490a-4dd9-a161-45f8c9b54943', // test-dev (Tech)
-    ]
+    const demoUserIds = HOME_FEATURED_SLUGS.map(
+      (slug) => DEMO_ACCOUNTS.find((a) => a.slug === slug)!.id
+    )
 
-    if (DEMO_USER_IDS.length > 0) {
+    if (demoUserIds.length > 0) {
       // Rotation quotidienne : offset different par jour et par persona,
       // 2 articles par persona pour composer une edition denser (6 articles cible)
       const now = new Date()
@@ -123,7 +122,7 @@ export default async function RootPage() {
       const dayOfYear = Math.floor((now.getTime() - startOfYear) / 86_400_000)
 
       const picks = await Promise.all(
-        DEMO_USER_IDS.map((uid, i) => {
+        demoUserIds.map((uid, i) => {
           const offset = (dayOfYear + i * 7) % 10
           return serviceClient
             .from('articles')
@@ -143,12 +142,12 @@ export default async function RootPage() {
     }
   }
 
-  // Plancher prod : si on a moins que la cible d'articles reels, on complete
-  // avec le fallback editorial. Garantit que la homepage n'est jamais vide.
-  if (featuredArticles.length < EDITION_TARGET) {
-    const needed = EDITION_TARGET - featuredArticles.length
-    featuredArticles = [...featuredArticles, ...FALLBACK_ARTICLES.slice(0, needed)]
-  }
+  // On ne mixe plus fallback + scored : un article sans score a cote d'articles
+  // 80% trahit la demo vide (feedback panel 21 personae, sprint 35).
+  // Si on n'a aucun article score, on bascule sur le fallback editorial label
+  // "Exemples editoriaux" via le flag isFallback.
+  const isFallback = featuredArticles.length === 0
+  const articles = isFallback ? FALLBACK_ARTICLES.slice(0, EDITION_TARGET) : featuredArticles
 
-  return <StartScreen articles={featuredArticles} />
+  return <StartScreen articles={articles} isFallback={isFallback} />
 }
