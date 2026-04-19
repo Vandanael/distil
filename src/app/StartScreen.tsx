@@ -66,15 +66,15 @@ const COPY = {
     howTitle: 'Comment Distil trie',
     howSteps: [
       {
-        kicker: 'Filtre',
+        kicker: 'Filtrer',
         body: "On lit 300 à 500 articles de votre veille chaque matin et on en garde 6 à 10. Les plus denses, les mieux sourcés.",
       },
       {
-        kicker: 'Ouvre',
+        kicker: 'Surprendre',
         body: "1 à 2 sélections par édition viennent d'un domaine que vous ne lisez jamais. La diversité n'est pas un effet de bord, c'est une règle.",
       },
       {
-        kicker: 'Explique',
+        kicker: 'Expliquer',
         body: "Chaque sélection affiche son score et la raison du choix. Vous gardez la main, l'algo rend des comptes.",
       },
     ],
@@ -102,7 +102,7 @@ const COPY = {
         body: 'We read 300 to 500 articles from your feeds each morning and keep 6 to 10. The densest, the best sourced.',
       },
       {
-        kicker: 'Open',
+        kicker: 'Surprise',
         body: "One or two picks per edition come from a domain you never read. Diversity is not a side-effect, it is a rule.",
       },
       {
