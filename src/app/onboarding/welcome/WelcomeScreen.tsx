@@ -77,7 +77,8 @@ export function WelcomeScreen() {
             {dots}
           </p>
           <p className="font-body text-sm text-muted-foreground">
-            Distil recherche vos premiers articles. Vous serez redirige automatiquement.
+            La premiere veille demande environ 30 secondes. Vous serez redirige
+            automatiquement.
           </p>
         </div>
 

@@ -7,11 +7,13 @@ type Lang = 'fr' | 'en'
 
 const COPY = {
   fr: {
+    home: 'Accueil',
     about: 'À propos',
     rights: 'Tous droits réservés.',
     navLabel: 'Navigation publique',
   },
   en: {
+    home: 'Home',
     about: 'About',
     rights: 'All rights reserved.',
     navLabel: 'Public navigation',
@@ -30,6 +32,11 @@ export function PublicFooter({ lang }: { lang?: Lang } = {}) {
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
           <nav aria-label={t.navLabel}>
             <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 font-ui text-[15px] text-subtle">
+              <li>
+                <Link href="/" className="hover:text-accent transition-colors">
+                  {t.home}
+                </Link>
+              </li>
               <li>
                 <Link href="/about" className="hover:text-accent transition-colors">
                   {t.about}

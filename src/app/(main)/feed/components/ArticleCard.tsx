@@ -278,7 +278,7 @@ export function ArticleCard({
         />
 
         {/* Ligne meta : source · date · duree */}
-        <div className="relative flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">
+        <div className="pointer-events-none relative flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">
           {origin === 'bookmarklet' && (
             <span
               className="text-accent shrink-0"
@@ -330,7 +330,7 @@ export function ArticleCard({
         </div>
 
         {/* Ligne 3-4 : titre + thumbnail */}
-        <div className="relative flex items-start gap-5">
+        <div className="pointer-events-none relative flex items-start gap-5">
           <div className="flex-1 min-w-0">
             <h2
               className={`font-ui text-[24px] md:text-[26px] font-bold leading-[1.2] group-hover:text-accent transition-colors duration-150${isPaywall ? ' line-through decoration-muted-foreground/40' : ''}${isRead ? ' text-muted-foreground' : ' text-foreground'}`}
@@ -362,7 +362,7 @@ export function ArticleCard({
 
         {/* Bloc relevance : score toujours visible, justif + sous-scores derriere toggle "Pourquoi ?" */}
         {tag && (
-          <div className="relative mt-4 pt-3 border-t border-border/60 space-y-2">
+          <div className="pointer-events-none relative mt-4 pt-3 border-t border-border/60 space-y-2">
             <div className="flex items-baseline gap-3">
               {score !== null && (
                 <span
@@ -393,7 +393,7 @@ export function ArticleCard({
                   aria-expanded={showDetails}
                   aria-controls={`relevance-details-${id}`}
                   data-testid={`toggle-details-${id}`}
-                  className="relative z-10 font-ui text-sm text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1"
+                  className="pointer-events-auto relative z-10 font-ui text-sm text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1"
                 >
                   {t.article.tagDetails}
                   <svg

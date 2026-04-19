@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { MainHeader } from '@/components/MainHeader'
 import { BottomNav } from '@/components/BottomNav'
+import { PublicFooter } from '@/components/PublicFooter'
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   // Bypass auth en dev local uniquement
@@ -46,6 +47,8 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <main id="main-content" className="flex-1 pb-14 md:pb-0">
         {children}
       </main>
+
+      <PublicFooter />
 
       {/* Navigation mobile bas d'ecran */}
       <BottomNav />
