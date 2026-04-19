@@ -35,15 +35,9 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="group inline-flex items-center gap-3 font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
+          className="inline-flex items-center font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
         >
           Retour a l&apos;accueil
-          <span
-            className="font-mono transition-transform group-hover:translate-x-1"
-            aria-hidden="true"
-          >
-            →
-          </span>
         </Link>
       </div>
     </main>

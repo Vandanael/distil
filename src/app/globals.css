@@ -30,6 +30,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-match-strong: var(--match-strong);
+  --color-subtle: var(--subtle);
   /* Radius 0 - coins francs, identite editoriale */
   --radius-sm: 0rem;
   --radius-md: 0rem;
@@ -60,6 +61,7 @@
   /* Muted */
   --muted: #f0ede6;
   --muted-foreground: #587060; /* vert-gris : harmonieux avec le primaire */
+  --subtle: #3f5649; /* vert-gris contraste AA sur creme, pour typos <= 13px */
 
   /* Accent = orange Distil (marque, hover, emphase editoriale) */
   /* #b84518 : 5.14:1 sur #fbf9f4 - passe WCAG AA pour tout texte */
@@ -88,6 +90,7 @@
   --secondary-foreground: #fbf9f4;
   --muted: #1a2e20; /* vert tres fonce (correction : etait bleu #1a3a6b) */
   --muted-foreground: #8aab94; /* vert-gris clair lisible */
+  --subtle: #b7ccbe; /* vert-gris clair, contraste AA sur fond sombre */
   --accent: #e8693d;
   --accent-foreground: #fbf9f4;
   --destructive: #ef4444;

@@ -22,16 +22,20 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 
 ## Stack technique
 
-| Couche          | Choix                                                        |
-| --------------- | ------------------------------------------------------------ |
-| Framework       | Next.js 16 App Router, TypeScript strict                     |
-| Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut) |
-| Base de donnees | Supabase : Postgres + pgvector + Auth                        |
-| IA / agents     | Gemini Flash (scoring + ranking + profil)                    |
-| Embeddings      | Voyage voyage-3                                              |
-| Tests           | Vitest (unit), Playwright (E2E)                              |
-| Observabilite   | Netlify function logs + Supabase logs                        |
-| Deploy          | Netlify                                                      |
+| Couche          | Choix                                                          |
+| --------------- | -------------------------------------------------------------- |
+| Framework       | Next.js 16 App Router, React 19, TypeScript strict             |
+| Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut)   |
+| Base de donnees | Supabase : Postgres + pgvector + Auth (Google OAuth only)      |
+| IA              | Gemini 2.5 Flash (scoring, ranking v2, profile-generator)      |
+| Embeddings      | Voyage voyage-3                                                |
+| Email           | Resend + Netlify scheduled function                            |
+| Rate limiting   | Upstash Redis                                                  |
+| Tests           | Vitest (unit), Playwright (E2E)                                |
+| Observabilite   | Netlify function logs + table Supabase `error_log`             |
+| Deploy          | Netlify                                                        |
+
+Pas de Sentry (overengineering solo) ; pas de fallback Anthropic (Gemini only). Voir ADR-010 pour la philosophie ranking.
 
 ---
 
@@ -43,7 +47,8 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 - Imports : chemins absolus via `@/` (alias src/). Pas d'imports relatifs remontants (`../../`).
 - Textes UI et docs : jamais de tiret cadratin. Utiliser le tiret demi-cadratin (`-`) ou reformuler.
 - Commentaires : en francais, concis, uniquement si la logique n'est pas auto-explicite.
-- Pas de `console.log` en production. Netlify function logs pour les erreurs server-side.
+- Typographie : plancher 14px partout, 15-16px pour le corps de texte (regle dure).
+- Pas de `console.log` en production. Pour les erreurs server-side : helper `logError()` ecrit dans table `error_log`.
 - Server Components par defaut. `'use client'` uniquement si interactivite reelle necessaire.
 
 ---
@@ -54,13 +59,13 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 docs/
   lessons/     <- Retours d'experience, bugs deja-vus, pieges evites  -> INDEX.md
   decisions/   <- ADR (Architecture Decision Records)                  -> INDEX.md
-  sprints/     <- Notes de sprint, retrospectives                       -> INDEX.md
+  sprints/     <- Plans et wrapups de sprint                           -> INDEX.md
   product/     <- Vision, personas, roadmap, specs fonctionnelles
 ```
 
 - **Avant toute decision d'architecture non triviale** : relire `docs/decisions/` et verifier si un ADR couvre deja le sujet.
 - **Avant de debugger un bug qui sent le deja-vu** : `grep -r "mot-cle" docs/lessons/` avant de chercher ailleurs.
-- **Apres chaque incident ou apprentissage notable** : documenter dans `docs/lessons/`.
+- **Apres chaque incident ou apprentissage notable** : documenter dans `docs/lessons/` via le skill `lesson-capture`.
 
 ---
 
@@ -76,8 +81,8 @@ docs/
 
 ## Regles de travail avec Claude Code
 
-- MVP strict : pas de feature speculaire. Si une fonctionnalite n'a pas de persona qui en a besoin aujourd'hui, elle n'entre pas dans le sprint.
+- MVP strict : pas de feature speculative. Si une fonctionnalite n'a pas de persona qui en a besoin aujourd'hui, elle n'entre pas dans le sprint.
 - Chaque PR porte un seul intent. Pas de refactoring opportuniste dans une PR de feature.
-- Les tests E2E Playwright couvrent les happy paths des personae, pas des cas inventés.
-- Supabase RLS active des le debut. Pas de bypass en developpement.
-- Les variables d'environnement sensibles restent dans `.env.local`, jamais committées.
+- Les tests E2E Playwright couvrent les happy paths des personae. Ne pas ecrire de nouveaux E2E pendant les phases de polish UX (on les reecrit une fois stabilise).
+- Supabase RLS active par defaut. `DEV_BYPASS_AUTH=true` autorise uniquement en local (`NODE_ENV=development`).
+- Les variables d'environnement sensibles restent dans `.env.local`, jamais committees. Template dans `.env.example`.

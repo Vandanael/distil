@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Masthead } from '@/components/Masthead'
 import { scoreColorClass } from '@/lib/utils'
 
 const PERSONAS: Record<string, { label: string; description: string; email: string }> = {
@@ -61,7 +62,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
   const cardContent = (
     <>
       {/* Meta : source · durée */}
-      <div className="flex items-center gap-1.5 mb-1.5 text-[13px] text-muted-foreground">
+      <div className="flex items-center gap-1.5 mb-1.5 text-[14px] text-subtle">
         {article.site_name && <span className="font-ui">{article.site_name}</span>}
         {article.reading_time_minutes && (
           <>
@@ -80,7 +81,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
       {/* Titre + extrait */}
       <div>
         <h2
-          className={`font-ui text-xl font-bold leading-snug group-hover:text-accent transition-colors duration-150 ${
+          className={`font-ui text-[20px] font-bold leading-[1.25] group-hover:text-accent transition-colors duration-150 ${
             isRejected
               ? 'line-through decoration-muted-foreground/40 text-muted-foreground'
               : 'text-foreground'
@@ -89,7 +90,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
           {article.title ?? 'Sans titre'}
         </h2>
         {article.excerpt && !isRejected && (
-          <p className="font-body text-[15px] text-muted-foreground line-clamp-2 leading-relaxed mt-1">
+          <p className="font-body text-[15px] text-subtle line-clamp-2 leading-[1.55] mt-1.5">
             {article.excerpt}
           </p>
         )}
@@ -99,10 +100,10 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
       {article.score !== null && (
         <div className="flex items-center gap-3 mt-2">
           {article.is_serendipity && (
-            <span className="font-ui text-[13px] text-accent">Découverte</span>
+            <span className="font-ui text-[15px] text-accent">Découverte</span>
           )}
           <span
-            className="font-ui text-[13px] text-muted-foreground"
+            className="font-ui text-[15px] text-subtle"
             title={article.justification ?? undefined}
           >
             Pertinence{' '}
@@ -192,28 +193,31 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="min-h-full bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-6 md:py-10 w-full">
-        {/* En-tete - identique au vrai feed */}
-        <div className="border-t-2 border-foreground mb-8 pt-3 space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
-            <span className="font-ui text-xs text-accent">Démo lecture seule</span>
-          </div>
-          <div className="flex items-baseline justify-between gap-4">
-            <p className="font-ui text-[13px] text-foreground">
-              Exemple de veille
-              <span className="text-muted-foreground"> - {persona.label}</span>
-            </p>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <Link
-                href="/"
-                className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors shrink-0"
-              >
-                ← Accueil
-              </Link>
-            </div>
-          </div>
+      <div className="max-w-2xl mx-auto px-4 py-5 md:py-10 w-full">
+        <div className="mb-8">
+          <Masthead
+            brandHref="/"
+            date={today}
+            dateSuffix="· Démo lecture seule"
+            rightSlot={
+              <>
+                <Link
+                  href="/"
+                  className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors"
+                >
+                  Accueil
+                </Link>
+                <span className="text-border text-[14px] leading-none" aria-hidden="true">
+                  |
+                </span>
+                <ThemeToggle />
+              </>
+            }
+          />
+          <p className="mt-4 font-ui text-[15px] text-foreground">
+            Exemple de veille
+            <span className="text-subtle"> - {persona.label}</span>
+          </p>
         </div>
 
         {/* Autres thèmes */}
@@ -222,7 +226,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
             <Link
               key={s}
               href={`/demo/${s}`}
-              className="font-ui text-xs text-muted-foreground border border-border px-3 py-1.5 hover:border-accent hover:text-foreground transition-colors"
+              className="font-ui text-[15px] text-subtle border border-border px-3 py-1.5 hover:border-accent hover:text-foreground transition-colors"
             >
               {PERSONAS[s].label}
             </Link>
@@ -244,7 +248,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
 
         {/* CTA */}
         <div className="border-t border-border mt-10 pt-8 space-y-4">
-          <p className="font-ui text-[13px] text-foreground">
+          <p className="font-ui text-[15px] text-foreground">
             Votre veille ressemblerait à ça - configurée sur vos sujets à vous.
           </p>
           <Link

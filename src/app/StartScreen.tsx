@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PublicFooter } from '@/components/PublicFooter'
-import { FlowPreview } from './FlowPreview'
+import { Masthead } from '@/components/Masthead'
+import { ArticleRow } from '@/components/ArticleRow'
 
 type FeaturedArticle = {
   title: string | null
@@ -13,6 +14,7 @@ type FeaturedArticle = {
   excerpt: string | null
   score: number | null
   is_serendipity: boolean
+  justification: string | null
 }
 
 const PERSONA_EXAMPLES = [
@@ -37,22 +39,6 @@ const PERSONA_EXAMPLES = [
     label: { fr: 'Tech & Numérique', en: 'Tech & Digital' },
     description: { fr: 'Actualité tech, outils, open source', en: 'Tech news, tools, open source' },
   },
-  {
-    slug: 'chercheur',
-    label: { fr: 'Sport & Bien-être', en: 'Sport & Wellness' },
-    description: {
-      fr: 'Running, mental, nutrition, performance',
-      en: 'Running, mindset, nutrition, performance',
-    },
-  },
-  {
-    slug: 'ml',
-    label: { fr: 'Culture & Société', en: 'Culture & Society' },
-    description: {
-      fr: 'Cinéma, musique, littérature, idées',
-      en: 'Cinema, music, literature, ideas',
-    },
-  },
 ]
 
 const COPY = {
@@ -61,26 +47,16 @@ const COPY = {
     taglineTail: 'sans le bruit.',
     body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
-    cta: "Commencer - c'est gratuit",
+    cta: 'Commencer',
     loginNav: 'Connexion',
-    howTitle: 'Comment ca marche',
-    howSteps: [
-      { n: '01', t: 'On capte', d: 'Vos sources, vos centres d\u2019interet, votre rythme.' },
-      {
-        n: '02',
-        t: 'On filtre',
-        d: 'Chaque matin, l\u2019IA elimine le bruit en comparant chaque article a votre profil.',
-      },
-      {
-        n: '03',
-        t: 'On sert',
-        d: 'Une page propre, lisible, sans notification ni scroll infini.',
-      },
-    ],
-    examplesTitle: 'Exemples de veille',
+    howTitle: 'Lire mieux avec une IA de lecture',
+    howLead:
+      "Les fils d'actu classent par popularité et vous enferment dans votre bulle. Les modèles de langage récents, eux, comprennent le sens d'un article : ce qui est dense, ce qui sort du lot, ce qui éclaire un angle mort.",
+    howBody:
+      "Distil lit votre web chaque matin avec ce regard. Il garde ce qui vaut vraiment votre temps et glisse régulièrement une découverte hors de votre zone de confort. Vous restez seul juge - chaque score est expliqué, rien n'est verrouillé.",
+    examplesTitle: 'Voir un exemple',
     examplesSubtitle: "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
-    feedEyebrow: 'Chapitre III · Aperçu',
-    feedTitle: 'Dans le flux ce matin',
+    feedTitle: 'La veille du jour',
     feedSub: 'Extrait de veilles actives',
     feedEmpty: 'Distil analyse le web en ce moment. Revenez dans quelques minutes.',
     serendipity: 'Découverte',
@@ -92,74 +68,22 @@ const COPY = {
     taglineTail: 'without the noise.',
     body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
-    cta: "Get started - it's free",
+    cta: 'Get started',
     loginNav: 'Sign in',
-    howTitle: 'How it works',
-    howSteps: [
-      { n: '01', t: 'We capture', d: 'Your sources, your interests, your rhythm.' },
-      {
-        n: '02',
-        t: 'We filter',
-        d: 'Each morning, the AI removes the noise by comparing every article to your profile.',
-      },
-      {
-        n: '03',
-        t: 'We serve',
-        d: 'A clean, readable page. No notifications, no infinite scroll.',
-      },
-    ],
-    examplesTitle: 'Feed examples',
+    howTitle: 'Read better with a reading AI',
+    howLead:
+      "Classic feeds rank by popularity and keep you inside your bubble. Modern language models read for meaning - what's dense, what's off-beat, what opens a blind spot.",
+    howBody:
+      "Distil scans your web each morning with that lens. It keeps what truly deserves your time and regularly slips in a discovery outside your comfort zone. You remain the judge - every score is explained, nothing is locked.",
+    examplesTitle: 'See an example',
     examplesSubtitle: "Pick a topic to preview today's selection.",
-    feedEyebrow: 'Chapter III · Preview',
-    feedTitle: 'In the feed this morning',
+    feedTitle: "Today's briefing",
     feedSub: 'From active feeds',
     feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',
     serendipity: 'Discovery',
     relevance: 'Relevance',
     noTitle: 'No title',
   },
-}
-
-function ArticlePreview({ article, lang }: { article: FeaturedArticle; lang: 'fr' | 'en' }) {
-  const t = COPY[lang]
-  const inner = (
-    <div className="space-y-2">
-      {article.site_name && (
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          {article.site_name}
-        </p>
-      )}
-      <h3 className="font-display text-[22px] leading-[1.15] text-foreground group-hover:text-accent transition-colors">
-        {article.title ?? t.noTitle}
-      </h3>
-      {article.excerpt && (
-        <p className="font-body text-[15px] text-muted-foreground line-clamp-2 leading-[1.55]">
-          {article.excerpt}
-        </p>
-      )}
-      {article.score !== null && (
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground pt-1">
-          {article.is_serendipity && <span className="text-accent mr-2">{t.serendipity}</span>}
-          {t.relevance}{' '}
-          <span className={`tabular-nums font-semibold ${scoreColorClass(article.score)}`}>
-            {Math.round(article.score)}
-          </span>
-        </p>
-      )}
-    </div>
-  )
-
-  return (
-    <li className="py-6 border-b border-border last:border-0">
-      {article.url ? (
-        <a href={article.url} target="_blank" rel="noopener noreferrer" className="group block">
-          {inner}
-        </a>
-      ) : (
-        <div>{inner}</div>
-      )}
-    </li>
-  )
 }
 
 export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
@@ -172,69 +96,64 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
     month: 'long',
     year: 'numeric',
   })
-  const issueNumber = Math.max(
-    1,
-    Math.floor(
-      (Date.now() - new Date('2026-01-01T00:00:00Z').getTime()) / (1000 * 60 * 60 * 24),
-    ),
-  )
-    .toString()
-    .padStart(3, '0')
 
   return (
-    <main className="min-h-full flex flex-col px-4 py-6 md:py-16 bg-background">
+    <main className="min-h-full flex flex-col px-5 md:px-8 py-5 md:py-10 bg-background">
       <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-1">
-        {/* Bandeau éditorial */}
-        <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
-          <span className="font-ui text-xs text-muted-foreground capitalize">{today}</span>
-          <div className="flex items-center gap-1">
-            <Link
-              href="/login"
-              className="font-ui text-xs px-2 py-0.5 text-muted-foreground hover:text-accent transition-colors"
-            >
-              {t.loginNav}
-            </Link>
-            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
-              |
-            </span>
-            <button
-              onClick={() => setLang('fr')}
-              aria-pressed={lang === 'fr'}
-              aria-label="Français"
-              className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'fr' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
-            >
-              FR
-            </button>
-            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
-              |
-            </span>
-            <button
-              onClick={() => setLang('en')}
-              aria-pressed={lang === 'en'}
-              aria-label="English"
-              className={`font-ui text-xs px-2 py-0.5 transition-colors ${lang === 'en' ? 'text-foreground font-semibold' : 'text-muted-foreground/50 hover:text-muted-foreground'}`}
-            >
-              EN
-            </button>
-            <span className="text-muted-foreground/30 text-xs" aria-hidden="true">
-              |
-            </span>
-            <ThemeToggle />
-          </div>
-        </header>
-
-        {/* Hero : 1 col mobile, 2 cols lg+ (copy a gauche, flux live a droite) */}
-        <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-16 xl:gap-24 lg:items-start mb-14 md:mb-20">
-          {/* Aplat top-right full-bleed (desktop) : porte le flux live */}
-          <div
-            aria-hidden
-            className="hidden lg:block pointer-events-none absolute -inset-y-6 left-[55%] right-[calc(50%-50vw)] bg-accent/[0.07]"
+        {/* Masthead editorial */}
+        <div
+          data-rise
+          style={{ ['--rise-delay' as string]: '0' }}
+          className="mb-12 md:mb-20"
+        >
+          <Masthead
+            date={today}
+            rightSlot={
+              <>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors"
+                >
+                  {t.loginNav}
+                </Link>
+                <span className="text-border text-[15px] leading-none" aria-hidden="true">
+                  |
+                </span>
+                <button
+                  onClick={() => setLang('fr')}
+                  aria-pressed={lang === 'fr'}
+                  aria-label="Français"
+                  className={`inline-flex items-center h-full font-ui text-[15px] px-2 transition-colors ${lang === 'fr' ? 'text-foreground' : 'text-subtle hover:text-foreground'}`}
+                >
+                  FR
+                </button>
+                <span className="text-border text-[15px] leading-none" aria-hidden="true">
+                  ·
+                </span>
+                <button
+                  onClick={() => setLang('en')}
+                  aria-pressed={lang === 'en'}
+                  aria-label="English"
+                  className={`inline-flex items-center h-full font-ui text-[15px] px-2 transition-colors ${lang === 'en' ? 'text-foreground' : 'text-subtle hover:text-foreground'}`}
+                >
+                  EN
+                </button>
+                <span className="text-border text-[15px] leading-none" aria-hidden="true">
+                  |
+                </span>
+                <ThemeToggle />
+              </>
+            }
           />
-          <div className="relative space-y-8 md:space-y-10">
+        </div>
+
+        {/* Hero : tagline compacte, CTA, puis edition du jour (asymetrie desktop) */}
+        <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16 xl:gap-24 lg:items-start mb-16 md:mb-24">
+          <div className="relative space-y-7 md:space-y-8 mb-12 lg:mb-0">
             <h1
               data-rise
               style={{ ['--rise-delay' as string]: '1' }}
-              className="font-display text-foreground text-[3.5rem] sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] leading-[0.92] tracking-[-0.02em] text-balance"
+              className="font-display text-foreground text-[3rem] sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] leading-[0.95] tracking-[-0.02em] text-balance"
             >
               {t.taglineLead}{' '}
               <em className="not-italic">
@@ -244,218 +163,114 @@ export function StartScreen({ articles }: { articles: FeaturedArticle[] }) {
             <p
               data-rise
               style={{ ['--rise-delay' as string]: '2' }}
-              className="font-body text-lg md:text-xl text-muted-foreground leading-[1.55] max-w-[44ch] text-pretty"
+              className="font-body text-lg md:text-xl text-subtle leading-[1.55] max-w-[44ch] text-pretty"
             >
               {t.body}
             </p>
+            <div data-rise style={{ ['--rise-delay' as string]: '3' }} className="pt-1">
+              <Link
+                href="/login"
+                className="inline-flex items-center font-ui text-[15px] md:text-[16px] uppercase tracking-[0.08em] bg-foreground text-background px-6 py-3.5 md:px-7 md:py-4 hover:bg-accent focus-visible:bg-accent transition-colors"
+              >
+                {t.cta}
+              </Link>
+            </div>
             <p
               data-rise
-              style={{ ['--rise-delay' as string]: '3' }}
-              className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+              style={{ ['--rise-delay' as string]: '4' }}
+              className="font-ui text-[15px] text-subtle"
             >
               {t.format}
             </p>
-            {articles[0] && (
-              <div
-                data-rise
-                style={{ ['--rise-delay' as string]: '4' }}
-                className="lg:hidden border-t border-border pt-4"
-              >
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent mb-2 flex items-center gap-2">
-                  <BrandGlyph size={12} />
-                  {t.proofEyebrow}
-                </p>
-                {articles[0].url ? (
-                  <a
-                    href={articles[0].url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block"
-                  >
-                    {articles[0].site_name && (
-                      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1">
-                        {articles[0].site_name}
-                      </p>
-                    )}
-                    <h3 className="font-display text-[22px] leading-[1.2] text-foreground group-hover:text-accent transition-colors">
-                      {articles[0].title ?? t.noTitle}
-                    </h3>
-                    {articles[0].score !== null && (
-                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground pt-1">
-                        {articles[0].is_serendipity && (
-                          <span className="text-accent mr-2">{t.serendipity}</span>
-                        )}
-                        {t.relevance}{' '}
-                        <span
-                          className={`tabular-nums font-semibold ${scoreColorClass(articles[0].score)}`}
-                        >
-                          {Math.round(articles[0].score)}
-                        </span>
-                      </p>
-                    )}
-                  </a>
-                ) : (
-                  <h3 className="font-display text-[22px] leading-[1.2] text-foreground">
-                    {articles[0].title ?? t.noTitle}
-                  </h3>
-                )}
-              </div>
-            )}
-            <div data-rise style={{ ['--rise-delay' as string]: '5' }} className="pt-2">
-              <Link
-                href="/login"
-                className="group inline-flex items-center gap-3 font-ui text-[15px] md:text-[16px] uppercase tracking-[0.08em] bg-foreground text-background px-6 py-3.5 md:px-7 md:py-4 hover:bg-accent focus-visible:bg-accent transition-colors"
-              >
-                {t.cta}
-                <span
-                  className="font-mono text-base transition-transform group-hover:translate-x-1"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-              </Link>
-            </div>
           </div>
+
+          {/* Edition du jour : aplat subtil + decalage vertical desktop pour asymetrie */}
           <aside
             data-rise
-            style={{ ['--rise-delay' as string]: '6' }}
-            className="relative hidden lg:block mt-0"
+            style={{ ['--rise-delay' as string]: '5' }}
+            className="relative lg:translate-y-16 xl:translate-y-24"
           >
-            <FlowPreview articles={articles} lang={lang} />
+            <div
+              aria-hidden
+              className="hidden lg:block pointer-events-none absolute -inset-x-6 -inset-y-8 bg-accent/[0.06]"
+            />
+            <div className="relative border-t border-border pt-4 mb-3">
+              <h2 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em]">
+                {t.feedTitle}
+              </h2>
+            </div>
+            <div className="relative">
+              {articles.length > 0 ? (
+                <ul>
+                  {articles.map((article, i) => (
+                    <ArticleRow
+                      key={article.url ?? String(i)}
+                      article={article}
+                      lang={lang}
+                      noTitleLabel={t.noTitle}
+                      serendipityLabel={t.serendipity}
+                      relevanceLabel={t.relevance}
+                      compact
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="font-body text-[15px] text-subtle italic py-4">{t.feedEmpty}</p>
+              )}
+            </div>
           </aside>
         </div>
 
-        {/* Comment ca marche - 3 etapes */}
-        <section className="mb-14">
-          <div className="border-t border-border pt-6 mb-6">
-            <p className="font-ui text-[13px] text-foreground font-medium">{t.howTitle}</p>
+        {/* Methode : pitch vulgarise */}
+        <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
+          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-6 text-balance max-w-[22ch]">
+            {t.howTitle}
+          </h2>
+          <div className="grid gap-5 md:gap-6 md:grid-cols-2 max-w-[72ch]">
+            <p className="font-body text-[17px] md:text-lg text-foreground leading-[1.55] text-pretty">
+              {t.howLead}
+            </p>
+            <p className="font-body text-[17px] md:text-lg text-subtle leading-[1.55] text-pretty">
+              {t.howBody}
+            </p>
           </div>
-          <ol className="grid gap-6 md:grid-cols-3">
-            {t.howSteps.map((step) => (
-              <li key={step.n} className="space-y-2">
-                <p className="font-ui text-xs tabular-nums text-accent">{step.n}</p>
-                <h3 className="font-ui text-lg font-bold text-foreground leading-snug">{step.t}</h3>
-                <p className="font-body text-[14px] text-muted-foreground leading-relaxed">
-                  {step.d}
-                </p>
-              </li>
-            ))}
-          </ol>
         </section>
 
-        {/* Exemples de veille */}
-        <div className="mb-14">
-          <div className="border-t border-border pt-6 mb-6">
-            <p className="font-ui text-[13px] text-foreground font-medium">{t.examplesTitle}</p>
-            <p className="font-body text-[13px] text-muted-foreground mt-0.5">
+        {/* Voir un exemple : liens compacts */}
+        <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
+          <div className="mb-6 md:mb-8">
+            <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-3 text-balance">
+              {t.examplesTitle}
+            </h2>
+            <p className="font-body text-[16px] md:text-[17px] text-subtle leading-[1.55] max-w-[48ch] text-pretty">
               {t.examplesSubtitle}
             </p>
-            <h2 className="font-display text-5xl md:text-7xl text-foreground leading-[0.95] tracking-[-0.01em] text-balance">
-              {t.howTitle}
-            </h2>
           </div>
-          <ol className="grid gap-12 md:gap-0 md:grid-cols-3">
-            {t.howSteps.map((step, i) => (
-              <li
-                key={step.n}
-                className={`relative space-y-4 md:px-8 first:md:pl-0 last:md:pr-0 ${i > 0 ? 'md:border-l md:border-border' : ''}`}
-              >
-                <p className="font-mono text-[13px] tabular-nums text-accent tracking-[0.15em]">
-                  {step.n}
-                </p>
-                <h3 className="font-display text-3xl md:text-4xl text-foreground leading-[1.05] tracking-[-0.01em]">
-                  {step.t}
-                </h3>
-                <p className="font-body text-[16px] md:text-[17px] text-muted-foreground leading-[1.55] max-w-[32ch] text-pretty">
-                  {step.d}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* Chapitre II : Demonstration (aplat bas-gauche full-bleed, inversion) */}
-        <section className="relative mb-20 md:mb-28">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 left-[calc(50%-50vw)] bg-foreground"
-          />
-          <div className="relative py-12 md:py-20 pr-0 md:pr-4">
-            <div className="relative border-t border-background/20 pt-8 md:pt-10 mb-10 md:mb-14">
-              <span
-                aria-hidden
-                className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-foreground px-2 text-accent inline-flex"
-              >
-                <BrandGlyph size={14} />
-              </span>
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-background/60 mb-5">
-                {t.examplesEyebrow}
-              </p>
-              <h2 className="font-display text-5xl md:text-7xl text-background leading-[0.95] tracking-[-0.01em] mb-6 text-balance">
-                {t.examplesTitle}
-              </h2>
-              <p className="font-body text-[17px] md:text-lg text-background/70 leading-[1.55] max-w-[48ch] text-pretty">
-                {t.examplesSubtitle}
-              </p>
-            </div>
-            <ul className="divide-y divide-background/15 border-t border-b border-background/15">
-              {PERSONA_EXAMPLES.map((p, i) => (
+          <div className="relative">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-x-4 -inset-y-4 md:-inset-x-6 md:-inset-y-6 bg-accent/[0.06]"
+            />
+            <ul className="relative divide-y divide-border border-t border-b border-border bg-background">
+              {PERSONA_EXAMPLES.map((p) => (
                 <li key={p.slug}>
                   <Link
                     href={`/demo/${p.slug}`}
-                    className="group flex items-baseline gap-6 md:gap-10 py-5 md:py-6 hover:bg-background/[0.04] transition-colors"
+                    className="group flex items-baseline gap-6 md:gap-10 py-4 md:py-5 px-4 md:px-6 hover:bg-muted/50 transition-colors"
                   >
-                    <span className="font-mono text-[12px] tabular-nums text-accent tracking-[0.15em] shrink-0 w-10 md:w-14">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
                     <span className="flex-1 flex flex-col md:flex-row md:items-baseline md:gap-8 gap-1 min-w-0">
-                      <span className="font-display text-2xl md:text-3xl text-background leading-tight group-hover:text-accent transition-colors md:w-60 shrink-0">
+                      <span className="font-display text-2xl md:text-3xl text-foreground leading-tight group-hover:text-accent transition-colors md:w-64 shrink-0">
                         {p.label[lang]}
                       </span>
-                      <span className="font-body text-[14px] md:text-[15px] text-background/70 leading-snug flex-1">
+                      <span className="font-body text-[15px] md:text-[16px] text-subtle leading-snug flex-1">
                         {p.description[lang]}
                       </span>
-                    </span>
-                    <span
-                      className="font-mono text-background/60 group-hover:text-accent group-hover:translate-x-1 transition-all shrink-0"
-                      aria-hidden="true"
-                    >
-                      →
                     </span>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-        </section>
-
-        {/* Chapitre III : Apercu (mobile seulement ; desktop l'a deja dans le hero) */}
-        <section className="lg:hidden mb-8">
-          <div className="relative border-t border-border pt-8 mb-8">
-            <span
-              aria-hidden
-              className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
-            >
-              <BrandGlyph size={14} />
-            </span>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
-              {t.feedEyebrow}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] text-balance">
-              {t.feedTitle}
-            </h2>
-          </div>
-          {articles.length > 0 ? (
-            <ul>
-              {articles.map((article, i) => (
-                <ArticlePreview key={article.url ?? String(i)} article={article} lang={lang} />
-              ))}
-            </ul>
-          ) : (
-            <p className="font-body text-[15px] text-muted-foreground italic py-4">
-              {t.feedEmpty}
-            </p>
-          )}
         </section>
       </div>
       <PublicFooter lang={lang} />
