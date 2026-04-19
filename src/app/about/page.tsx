@@ -7,6 +7,8 @@ export const metadata = {
   title: 'A propos - Distil',
   description:
     'Distil est une veille intelligente et un read-later personnel. Curation IA transparente, diversite editoriale by design.',
+  // Page publique indexable : override le noindex par defaut du layout racine.
+  robots: { index: true, follow: true },
 }
 
 export default function AboutPage() {

@@ -8,6 +8,12 @@ import { StartScreen } from './StartScreen'
 // suffisant pour suivre le cron digest quotidien sans battre la base a chaque visite.
 export const revalidate = 3600
 
+// Allowlist SEO : / et /about sont les 2 seules pages publiques indexables.
+// Tout le reste heritage du layout racine (noindex par defaut, defense en profondeur).
+export const metadata = {
+  robots: { index: true, follow: true },
+}
+
 // Fallback editorial : articles perennes, n'apparaissent QUE si aucun article
 // score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
 // affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
