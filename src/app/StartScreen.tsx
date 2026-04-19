@@ -1,11 +1,25 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PublicFooter } from '@/components/PublicFooter'
 import { Masthead } from '@/components/Masthead'
 import { ArticleRow } from '@/components/ArticleRow'
+
+// Wrappe chaque "Distil" du texte dans un span accent (le wordmark reste toujours orange).
+function withBrand(text: string) {
+  const parts = text.split(/(Distil)/g)
+  return parts.map((part, i) =>
+    part === 'Distil' ? (
+      <span key={i} className="text-accent">
+        Distil
+      </span>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    ),
+  )
+}
 
 type FeaturedArticle = {
   title: string | null
@@ -45,15 +59,25 @@ const COPY = {
   fr: {
     taglineLead: 'Votre veille quotidienne,',
     taglineTail: 'sans le bruit.',
-    body: "Chaque matin, Distil lit le web à votre place et ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
+    body: "Chaque matin, on lit le web à votre place et on ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
     cta: 'Commencer',
     loginNav: 'Connexion',
-    howTitle: 'Lire mieux avec une IA de lecture',
-    howLead:
-      "Les fils d'actu classent par popularité et vous enferment dans votre bulle. Les modèles de langage récents, eux, comprennent le sens d'un article : ce qui est dense, ce qui sort du lot, ce qui éclaire un angle mort.",
-    howBody:
-      "Distil lit votre web chaque matin avec ce regard. Il garde ce qui vaut vraiment votre temps et glisse régulièrement une découverte hors de votre zone de confort. Vous restez seul juge - chaque score est expliqué, rien n'est verrouillé.",
+    howTitle: 'Comment Distil trie',
+    howSteps: [
+      {
+        kicker: 'Filtre',
+        body: "On lit 300 à 500 articles de votre veille chaque matin et on en garde 6 à 10. Les plus denses, les mieux sourcés.",
+      },
+      {
+        kicker: 'Ouvre',
+        body: "1 à 2 sélections par édition viennent d'un domaine que vous ne lisez jamais. La diversité n'est pas un effet de bord, c'est une règle.",
+      },
+      {
+        kicker: 'Explique',
+        body: "Chaque sélection affiche son score et la raison du choix. Vous gardez la main, l'algo rend des comptes.",
+      },
+    ],
     examplesTitle: 'Voir un exemple',
     examplesSubtitle: "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
     feedTitle: 'La veille du jour',
@@ -67,15 +91,25 @@ const COPY = {
   en: {
     taglineLead: 'Your daily briefing,',
     taglineTail: 'without the noise.',
-    body: 'Every morning, Distil reads the web for you and keeps only what truly matters - filtered by your interests, not by a popularity algorithm.',
+    body: 'Every morning, we read the web for you and keep only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
     cta: 'Get started',
     loginNav: 'Sign in',
-    howTitle: 'Read better with a reading AI',
-    howLead:
-      "Classic feeds rank by popularity and keep you inside your bubble. Modern language models read for meaning - what's dense, what's off-beat, what opens a blind spot.",
-    howBody:
-      "Distil scans your web each morning with that lens. It keeps what truly deserves your time and regularly slips in a discovery outside your comfort zone. You remain the judge - every score is explained, nothing is locked.",
+    howTitle: 'How Distil sorts',
+    howSteps: [
+      {
+        kicker: 'Filter',
+        body: 'We read 300 to 500 articles from your feeds each morning and keep 6 to 10. The densest, the best sourced.',
+      },
+      {
+        kicker: 'Open',
+        body: "One or two picks per edition come from a domain you never read. Diversity is not a side-effect, it is a rule.",
+      },
+      {
+        kicker: 'Explain',
+        body: 'Every pick shows its score and the reason. You stay in charge, the algo is accountable.',
+      },
+    ],
     examplesTitle: 'See an example',
     examplesSubtitle: "Pick a topic to preview today's selection.",
     feedTitle: "Today's briefing",
@@ -174,7 +208,7 @@ export function StartScreen({
               style={{ ['--rise-delay' as string]: '2' }}
               className="font-body text-lg md:text-xl text-subtle leading-[1.55] max-w-[44ch] text-pretty"
             >
-              {t.body}
+              {withBrand(t.body)}
             </p>
             <div data-rise style={{ ['--rise-delay' as string]: '3' }} className="pt-1">
               <Link
@@ -224,7 +258,9 @@ export function StartScreen({
                   ))}
                 </ul>
               ) : (
-                <p className="font-body text-[15px] text-subtle italic py-4">{t.feedEmpty}</p>
+                <p className="font-body text-[15px] text-subtle italic py-4">
+                  {withBrand(t.feedEmpty)}
+                </p>
               )}
             </div>
           </aside>
@@ -232,17 +268,21 @@ export function StartScreen({
 
         {/* Methode : pitch vulgarise */}
         <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
-          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-6 text-balance max-w-[22ch]">
-            {t.howTitle}
+          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-8 md:mb-10 text-balance max-w-[22ch]">
+            {withBrand(t.howTitle)}
           </h2>
-          <div className="grid gap-5 md:gap-6 md:grid-cols-2 max-w-[72ch]">
-            <p className="font-body text-[17px] md:text-lg text-foreground leading-[1.55] text-pretty">
-              {t.howLead}
-            </p>
-            <p className="font-body text-[17px] md:text-lg text-subtle leading-[1.55] text-pretty">
-              {t.howBody}
-            </p>
-          </div>
+          <ol className="grid gap-8 md:gap-10 md:grid-cols-3 max-w-[88ch]">
+            {t.howSteps.map((step) => (
+              <li key={step.kicker} className="space-y-4 md:space-y-5 md:border-l md:border-border md:pl-6 first:md:border-l-0 first:md:pl-0">
+                <h3 className="font-display text-3xl md:text-4xl text-accent leading-[0.95] tracking-[-0.01em]">
+                  {step.kicker}
+                </h3>
+                <p className="font-body text-[17px] md:text-lg text-foreground leading-[1.55] text-pretty">
+                  {withBrand(step.body)}
+                </p>
+              </li>
+            ))}
+          </ol>
         </section>
 
         {/* Voir un exemple : liens compacts */}

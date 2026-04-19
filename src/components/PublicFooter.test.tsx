@@ -13,7 +13,11 @@ describe('PublicFooter', () => {
 
   it('affiche l annee courante dynamique dans le copyright', () => {
     render(<PublicFooter />)
-    expect(screen.getByText('© 2027 Distil')).toBeTruthy()
+    expect(
+      screen.getByText(
+        (_, el) => el?.tagName === 'P' && el.textContent?.replace(/\s+/g, ' ').trim() === '© 2027 Distil',
+      ),
+    ).toBeTruthy()
   })
 
   it('affiche les labels FR par defaut', () => {

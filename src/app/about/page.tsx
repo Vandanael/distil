@@ -61,8 +61,8 @@ export default function AboutPage() {
           <em className="italic text-accent">lecture souveraine.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-16 text-pretty">
-          Distil capte, filtre et organise l&apos;information en ligne pour qu&apos;elle reste au
-          service du jugement humain.
+          <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information en
+          ligne pour qu&apos;elle reste au service du jugement humain.
         </p>
 
         {/* Mission */}
@@ -154,7 +154,7 @@ export default function AboutPage() {
               l&apos;ensemble de vos donnees sont supprimes sous 30 jours.
             </p>
             <p className="font-mono text-[11px] uppercase tracking-[0.18em]">
-              © 2026-{year} Distil. Tous droits reserves.
+              © 2026-{year} <span className="text-accent">Distil</span>. Tous droits reserves.
             </p>
           </div>
         </section>
