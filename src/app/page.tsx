@@ -4,6 +4,10 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { DEMO_ACCOUNTS, HOME_FEATURED_SLUGS, type DemoAccountSlug } from '@/lib/demo-accounts'
 import { StartScreen } from './StartScreen'
 
+// Revalidation horaire : le compteur "editions livrees" se rafraichit toutes les heures,
+// suffisant pour suivre le cron digest quotidien sans battre la base a chaque visite.
+export const revalidate = 3600
+
 // Fallback editorial : articles perennes, n'apparaissent QUE si aucun article
 // score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
 // affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
@@ -112,10 +116,20 @@ export default async function RootPage() {
 
   // Non-connecte : 1 article par persona (diversite des themes)
   let featuredArticles: FeaturedArticle[] = []
+  let editionsToday = 0
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (serviceKey) {
     const serviceClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
+
+    // Compteur "editions livrees aujourd'hui" : count distinct user_id dans daily_ranking
+    // pour la date du jour. Inclut comptes demo (ils recoivent une vraie edition chaque matin).
+    const today = new Date().toISOString().slice(0, 10)
+    const { data: rankingsToday } = await serviceClient
+      .from('daily_ranking')
+      .select('user_id')
+      .eq('date', today)
+    editionsToday = new Set((rankingsToday ?? []).map((r) => r.user_id)).size
 
     const demoUserIds = HOME_FEATURED_SLUGS.map(
       (slug) => DEMO_ACCOUNTS.find((a) => a.slug === slug)!.id
@@ -158,5 +172,5 @@ export default async function RootPage() {
   const isFallback = featuredArticles.length === 0
   const articles = isFallback ? FALLBACK_ARTICLES.slice(0, EDITION_TARGET) : featuredArticles
 
-  return <StartScreen articles={articles} isFallback={isFallback} />
+  return <StartScreen articles={articles} isFallback={isFallback} editionsToday={editionsToday} />
 }

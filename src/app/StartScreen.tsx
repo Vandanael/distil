@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { Fragment, useState } from 'react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Fragment } from 'react'
 import { PublicFooter } from '@/components/PublicFooter'
-import { Masthead } from '@/components/Masthead'
+import { PublicHeader } from '@/components/PublicHeader'
 import { ArticleRow } from '@/components/ArticleRow'
 import { DEMO_ACCOUNTS, type DemoAccountSlug } from '@/lib/demo-accounts'
+import { useLocale } from '@/lib/i18n/context'
 
 // Wrappe chaque "Distil" du texte dans un span accent (le wordmark reste toujours orange).
 function withBrand(text: string) {
@@ -66,6 +66,10 @@ const COPY = {
     cta: 'Commencer',
     loginNav: 'Connexion',
     howTitle: 'Comment Distil trie',
+    howDeck: {
+      lead: 'Distil ne classe pas par likes comme Feedly, ni par viralité comme Artifact.',
+      kicker: 'Le sens avant le signal.',
+    },
     howSteps: [
       {
         kicker: 'Filtrer',
@@ -88,6 +92,9 @@ const COPY = {
     serendipity: 'Découverte',
     relevance: 'Pertinence',
     noTitle: 'Sans titre',
+    editionsTodaySingular: 'édition filtrée ce matin',
+    editionsTodayPlural: 'éditions filtrées ce matin',
+    onboardingPromise: '1 minute, 2 questions, gratuit pendant la beta.',
   },
   en: {
     taglineLead: 'Your daily briefing,',
@@ -97,6 +104,10 @@ const COPY = {
     cta: 'Get started',
     loginNav: 'Sign in',
     howTitle: 'How Distil sorts',
+    howDeck: {
+      lead: "Distil doesn't rank by likes like Feedly, or by virality like Artifact.",
+      kicker: 'Meaning over signal.',
+    },
     howSteps: [
       {
         kicker: 'Filter',
@@ -119,65 +130,37 @@ const COPY = {
     serendipity: 'Discovery',
     relevance: 'Relevance',
     noTitle: 'No title',
+    editionsTodaySingular: 'edition filtered this morning',
+    editionsTodayPlural: 'editions filtered this morning',
+    onboardingPromise: '1 minute, 2 questions, free during beta.',
   },
 }
 
 export function StartScreen({
   articles,
   isFallback = false,
+  editionsToday = 0,
 }: {
   articles: FeaturedArticle[]
   isFallback?: boolean
+  editionsToday?: number
 }) {
-  const [lang, setLang] = useState<'fr' | 'en'>('fr')
-  const t = COPY[lang]
+  const { locale } = useLocale()
+  const t = COPY[locale]
   const feedHeading = isFallback ? t.feedTitleFallback : t.feedTitle
 
-  const today = new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-
   return (
-    <main className="min-h-full flex flex-col px-5 md:px-8 py-5 md:py-10 bg-background overflow-x-clip">
-      <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-1">
-        {/* Masthead editorial */}
-        <div
-          data-rise
-          style={{ ['--rise-delay' as string]: '0' }}
-          className="mb-12 md:mb-20"
-        >
-          <Masthead
-            date={today}
-            rightSlot={
-              <>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors"
-                >
-                  {t.loginNav}
-                </Link>
-                <span className="text-border text-[15px] leading-none" aria-hidden="true">
-                  |
-                </span>
-                <button
-                  onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
-                  aria-label={lang === 'fr' ? 'Switch to English' : 'Passer en français'}
-                  className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-foreground transition-colors"
-                >
-                  {lang.toUpperCase()}
-                </button>
-                <span className="text-border text-[15px] leading-none" aria-hidden="true">
-                  |
-                </span>
-                <ThemeToggle />
-              </>
-            }
-          />
-        </div>
-
+    <main className="flex-1 flex flex-col bg-background overflow-x-clip">
+      {/* Masthead partage public, pleine largeur */}
+      <div
+        data-rise
+        style={{ ['--rise-delay' as string]: '0' }}
+        className="pt-5 md:pt-10"
+      >
+        <PublicHeader />
+      </div>
+      <div className="flex-1 px-5 md:px-8 pt-8 md:pt-12">
+      <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto">
         {/* Hero : tagline compacte, CTA, puis edition du jour (asymetrie desktop) */}
         <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16 xl:gap-24 lg:items-start mb-16 md:mb-24 lg:mb-28 xl:mb-36">
           <div className="relative space-y-7 md:space-y-8 mb-12 lg:mb-0">
@@ -208,7 +191,7 @@ export function StartScreen({
             <div
               data-rise
               style={{ ['--rise-delay' as string]: '4' }}
-              className="pt-2 md:pt-3 flex flex-col items-start gap-4"
+              className="pt-2 md:pt-3 space-y-4"
             >
               <Link
                 href="/login"
@@ -216,18 +199,17 @@ export function StartScreen({
               >
                 {t.cta}
               </Link>
-              <a
-                href="#examples"
-                className="group inline-flex items-center gap-1.5 font-ui text-[15px] text-subtle hover:text-foreground transition-colors"
-              >
-                {t.examplesTitle}
-                <span
-                  aria-hidden
-                  className="transition-transform group-hover:translate-x-0.5"
-                >
-                  →
-                </span>
-              </a>
+              <p className="font-ui text-[14px] text-subtle">{t.onboardingPromise}</p>
+              {editionsToday > 0 && (
+                <p className="font-ui text-[14px] text-subtle">
+                  <span
+                    className="inline-block w-1.5 h-1.5 rounded-full bg-accent align-middle mr-2"
+                    aria-hidden
+                  />
+                  <span className="tabular-nums text-foreground">{editionsToday}</span>{' '}
+                  {editionsToday === 1 ? t.editionsTodaySingular : t.editionsTodayPlural}
+                </p>
+              )}
             </div>
           </div>
 
@@ -253,12 +235,12 @@ export function StartScreen({
                     const persona = article.persona_slug
                       ? DEMO_ACCOUNTS.find((a) => a.slug === article.persona_slug)
                       : null
-                    const personaLabel = persona ? persona.label[lang] : undefined
+                    const personaLabel = persona ? persona.label[locale] : undefined
                     return (
                       <ArticleRow
                         key={article.url ?? String(i)}
                         article={article}
-                        lang={lang}
+                        lang={locale}
                         noTitleLabel={t.noTitle}
                         serendipityLabel={t.serendipity}
                         relevanceLabel={t.relevance}
@@ -279,9 +261,15 @@ export function StartScreen({
 
         {/* Methode : pitch vulgarise */}
         <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
-          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-8 md:mb-10 text-balance max-w-[22ch]">
+          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-4 md:mb-5 text-balance max-w-[22ch]">
             {withBrand(t.howTitle)}
           </h2>
+          <p className="font-body text-[17px] md:text-lg text-subtle leading-[1.55] mb-8 md:mb-10 max-w-[52ch] lg:max-w-[72ch] text-pretty">
+            {withBrand(t.howDeck.lead)}{' '}
+            <em className="not-italic text-foreground">
+              <span className="italic text-accent whitespace-nowrap">{t.howDeck.kicker}</span>
+            </em>
+          </p>
           <ol className="grid gap-8 md:gap-10 md:grid-cols-3">
             {t.howSteps.map((step) => (
               <li key={step.kicker} className="space-y-4 md:space-y-5 md:border-l md:border-border md:pl-6 first:md:border-l-0 first:md:pl-0">
@@ -299,7 +287,7 @@ export function StartScreen({
         {/* Voir un exemple : liens compacts, aplat full-viewport */}
         <section
           id="examples"
-          className="relative mb-16 md:mb-24 pt-8 md:pt-10 pb-8 md:pb-10 scroll-mt-8"
+          className="relative pt-8 md:pt-10 pb-8 md:pb-10 scroll-mt-8"
         >
           <div
             aria-hidden
@@ -328,10 +316,10 @@ export function StartScreen({
                     <span className="relative flex items-baseline gap-6 md:gap-10 py-4 md:py-5 px-4 md:px-6">
                       <span className="flex-1 flex flex-col md:flex-row md:items-baseline md:gap-8 gap-1 min-w-0">
                         <span className="font-display text-2xl md:text-3xl text-foreground leading-tight group-hover:text-accent transition-colors md:w-64 shrink-0">
-                          {p.label[lang]}
+                          {p.label[locale]}
                         </span>
                         <span className="font-body text-[15px] md:text-[16px] text-subtle leading-snug flex-1">
-                          {p.description[lang]}
+                          {p.description[locale]}
                         </span>
                       </span>
                     </span>
@@ -342,7 +330,8 @@ export function StartScreen({
           </div>
         </section>
       </div>
-      <PublicFooter lang={lang} />
+      </div>
+      <PublicFooter lang={locale} />
     </main>
   )
 }

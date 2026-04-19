@@ -1,34 +1,65 @@
+'use client'
+
 import Link from 'next/link'
+import { useLocale } from '@/lib/i18n/context'
 
 type Lang = 'fr' | 'en'
 
 const COPY = {
   fr: {
-    about: 'A propos',
+    about: 'À propos',
+    login: 'Connexion',
+    github: 'GitHub',
+    rights: 'Tous droits réservés.',
+    navLabel: 'Navigation publique',
   },
   en: {
     about: 'About',
+    login: 'Sign in',
+    github: 'GitHub',
+    rights: 'All rights reserved.',
+    navLabel: 'Public navigation',
   },
 } as const
 
-export function PublicFooter({ lang = 'fr' }: { lang?: Lang }) {
-  const t = COPY[lang]
+export function PublicFooter({ lang }: { lang?: Lang } = {}) {
+  const { locale } = useLocale()
+  const effective: Lang = lang ?? locale
+  const t = COPY[effective]
   const year = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-border mt-16 py-6">
-      <div className="max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <p className="font-ui text-[15px] text-subtle">
-          © {year} <span className="text-accent">Distil</span>
-        </p>
-        <nav aria-label="Public" className="flex items-center gap-4">
-          <Link
-            href="/about"
-            className="font-ui text-[15px] text-subtle hover:text-accent transition-colors"
-          >
-            {t.about}
-          </Link>
-        </nav>
+    <footer className="bg-muted border-t border-border">
+      <div className="max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-5 md:px-8 py-5 md:py-6">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <nav aria-label={t.navLabel}>
+            <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 font-ui text-[15px] text-subtle">
+              <li>
+                <Link href="/about" className="hover:text-accent transition-colors">
+                  {t.about}
+                </Link>
+              </li>
+              <li>
+                <Link href="/login" className="hover:text-accent transition-colors">
+                  {t.login}
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/Vandanael/distil"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent transition-colors"
+                >
+                  {t.github}
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <p className="font-ui text-[15px] text-subtle">
+            © 2026-{year} <span className="text-accent">Distil</span>. {t.rights}
+          </p>
+        </div>
       </div>
     </footer>
   )

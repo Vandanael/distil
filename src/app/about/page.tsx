@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import Image from 'next/image'
 import { PublicFooter } from '@/components/PublicFooter'
+import { PublicHeader } from '@/components/PublicHeader'
 import { BrandGlyph } from '@/components/BrandGlyph'
 
 export const metadata = {
@@ -10,85 +10,63 @@ export const metadata = {
 }
 
 export default function AboutPage() {
-  const year = new Date().getFullYear()
-
   return (
-    <main className="min-h-full flex flex-col bg-background">
-      <div className="w-full max-w-2xl mx-auto flex-1 px-5 md:px-8 py-5 md:py-10">
-        {/* Masthead editorial */}
-        <header className="border-t-2 border-foreground pt-3 mb-12 md:mb-16">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-baseline gap-3 md:gap-5 min-w-0">
-              <Link
-                href="/"
-                className="flex items-baseline gap-1.5 md:gap-2 text-accent hover:opacity-80 transition-opacity"
-              >
-                <BrandGlyph size={20} className="self-center shrink-0" />
-                <span className="font-display text-2xl md:text-3xl leading-none italic">
-                  Distil
-                </span>
-              </Link>
-              <span className="hidden sm:inline text-border" aria-hidden="true">
-                |
-              </span>
-              <span className="hidden sm:inline font-mono text-[11px] tracking-wider uppercase text-muted-foreground truncate">
-                A propos
-              </span>
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <Link
-                href="/"
-                className="font-ui text-[15px] text-subtle hover:text-accent transition-colors"
-              >
-                Accueil
-              </Link>
-              <span className="text-border" aria-hidden="true">
-                |
-              </span>
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
-
+    <main className="flex-1 flex flex-col bg-background">
+      <div className="pt-5 md:pt-10">
+        <PublicHeader contextLabel="À propos" />
+      </div>
+      <div className="flex-1 w-full max-w-2xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-5 md:pb-10">
         {/* Hero */}
         <BrandGlyph
           size={96}
           className="text-accent mb-8 md:mb-10"
           title="Distil"
         />
-        <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 md:mb-10 text-balance">
+        <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-12 md:mb-16 text-balance">
           Veille intelligente,{' '}
           <em className="italic text-accent">lecture souveraine.</em>
         </h1>
-        <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-16 text-pretty">
+        <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-20 md:mb-24 text-pretty">
           <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information en
           ligne pour qu&apos;elle reste au service du jugement humain.
         </p>
 
-        {/* Mission */}
-        <section className="relative border-t border-border pt-8 mb-14">
-          <span
-            aria-hidden
-            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
-          >
-            <BrandGlyph size={14} />
-          </span>
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-6">
-            Chapitre I · Mission
-          </p>
-          <ul className="space-y-8">
+        {/* Capture produit */}
+        <figure className="mb-14">
+          <div className="relative overflow-hidden border border-border bg-[color-mix(in_oklab,var(--color-foreground)_6%,transparent)]">
+            <Image
+              src="/screenshots/feed-dark.png"
+              alt="Capture du feed Distil en mode sombre : liste d'articles sélectionnés du jour avec score de pertinence, badge découverte et justification éditoriale."
+              width={1600}
+              height={1000}
+              priority={false}
+              sizes="(min-width: 768px) 672px, 100vw"
+              className="w-full h-auto"
+            />
+          </div>
+          <figcaption className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            Le feed Distil. Une édition par jour, scores visibles, découvertes marquées.
+          </figcaption>
+        </figure>
+
+        {/* Principes */}
+        <section className="mb-14 md:mb-16 border-t border-border pt-8 md:pt-10">
+          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-8 md:mb-10 text-balance">
+            Trois principes.
+          </h2>
+          <ul className="space-y-8 md:space-y-10">
             <li>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground leading-[1.15] mb-2">
-                Le jugement humain pilote l&apos;algo
+              <h3 className="font-display text-2xl md:text-3xl text-accent leading-[1.15] mb-2">
+                Jugement humain
               </h3>
               <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
-                L&apos;IA propose, trie, resume. Vous decidez ce qui compte. Aucun mecanisme de
-                scoring n&apos;est opaque ni irreversible.
+                L&apos;IA propose, trie, résume. Vous décidez ce qui compte. Aucun mécanisme de
+                scoring n&apos;est opaque ni irréversible.
               </p>
             </li>
             <li>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground leading-[1.15] mb-2">
-                Transparence comme pilier
+              <h3 className="font-display text-2xl md:text-3xl text-accent leading-[1.15] mb-2">
+                Transparence
               </h3>
               <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
                 Chaque score, chaque signal de curation expose sa source. Si on ne peut pas
@@ -96,11 +74,11 @@ export default function AboutPage() {
               </p>
             </li>
             <li>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground leading-[1.15] mb-2">
-                Diversite by design
+              <h3 className="font-display text-2xl md:text-3xl text-accent leading-[1.15] mb-2">
+                Diversité
               </h3>
               <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
-                Le systeme introduit activement des signaux hors-bulle. La decouverte n&apos;est pas
+                Le système introduit activement des signaux hors-bulle. La découverte n&apos;est pas
                 un effet de bord, c&apos;est une feature de premier rang.
               </p>
             </li>
@@ -108,15 +86,9 @@ export default function AboutPage() {
         </section>
 
         {/* Contact */}
-        <section className="relative border-t border-border pt-8 mb-14">
-          <span
-            aria-hidden
-            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
-          >
-            <BrandGlyph size={14} />
-          </span>
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-6">
-            Chapitre II · Contact
+        <section className="mb-14 md:mb-16 border-t border-border pt-8 md:pt-10">
+          <p className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-4">
+            Contact
           </p>
           <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
             Pour toute question, demande ou retour, ouvrez une issue sur{' '}
@@ -133,28 +105,18 @@ export default function AboutPage() {
         </section>
 
         {/* Mentions legales */}
-        <section className="relative border-t border-border pt-8 mb-14">
-          <span
-            aria-hidden
-            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-accent inline-flex"
-          >
-            <BrandGlyph size={14} />
-          </span>
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-6">
-            Chapitre III · Mentions legales
+        <section className="border-t border-border pt-8 md:pt-10">
+          <p className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-4">
+            Mentions légales
           </p>
           <div className="space-y-4 font-body text-[15px] text-muted-foreground leading-[1.6] text-pretty">
             <p>
-              Responsable du traitement : Yvan Forestier. Les donnees collectees (email, profil de
-              veille, articles lus) servent exclusivement a fournir le service et ne sont jamais
-              revendues.
+              Les données collectées (email, profil de veille, articles lus) servent exclusivement à
+              fournir le service et ne sont jamais revendues.
             </p>
             <p>
-              Droit a l&apos;oubli : sur simple demande via une issue GitHub, votre compte et
-              l&apos;ensemble de vos donnees sont supprimes sous 30 jours.
-            </p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em]">
-              © 2026-{year} <span className="text-accent">Distil</span>. Tous droits reserves.
+              Droit à l&apos;oubli : sur simple demande via une issue GitHub, votre compte et
+              l&apos;ensemble de vos données sont supprimés sous 30 jours.
             </p>
           </div>
         </section>

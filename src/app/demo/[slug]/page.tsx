@@ -3,8 +3,8 @@ export const revalidate = 3600
 import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { Masthead } from '@/components/Masthead'
+import { PublicHeader } from '@/components/PublicHeader'
+import { PublicFooter } from '@/components/PublicFooter'
 import { scoreColorClass } from '@/lib/utils'
 import { DEMO_ACCOUNTS, getDemoAccountBySlug } from '@/lib/demo-accounts'
 
@@ -143,40 +143,16 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
   const rejected = articles.filter((a) => a.status === 'rejected')
   const all = [...accepted, ...rejected]
 
-  const today = new Date().toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  })
-
   return (
-    <div className="min-h-full bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-5 md:py-10 w-full">
-        <div className="mb-8">
-          <Masthead
-            brandHref="/"
-            date={today}
-            dateSuffix="· Démo lecture seule"
-            rightSlot={
-              <>
-                <Link
-                  href="/"
-                  className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors"
-                >
-                  Accueil
-                </Link>
-                <span className="text-border text-[14px] leading-none" aria-hidden="true">
-                  |
-                </span>
-                <ThemeToggle />
-              </>
-            }
-          />
-          <p className="mt-4 font-ui text-[15px] text-foreground">
-            Exemple de veille
-            <span className="text-subtle"> - {persona.label.fr}</span>
-          </p>
-        </div>
+    <div className="flex-1 flex flex-col bg-background">
+      <div className="pt-5 md:pt-10">
+        <PublicHeader contextLabel={`Exemple · ${persona.label.fr}`} />
+      </div>
+      <div className="max-w-2xl mx-auto px-5 md:px-8 pt-8 md:pt-12 pb-5 md:pb-10 w-full flex-1">
+        <p className="mb-8 font-ui text-[15px] text-foreground">
+          Exemple de veille
+          <span className="text-subtle"> - {persona.label.fr}</span>
+        </p>
 
         {/* Autres thèmes */}
         <div className="flex flex-wrap gap-2 mb-8">
@@ -217,6 +193,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
           </Link>
         </div>
       </div>
+      <PublicFooter />
     </div>
   )
 }
