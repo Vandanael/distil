@@ -22,6 +22,13 @@ export const MIN_Q1_RELEVANCE = 6
 export const MAX_ESSENTIAL_DISTANCE = 0.6
 export const HIGH_RELEVANCE_Q1 = 7
 
+// Slots reserves dans essential pour les top keyword_hits par ts_rank.
+// Filet de securite : si le LLM ignore la regle [MATCH] et exclut ces items,
+// on les force dans essential. La telemetrie keyword_hits_force_injected
+// mesure la frequence d'activation (si eleve, la regle prompt ne tient pas).
+export const RESERVED_KEYWORD_SLOTS = 2
+export const ESSENTIAL_MAX = 5
+
 type LlmRankedItem = {
   item_id: string
   q1: number
@@ -37,6 +44,60 @@ type LlmResponse = {
 
 export function enforceMinRelevance(items: LlmRankedItem[]): LlmRankedItem[] {
   return items.filter((item) => (item.q1 ?? 0) >= MIN_Q1_RELEVANCE)
+}
+
+/**
+ * Force-injecte les top keyword_hits (par ts_rank) dans essential s'ils n'y
+ * sont pas deja. Garantit la "promesse mot-cle" meme si le LLM ignore la
+ * regle [MATCH]. Ejecte les items non-keyword en queue d'essential.
+ */
+export function injectReservedKeywordSlots(
+  essential: RankedItem[],
+  surprise: RankedItem[],
+  candidates: RankingCandidate[]
+): { essential: RankedItem[]; forceInjected: number } {
+  const candById = new Map(candidates.map((c) => [c.itemId, c]))
+  const isKwHit = (id: string) => candById.get(id)?.isKeywordHit ?? false
+
+  const existingKwEssential = essential.filter((r) => isKwHit(r.itemId)).length
+  const slotsNeeded = Math.max(0, RESERVED_KEYWORD_SLOTS - existingKwEssential)
+  if (slotsNeeded === 0) return { essential, forceInjected: 0 }
+
+  const promotedIds = new Set([...essential, ...surprise].map((r) => r.itemId))
+  const toInject = candidates
+    .filter((c) => c.isKeywordHit && !promotedIds.has(c.itemId))
+    .sort((a, b) => b.keywordRank - a.keywordRank)
+    .slice(0, slotsNeeded)
+
+  if (toInject.length === 0) return { essential, forceInjected: 0 }
+
+  const kwInEssential = essential.filter((r) => isKwHit(r.itemId))
+  const nonKwInEssential = essential.filter((r) => !isKwHit(r.itemId))
+  // On grandit essential jusqu'a ESSENTIAL_MAX avant d'ejecter. Exemple :
+  // LLM retourne 2 essentials + on injecte 2 -> final = 4, pas 2. L'ejection
+  // se declenche uniquement si essential est deja sature (>= ESSENTIAL_MAX).
+  const keptCount = Math.min(
+    nonKwInEssential.length,
+    Math.max(0, ESSENTIAL_MAX - kwInEssential.length - toInject.length)
+  )
+  const keptNonKw = nonKwInEssential.slice(0, keptCount)
+
+  const injected: RankedItem[] = toInject.map((c) => ({
+    itemId: c.itemId,
+    q1: MIN_Q1_RELEVANCE,
+    q2: 5,
+    q3: 6,
+    justification: 'Match mot-cle declare (slot reserve).',
+    bucket: 'essential' as const,
+    rank: 0,
+  }))
+
+  const merged = [...kwInEssential, ...keptNonKw, ...injected].map((item, i) => ({
+    ...item,
+    rank: i + 1,
+  }))
+
+  return { essential: merged, forceInjected: toInject.length }
 }
 
 export function applyCosineGuard(
@@ -287,6 +348,9 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       fallback: false,
       modelUsed: null,
       candidatesCount: 0,
+      keywordHitsCount: 0,
+      keywordHitsPromoted: 0,
+      keywordHitsForceInjected: 0,
       error: "Deja classe aujourd'hui",
       durationMs: Date.now() - start,
     }
@@ -303,6 +367,9 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       fallback: false,
       modelUsed: null,
       candidatesCount: 0,
+      keywordHitsCount: 0,
+      keywordHitsPromoted: 0,
+      keywordHitsForceInjected: 0,
       error: "Pas d'embedding profil disponible",
       durationMs: Date.now() - start,
     }
@@ -319,6 +386,9 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       fallback: false,
       modelUsed: null,
       candidatesCount: 0,
+      keywordHitsCount: 0,
+      keywordHitsPromoted: 0,
+      keywordHitsForceInjected: 0,
       error: 'Aucun candidat disponible',
       durationMs: Date.now() - start,
     }
@@ -389,7 +459,24 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     surprise = fb.surprise
   }
 
+  // Filet de securite : si moins de RESERVED_KEYWORD_SLOTS keyword_hits sont
+  // presents dans essential, on les force avant persist. Ne s'applique pas en
+  // fallback cosine (pas de signal LLM a corriger).
+  let forceInjected = 0
+  if (!fallback) {
+    const reserved = injectReservedKeywordSlots(essential, surprise, candidates)
+    essential = reserved.essential
+    forceInjected = reserved.forceInjected
+  }
+
   await persistRanking(supabase, userId, today, essential, surprise, candidates)
+
+  // Telemetrie recall : combien de candidates etaient marques keyword_hit, et
+  // combien ont atteint essential+surprise. Sert a valider la regle prompt
+  // "ne peut pas etre ignore sans Q1 < 6" dans le temps.
+  const keywordHitIds = new Set(candidates.filter((c) => c.isKeywordHit).map((c) => c.itemId))
+  const promotedIds = new Set([...essential, ...surprise].map((r) => r.itemId))
+  const keywordHitsPromoted = [...keywordHitIds].filter((id) => promotedIds.has(id)).length
 
   return {
     userId,
@@ -399,6 +486,9 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     fallback,
     modelUsed,
     candidatesCount: candidates.length,
+    keywordHitsCount: keywordHitIds.size,
+    keywordHitsPromoted,
+    keywordHitsForceInjected: forceInjected,
     error: rankError,
     durationMs: Date.now() - start,
   }
@@ -449,6 +539,9 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
           surprise_count: r.surprise.length,
           duration_ms: r.durationMs,
           error: r.error,
+          keyword_hits_count: r.keywordHitsCount,
+          keyword_hits_promoted: r.keywordHitsPromoted,
+          keyword_hits_force_injected: r.keywordHitsForceInjected,
         }))
       )
       .then(({ error }) => {

@@ -164,8 +164,8 @@ export function StartScreen({
       <div data-rise style={{ ['--rise-delay' as string]: '0' }}>
         <PublicHeader />
       </div>
-      <div className="flex-1 px-5 md:px-8 pt-8 md:pt-12">
-        <div className="w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto">
+      <div className="flex-1 w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-5 md:px-8 pt-8 md:pt-12">
+        <div className="w-full">
           {/* Hero : tagline compacte, CTA, puis edition du jour (asymetrie desktop) */}
           <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16 xl:gap-24 lg:items-start mb-16 md:mb-24 lg:mb-28 xl:mb-36">
             <div className="relative space-y-7 md:space-y-8 mb-12 lg:mb-0">

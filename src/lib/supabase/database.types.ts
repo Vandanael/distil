@@ -592,6 +592,9 @@ export type Database = {
           duration_ms: number
           error: string | null
           created_at: string
+          keyword_hits_count: number
+          keyword_hits_promoted: number
+          keyword_hits_force_injected: number
         }
         Insert: {
           id?: string
@@ -605,6 +608,9 @@ export type Database = {
           duration_ms?: number
           error?: string | null
           created_at?: string
+          keyword_hits_count?: number
+          keyword_hits_promoted?: number
+          keyword_hits_force_injected?: number
         }
         Update: {
           id?: string
@@ -618,6 +624,9 @@ export type Database = {
           duration_ms?: number
           error?: string | null
           created_at?: string
+          keyword_hits_count?: number
+          keyword_hits_promoted?: number
+          keyword_hits_force_injected?: number
         }
         Relationships: []
       }
@@ -654,6 +663,7 @@ export type Database = {
           target_user_id: string
           cutoff_time: string
           max_count?: number
+          keyword_cap?: number
         }
         Returns: Array<{
           item_id: string
@@ -666,6 +676,24 @@ export type Database = {
           word_count: number | null
           distance: number
           unpop_score: number
+          is_keyword_hit: boolean
+          matched_keywords: string[]
+          keyword_rank: number
+        }>
+      }
+      list_keyword_hits: {
+        Args: {
+          target_user_id: string
+          cutoff_time: string
+        }
+        Returns: Array<{
+          keyword: string
+          item_id: string
+          url: string
+          title: string | null
+          site_name: string | null
+          published_at: string | null
+          word_count: number | null
         }>
       }
       count_similar_items: {

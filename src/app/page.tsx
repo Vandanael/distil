@@ -75,7 +75,8 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
   },
 ]
 
-const EDITION_TARGET = 6
+// 1 article par persona vitrine, total = HOME_FEATURED_SLUGS.length.
+const EDITION_TARGET = 3
 
 type FeaturedArticle = {
   title: string | null
@@ -137,7 +138,7 @@ export default async function RootPage() {
 
     if (demoUserIds.length > 0) {
       // Rotation quotidienne : offset different par jour et par persona,
-      // 2 articles par persona pour composer une edition denser (6 articles cible)
+      // 1 article par persona pour garantir diversite thematique (3 articles cible).
       const now = new Date()
       const startOfYear = new Date(now.getFullYear(), 0, 0).getTime()
       const dayOfYear = Math.floor((now.getTime() - startOfYear) / 86_400_000)
@@ -152,7 +153,7 @@ export default async function RootPage() {
             .eq('status', 'accepted')
             .not('score', 'is', null)
             .order('score', { ascending: false })
-            .range(offset, offset + 1)
+            .range(offset, offset)
         })
       )
 

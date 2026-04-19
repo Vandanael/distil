@@ -197,8 +197,7 @@ export function ArticleCard({
         toast.success(t.article.positiveSent)
       } else {
         toast.success(t.article.positiveSentCoach, { duration: 6000 })
-        if (typeof window !== 'undefined')
-          window.localStorage.setItem(SIGNAL_COACH_FLAG, '1')
+        if (typeof window !== 'undefined') window.localStorage.setItem(SIGNAL_COACH_FLAG, '1')
       }
     } catch {
       setPositiveSignalSent(false)
@@ -326,9 +325,7 @@ export function ArticleCard({
           {retrievedLabel && (
             <span className="font-ui text-muted-foreground/70">{retrievedLabel}</span>
           )}
-          {readingTimeMinutes && (publishedLabel || retrievedLabel || siteName) && (
-            <span>·</span>
-          )}
+          {readingTimeMinutes && (publishedLabel || retrievedLabel || siteName) && <span>·</span>}
           {readingTimeMinutes && <span className="font-ui">{readingTimeMinutes} min</span>}
           {isPaywall && (
             <>

@@ -9,6 +9,9 @@ export type RankingCandidate = {
   wordCount: number
   distance: number
   unpopScore: number
+  isKeywordHit: boolean
+  matchedKeywords: string[]
+  keywordRank: number
 }
 
 export type RankedItem = {
@@ -29,6 +32,9 @@ export type RankingResult = {
   fallback: boolean
   modelUsed: string | null
   candidatesCount: number
+  keywordHitsCount: number
+  keywordHitsPromoted: number
+  keywordHitsForceInjected: number
   error: string | null
   durationMs: number
 }
