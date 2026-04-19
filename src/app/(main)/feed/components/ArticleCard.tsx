@@ -205,7 +205,7 @@ export function ArticleCard({
     }
   }
 
-return (
+  return (
     <div className="relative -mx-3" data-article-card-wrapper>
       {swipeDirection === 'right' && (
         <div
@@ -276,7 +276,6 @@ return (
           aria-label={title ?? 'Sans titre'}
           data-testid={`article-card-link-${id}`}
         />
-
 
         {/* Ligne meta : source · date · duree */}
         <div className="relative flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">
@@ -361,7 +360,7 @@ return (
           )}
         </div>
 
-        {/* Bloc relevance : score + justif + sous-scores (sous-scores caches par defaut, toggle "Pourquoi ?") */}
+        {/* Bloc relevance : score toujours visible, justif + sous-scores derriere toggle "Pourquoi ?" */}
         {tag && (
           <div className="relative mt-4 pt-3 border-t border-border/60 space-y-2">
             <div className="flex items-baseline gap-3">
@@ -383,7 +382,7 @@ return (
                   {Math.round(score ?? 0)}%
                 </span>
               )}
-              {hasSubScores && (
+              {(justification || hasSubScores) && (
                 <button
                   type="button"
                   onClick={(e) => {
@@ -392,7 +391,7 @@ return (
                     setShowDetails((v) => !v)
                   }}
                   aria-expanded={showDetails}
-                  aria-controls={`sub-scores-${id}`}
+                  aria-controls={`relevance-details-${id}`}
                   data-testid={`toggle-details-${id}`}
                   className="relative z-10 font-ui text-sm text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1"
                 >
@@ -414,42 +413,45 @@ return (
                 </button>
               )}
             </div>
-            {justification && (
-              <p
-                data-testid={`justification-inline-${id}`}
-                className="font-body text-sm text-muted-foreground leading-relaxed"
-              >
-                {justification}
-              </p>
-            )}
-            {hasSubScores && showDetails && (
-              <dl
-                id={`sub-scores-${id}`}
-                data-testid={`sub-scores-${id}`}
-                className="flex flex-wrap gap-x-5 gap-y-1 font-ui text-sm text-muted-foreground"
-              >
-                <div className="flex items-baseline gap-1.5">
-                  <dt>{t.article.subScoreQ1}</dt>
-                  <dd className="font-semibold text-foreground tabular-nums">
-                    {subScores!.q1 ?? '—'}
-                    <span className="text-muted-foreground font-normal">/10</span>
-                  </dd>
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                  <dt>{t.article.subScoreQ2}</dt>
-                  <dd className="font-semibold text-foreground tabular-nums">
-                    {subScores!.q2 ?? '—'}
-                    <span className="text-muted-foreground font-normal">/10</span>
-                  </dd>
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                  <dt>{t.article.subScoreQ3}</dt>
-                  <dd className="font-semibold text-foreground tabular-nums">
-                    {subScores!.q3 ?? '—'}
-                    <span className="text-muted-foreground font-normal">/10</span>
-                  </dd>
-                </div>
-              </dl>
+            {showDetails && (justification || hasSubScores) && (
+              <div id={`relevance-details-${id}`} className="space-y-2">
+                {justification && (
+                  <p
+                    data-testid={`justification-inline-${id}`}
+                    className="font-body text-sm text-muted-foreground leading-relaxed"
+                  >
+                    {justification}
+                  </p>
+                )}
+                {hasSubScores && (
+                  <dl
+                    data-testid={`sub-scores-${id}`}
+                    className="flex flex-wrap gap-x-5 gap-y-1 font-ui text-sm text-muted-foreground"
+                  >
+                    <div className="flex items-baseline gap-1.5">
+                      <dt>{t.article.subScoreQ1}</dt>
+                      <dd className="font-semibold text-foreground tabular-nums">
+                        {subScores!.q1 ?? '—'}
+                        <span className="text-muted-foreground font-normal">/10</span>
+                      </dd>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <dt>{t.article.subScoreQ2}</dt>
+                      <dd className="font-semibold text-foreground tabular-nums">
+                        {subScores!.q2 ?? '—'}
+                        <span className="text-muted-foreground font-normal">/10</span>
+                      </dd>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <dt>{t.article.subScoreQ3}</dt>
+                      <dd className="font-semibold text-foreground tabular-nums">
+                        {subScores!.q3 ?? '—'}
+                        <span className="text-muted-foreground font-normal">/10</span>
+                      </dd>
+                    </div>
+                  </dl>
+                )}
+              </div>
             )}
           </div>
         )}

@@ -41,36 +41,36 @@
 }
 
 :root {
-  /* Palette Distil G2 - Vert bouteille + stone + grenat (3 couleurs strict) */
-  --background: #eeece4; /* stone creme froid : passe-partout editorial, flatte les thumbnails */
+  /* Palette Distil G4 (sprint QA) - sauge ultra-claire, cards blanches */
+  --background: #f7f8f3; /* +2% luminance vs G3, moins tinte, plus frais */
   --foreground: #1a3a2e; /* vert bouteille : encre botanique, signature Distil */
-  --card: #f5f3eb;
+  --card: #ffffff; /* blanc franc pour detacher les cards du fond */
   --card-foreground: #1a3a2e;
-  --popover: #f5f3eb;
+  --popover: #ffffff;
   --popover-foreground: #1a3a2e;
 
   /* Primary = vert bouteille (autorite, CTA principal) */
   --primary: #1a3a2e;
-  --primary-foreground: #eeece4;
+  --primary-foreground: #f7f8f3;
 
-  /* Secondary = stone un ton plus sombre (bouton secondaire) */
-  --secondary: #dfdcce;
+  /* Secondary = stone sauge un ton plus sombre (bouton secondaire) */
+  --secondary: #e3e6dc;
   --secondary-foreground: #1a3a2e;
 
-  /* Muted : declinaisons de stone */
-  --muted: #e6e3d5;
-  --muted-foreground: #5e5e4e; /* 5.4:1 AA sur background */
-  --subtle: #3f3f33; /* 8.3:1 AAA pour petits textes (<= 13px) */
+  /* Muted : neutre moins sature */
+  --muted: #edeee8;
+  --muted-foreground: #5a6358; /* 5.2:1 AA sur background */
+  --subtle: #333a35; /* 9:1 AAA pour petits textes (<= 13px) */
 
   /* Accent = grenat (marque, hover, emphase editoriale) */
-  /* #a62639 : 6.0:1 sur #eeece4 - AAA */
+  /* #a62639 : ~5.9:1 sur #f7f8f3 - AAA conserve */
   --accent: #a62639;
-  --accent-foreground: #eeece4;
+  --accent-foreground: #f7f8f3;
 
   /* Destructive : rouge presse, distinct du grenat de marque pour eviter l'ambiguite action/erreur */
   --destructive: #c8102e;
-  --border: #d8d3c3;
-  --input: #d8d3c3;
+  --border: #d6dbcd;
+  --input: #d6dbcd;
   --ring: #a62639; /* focus ring = grenat */
   --radius: 0rem; /* coins francs */
 }
@@ -78,15 +78,15 @@
 .dark {
   /* Dark mode G2 - vert bouteille tres fonce + stone clair + grenat clair */
   --background: #0e1d17; /* vert bouteille profond */
-  --foreground: #eeece4; /* stone clair : encre inversee */
+  --foreground: #f2f4ee; /* stone clair : encre inversee */
   --card: #1a3a2e;
-  --card-foreground: #eeece4;
+  --card-foreground: #f2f4ee;
   --popover: #1a3a2e;
-  --popover-foreground: #eeece4;
-  --primary: #eeece4;
+  --popover-foreground: #f2f4ee;
+  --primary: #f2f4ee;
   --primary-foreground: #1a3a2e;
   --secondary: #244030;
-  --secondary-foreground: #eeece4;
+  --secondary-foreground: #f2f4ee;
   --muted: #1a3a2e;
   --muted-foreground: #a8b4a5; /* stone-vert clair : 8:1 AAA sur fond */
   --subtle: #d4cdb5; /* stone tres clair pour petits textes */

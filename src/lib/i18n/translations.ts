@@ -2,7 +2,7 @@ export const translations = {
   fr: {
     nav: {
       feed: 'Feed',
-      library: 'Sauvegardés',
+      library: 'Archives',
       search: 'Recherche',
       profile: 'Profil',
     },
@@ -47,7 +47,8 @@ export const translations = {
       undo: 'Annuler',
       bookmarked: 'Sauvegardé par vous',
       positiveSent: 'Pris en compte au prochain classement',
-      positiveSentCoach: 'Pris en compte au prochain classement. Vos signaux sont réinjectés chaque matin.',
+      positiveSentCoach:
+        'Pris en compte au prochain classement. Vos signaux sont réinjectés chaque matin.',
       ago: 'il y a',
       yesterday: 'hier',
       now: "à l'instant",
@@ -73,7 +74,7 @@ export const translations = {
   en: {
     nav: {
       feed: 'Feed',
-      library: 'Saved',
+      library: 'Archive',
       search: 'Search',
       profile: 'Profile',
     },

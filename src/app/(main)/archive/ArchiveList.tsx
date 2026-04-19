@@ -1,7 +1,10 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 import { useLocale } from '@/lib/i18n/context'
+import { removeFromLibrary } from '@/app/(main)/article/[id]/actions'
 
 type Article = {
   id: string
@@ -13,6 +16,11 @@ type Article = {
   score: number | null
 }
 
+type PendingRemoval = {
+  timer: ReturnType<typeof setTimeout>
+  cancelled: boolean
+}
+
 function formatArchivedDate(iso: string | null, locale: 'fr' | 'en'): string {
   if (!iso) return ''
   const date = new Date(iso)
@@ -21,14 +29,77 @@ function formatArchivedDate(iso: string | null, locale: 'fr' | 'en'): string {
   if (diffD === 0) return isFr ? "aujourd'hui" : 'today'
   if (diffD === 1) return isFr ? 'hier' : 'yesterday'
   if (diffD < 7) return isFr ? `il y a ${diffD}j` : `${diffD}d ago`
-  return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 type Props = { articles: Article[] }
 
 export function ArchiveList({ articles }: Props) {
   const { locale } = useLocale()
-  if (articles.length === 0) {
+  const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set())
+  // Timers et flags d'annulation par article : on referme proprement si le
+  // composant unmount ou si l'utilisateur clique Annuler avant les 4s.
+  const pendingRef = useRef<Map<string, PendingRemoval>>(new Map())
+
+  useEffect(() => {
+    const pending = pendingRef.current
+    return () => {
+      for (const p of pending.values()) clearTimeout(p.timer)
+      pending.clear()
+    }
+  }, [])
+
+  function handleRemove(id: string) {
+    setRemovedIds((prev) => {
+      if (prev.has(id)) return prev
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
+
+    const existing = pendingRef.current.get(id)
+    if (existing) clearTimeout(existing.timer)
+
+    const entry: PendingRemoval = {
+      cancelled: false,
+      timer: setTimeout(() => {
+        const current = pendingRef.current.get(id)
+        pendingRef.current.delete(id)
+        if (current?.cancelled) return
+        void removeFromLibrary(id)
+      }, 4000),
+    }
+    pendingRef.current.set(id, entry)
+
+    toast.success(locale === 'fr' ? 'Retiré des archives' : 'Removed from archive', {
+      action: {
+        label: locale === 'fr' ? 'Annuler' : 'Undo',
+        onClick: () => {
+          const pending = pendingRef.current.get(id)
+          if (pending) {
+            pending.cancelled = true
+            clearTimeout(pending.timer)
+            pendingRef.current.delete(id)
+          }
+          setRemovedIds((prev) => {
+            if (!prev.has(id)) return prev
+            const next = new Set(prev)
+            next.delete(id)
+            return next
+          })
+        },
+      },
+      duration: 4000,
+    })
+  }
+
+  const visibleArticles = articles.filter((a) => !removedIds.has(a.id))
+
+  if (visibleArticles.length === 0) {
     return (
       <div className="space-y-3 py-8">
         <p className="font-ui text-sm text-muted-foreground">
@@ -49,32 +120,72 @@ export function ArchiveList({ articles }: Props) {
       className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0"
       data-testid="archive-list"
     >
-      {articles.map((a) => (
-        <Link
+      {visibleArticles.map((a) => (
+        <div
           key={a.id}
-          href={`/article/${a.id}`}
-          className="group block space-y-2 border-b border-border pb-6 lg:py-6 lg:mb-0 last:border-0"
+          className="group relative border-b border-border pb-6 lg:py-6 lg:mb-0 last:border-0"
           data-testid={`archive-card-${a.id}`}
         >
-          <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
-            {a.title ?? 'Sans titre'}
-          </h2>
-          <div className="flex items-center gap-3">
-            {a.site_name && (
-              <span className="font-ui text-sm text-muted-foreground">{a.site_name}</span>
-            )}
-            {a.reading_time_minutes && (
-              <span className="font-ui text-sm text-muted-foreground">
-                {a.reading_time_minutes} min
-              </span>
-            )}
-            {a.archived_at && (
-              <span className="font-ui text-sm text-muted-foreground/60 ml-auto">
-                {formatArchivedDate(a.archived_at, locale)}
-              </span>
-            )}
-          </div>
-        </Link>
+          <Link
+            href={`/article/${a.id}`}
+            className="block space-y-2 pr-12"
+            data-testid={`archive-card-link-${a.id}`}
+          >
+            <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
+              {a.title ?? 'Sans titre'}
+            </h2>
+            <div className="flex items-center gap-3">
+              {a.site_name && (
+                <span className="font-ui text-sm text-muted-foreground">{a.site_name}</span>
+              )}
+              {a.reading_time_minutes && (
+                <span className="font-ui text-sm text-muted-foreground">
+                  {a.reading_time_minutes} min
+                </span>
+              )}
+              {a.archived_at && (
+                <span className="font-ui text-sm text-muted-foreground/60 ml-auto">
+                  {formatArchivedDate(a.archived_at, locale)}
+                </span>
+              )}
+            </div>
+          </Link>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleRemove(a.id)
+            }}
+            aria-label={
+              locale === 'fr'
+                ? `Retirer ${a.title ?? 'cet article'} des archives`
+                : `Remove ${a.title ?? 'this article'} from archive`
+            }
+            title={locale === 'fr' ? 'Retirer des archives' : 'Remove from archive'}
+            data-testid={`archive-remove-${a.id}`}
+            className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 6h18" />
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6" />
+              <path d="M14 11v6" />
+            </svg>
+          </button>
+        </div>
       ))}
     </div>
   )
