@@ -44,7 +44,7 @@ export function TagInput({ articleId, existingTags, onTagAdded, onClose }: Props
       data-testid="tag-input-container"
     >
       {existingTags.map((t) => (
-        <span key={t} className="font-ui text-xs bg-muted text-muted-foreground px-2 py-0.5">
+        <span key={t} className="font-ui text-sm bg-muted text-muted-foreground px-2 py-0.5">
           {t}
         </span>
       ))}

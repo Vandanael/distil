@@ -89,8 +89,8 @@ export function ArticleCard({
   const { dismissedIds } = useDismissContext()
   const [dismissed, setDismissed] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
-  const [surprisedUsefulSent, setSurprisedUsefulSent] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
@@ -205,26 +205,7 @@ export function ArticleCard({
     }
   }
 
-  async function handleSurprisedUseful(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    if (surprisedUsefulSent) return
-    setSurprisedUsefulSent(true)
-    try {
-      const res = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'surprised_useful', articleId: id }),
-      })
-      if (!res.ok) throw new Error()
-      toast.success(t.article.surprisedUsefulSent)
-    } catch {
-      setSurprisedUsefulSent(false)
-      toast.error(locale === 'fr' ? 'Erreur lors du retour.' : 'Error sending feedback.')
-    }
-  }
-
-  return (
+return (
     <div className="relative -mx-3" data-article-card-wrapper>
       {swipeDirection === 'right' && (
         <div
@@ -280,17 +261,25 @@ export function ArticleCard({
           </span>
         </div>
       )}
-      <Link
-        href={`/article/${id}`}
-        className="group relative block py-7 px-3 bg-background transition-colors hover:bg-muted/40"
+      <div
+        className="group relative block py-5 md:py-6 px-3 bg-background transition-colors hover:bg-muted/40 focus-within:ring-2 focus-within:ring-accent/50 focus-within:rounded-sm"
         data-testid={`article-card-${id}`}
         data-article-card
         data-article-id={id}
         style={{ '--stagger': staggerIndex, ...swipeStyle } as React.CSSProperties}
         {...swipeHandlers}
       >
+        {/* Lien plein-carte (pattern stretched link) : clic n'importe ou sauf boutons actions (z-10) */}
+        <Link
+          href={`/article/${id}`}
+          className="absolute inset-0 z-0 rounded-sm focus:outline-none"
+          aria-label={title ?? 'Sans titre'}
+          data-testid={`article-card-link-${id}`}
+        />
+
+
         {/* Ligne meta : source · date · duree */}
-        <div className="flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">
+        <div className="relative flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">
           {origin === 'bookmarklet' && (
             <span
               className="text-accent shrink-0"
@@ -313,7 +302,7 @@ export function ArticleCard({
             <span className="font-ui">
               {siteName}
               {isReferenceDomain(siteName) && (
-                <span className="ml-1 text-[11px] text-accent/70" title="Source de reference">
+                <span className="ml-1 text-sm text-accent/70" title="Source de reference">
                   Ref.
                 </span>
               )}
@@ -342,7 +331,7 @@ export function ArticleCard({
         </div>
 
         {/* Ligne 3-4 : titre + thumbnail */}
-        <div className="flex items-start gap-5">
+        <div className="relative flex items-start gap-5">
           <div className="flex-1 min-w-0">
             <h2
               className={`font-ui text-[24px] md:text-[26px] font-bold leading-[1.2] group-hover:text-accent transition-colors duration-150${isPaywall ? ' line-through decoration-muted-foreground/40' : ''}${isRead ? ' text-muted-foreground' : ' text-foreground'}`}
@@ -372,17 +361,17 @@ export function ArticleCard({
           )}
         </div>
 
-        {/* Bloc relevance deplie par defaut : transparence algo */}
+        {/* Bloc relevance : score + justif + sous-scores (sous-scores caches par defaut, toggle "Pourquoi ?") */}
         {tag && (
-          <div className="mt-4 pt-3 border-t border-border/60 space-y-2">
+          <div className="relative mt-4 pt-3 border-t border-border/60 space-y-2">
             <div className="flex items-baseline gap-3">
               {score !== null && (
                 <span
                   data-testid={`score-${id}`}
-                  className={`font-ui text-lg font-semibold tabular-nums ${scoreColorClass(score)}`}
+                  className={`font-ui text-lg tabular-nums ${scoreColorClass(score)}`}
                 >
                   {Math.round(score)}
-                  <span className="text-xs text-muted-foreground font-normal">%</span>
+                  <span className="text-sm text-muted-foreground font-normal">%</span>
                 </span>
               )}
               {tagLabel ? (
@@ -394,6 +383,36 @@ export function ArticleCard({
                   {Math.round(score ?? 0)}%
                 </span>
               )}
+              {hasSubScores && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowDetails((v) => !v)
+                  }}
+                  aria-expanded={showDetails}
+                  aria-controls={`sub-scores-${id}`}
+                  data-testid={`toggle-details-${id}`}
+                  className="relative z-10 font-ui text-sm text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1"
+                >
+                  {t.article.tagDetails}
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className={`transition-transform ${showDetails ? 'rotate-180' : ''}`}
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+              )}
             </div>
             {justification && (
               <p
@@ -403,10 +422,11 @@ export function ArticleCard({
                 {justification}
               </p>
             )}
-            {hasSubScores && (
+            {hasSubScores && showDetails && (
               <dl
+                id={`sub-scores-${id}`}
                 data-testid={`sub-scores-${id}`}
-                className="flex flex-wrap gap-x-5 gap-y-1 font-ui text-xs text-muted-foreground"
+                className="flex flex-wrap gap-x-5 gap-y-1 font-ui text-sm text-muted-foreground"
               >
                 <div className="flex items-baseline gap-1.5">
                   <dt>{t.article.subScoreQ1}</dt>
@@ -434,51 +454,9 @@ export function ArticleCard({
           </div>
         )}
 
-        {/* Ligne actions */}
-        <div className="flex items-center gap-3 mt-3">
+        {/* Ligne actions : hors Link via z-10 pour que les clics prennent */}
+        <div className="relative z-10 flex items-center gap-3 mt-3">
           <div className="ml-auto flex items-center gap-1">
-            {isSerendipity && (
-              <button
-                type="button"
-                onClick={handleSurprisedUseful}
-                disabled={surprisedUsefulSent}
-                aria-label={t.article.surprisedUseful}
-                data-testid={`surprised-${id}`}
-                className="inline-flex items-center justify-center h-11 w-11 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
-                title={t.article.surprisedUseful}
-              >
-                {surprisedUsefulSent ? (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-                  </svg>
-                )}
-              </button>
-            )}
-
             <button
               type="button"
               onClick={handlePositiveSignal}
@@ -519,7 +497,7 @@ export function ArticleCard({
                 </svg>
               )}
               {!positiveSignalSent && (
-                <span className="hidden md:inline whitespace-nowrap text-xs">
+                <span className="hidden md:inline whitespace-nowrap text-sm">
                   {t.article.moreLikeThis}
                 </span>
               )}
@@ -552,13 +530,13 @@ export function ArticleCard({
                 <path d="m15 9-6 6" />
                 <path d="m9 9 6 6" />
               </svg>
-              <span className="hidden md:inline whitespace-nowrap text-xs">
+              <span className="hidden md:inline whitespace-nowrap text-sm">
                 {t.article.dismissShort}
               </span>
             </button>
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   )
 }

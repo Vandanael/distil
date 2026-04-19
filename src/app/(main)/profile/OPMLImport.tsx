@@ -79,10 +79,10 @@ export function OPMLImport() {
           {isPending ? 'Import en cours...' : 'Importer un fichier OPML'}
         </button>
         {fileName && !isPending && (
-          <span className="font-body text-xs text-muted-foreground">{fileName}</span>
+          <span className="font-body text-sm text-muted-foreground">{fileName}</span>
         )}
       </div>
-      <p className="font-body text-xs text-muted-foreground">
+      <p className="font-body text-sm text-muted-foreground">
         Compatible Feedly, FreshRSS, Miniflux. Maximum 50 sources.
       </p>
     </div>

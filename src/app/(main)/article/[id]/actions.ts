@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { logError } from '@/lib/errors/log-error'
 import type { HighlightAnchor } from '@/lib/highlights/serializer'
 
 export async function archiveArticle(articleId: string): Promise<void> {
@@ -11,11 +12,12 @@ export async function archiveArticle(articleId: string): Promise<void> {
   } = await supabase.auth.getUser()
   if (!user) return
 
-  await supabase
+  const { error } = await supabase
     .from('articles')
     .update({ status: 'archived', archived_at: new Date().toISOString() })
     .eq('id', articleId)
     .eq('user_id', user.id)
+  if (error) await logError({ route: 'archiveArticle', error, userId: user.id })
 
   revalidatePath('/feed')
   revalidatePath('/library')
@@ -60,12 +62,13 @@ export async function saveNote(
   } = await supabase.auth.getUser()
   if (!user) return
 
-  await supabase.from('notes').insert({
+  const { error: noteError } = await supabase.from('notes').insert({
     article_id: articleId,
     user_id: user.id,
     content,
     highlight_id: highlightId ?? null,
   })
+  if (noteError) await logError({ route: 'saveNote', error: noteError, userId: user.id })
 
   revalidatePath('/library')
 }
@@ -80,11 +83,12 @@ export async function dismissArticle(
   } = await supabase.auth.getUser()
   if (!user) return
 
-  await supabase
+  const { error: dismissError } = await supabase
     .from('articles')
     .update({ status: 'rejected', rejection_reason: reason })
     .eq('id', articleId)
     .eq('user_id', user.id)
+  if (dismissError) await logError({ route: 'dismissArticle', error: dismissError, userId: user.id })
 
   revalidatePath('/feed')
 }
@@ -109,7 +113,8 @@ export async function addTag(articleId: string, tagName: string): Promise<void> 
 
   if (!tag) return
 
-  await supabase
+  const { error: tagError } = await supabase
     .from('article_tags')
     .upsert({ article_id: articleId, tag_id: tag.id, user_id: user.id })
+  if (tagError) await logError({ route: 'addTag', error: tagError, userId: user.id })
 }

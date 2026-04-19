@@ -1,6 +1,20 @@
 import { isReferenceDomain } from './sources'
 import type { RankingCandidate } from './ranking-types'
 
+export type RecentSignal = {
+  title: string | null
+  siteName: string | null
+}
+
+export type RecentSignals = {
+  positive: RecentSignal[]
+  rejected: RecentSignal[]
+}
+
+// Cap du nombre de signaux injectes par prompt. Au-dela, le bruit dilue le
+// signal et la fenetre de contexte enfle inutilement (cf. ADR-012).
+export const MAX_SIGNALS_PER_BUCKET = 20
+
 export const RANKING_SYSTEM_PROMPT = `Tu es l'agent de ranking de Distil, une veille intelligente.
 Tu evalues des articles candidats pour un lecteur exigeant en utilisant une methodologie validee empiriquement (Fu & Niu 2024, SerenPrompt style indirect).
 
@@ -76,6 +90,12 @@ Format :
   ]
 }`
 
+function formatSignalLine(s: RecentSignal): string {
+  const title = (s.title ?? 'Sans titre').slice(0, 200)
+  const site = s.siteName ?? 'inconnu'
+  return `- ${title} | ${site}`
+}
+
 export function buildRankingUserPrompt(
   profile: {
     staticProfile: string | null
@@ -83,7 +103,8 @@ export function buildRankingUserPrompt(
     shortTermProfile: string | null
     fallbackText: string | null
   },
-  candidates: RankingCandidate[]
+  candidates: RankingCandidate[],
+  signals?: RecentSignals
 ): string {
   const lines: string[] = ['PROFIL LECTEUR :']
 
@@ -98,6 +119,23 @@ export function buildRankingUserPrompt(
   }
   if (!profile.staticProfile && !profile.longTermProfile && profile.fallbackText) {
     lines.push(profile.fallbackText)
+  }
+
+  // Bloc signaux courts (ADR-012). Le profil reste la source principale,
+  // les signaux ajustent au niveau in-context sans reentrainer l'embedding.
+  const positive = signals?.positive ?? []
+  const rejected = signals?.rejected ?? []
+  if (positive.length > 0 || rejected.length > 0) {
+    lines.push('')
+    lines.push('SIGNAUX RECENTS (14 jours) :')
+    if (positive.length > 0) {
+      lines.push('Appreciations explicites (a considerer comme pertinent pour ce lecteur) :')
+      for (const s of positive.slice(0, MAX_SIGNALS_PER_BUCKET)) lines.push(formatSignalLine(s))
+    }
+    if (rejected.length > 0) {
+      lines.push('Articles rejetes (hors sujet pour ce lecteur) :')
+      for (const s of rejected.slice(0, MAX_SIGNALS_PER_BUCKET)) lines.push(formatSignalLine(s))
+    }
   }
 
   lines.push('')

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { markAsRead } from '@/app/(main)/actions'
+import { useLocale } from '@/lib/i18n/context'
 import { HighlightPopover } from './components/HighlightPopover'
 import { FloatingActionBar } from './components/FloatingActionBar'
 import { ReadingProgress } from './components/ReadingProgress'
@@ -43,44 +44,10 @@ export function ReadingView({
     null
   )
   const isOnline = useOnlineStatus()
+  const { locale } = useLocale()
 
   useEffect(() => {
     markAsRead(id)
-  }, [id])
-
-  // Track reading time and log read_full feedback after 30s
-  useEffect(() => {
-    const startTime = Date.now()
-    let logged = false
-
-    function logReadFull() {
-      if (logged) return
-      const elapsed = Math.round((Date.now() - startTime) / 1000)
-      if (elapsed < 30) return
-      logged = true
-      void fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'read_full',
-          articleId: id,
-          secondsOnPage: elapsed,
-        }),
-      })
-    }
-
-    function onVisibilityChange() {
-      if (document.visibilityState === 'hidden') logReadFull()
-    }
-
-    document.addEventListener('visibilitychange', onVisibilityChange)
-    window.addEventListener('beforeunload', logReadFull)
-
-    return () => {
-      logReadFull()
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-      window.removeEventListener('beforeunload', logReadFull)
-    }
   }, [id])
 
   // Forcer target="_blank" sur tous les liens du contenu article (DOMPurify strip l'attribut sur les anciens articles)
@@ -113,7 +80,7 @@ export function ReadingView({
   }, [])
 
   const publishedDate = publishedAt
-    ? new Date(publishedAt).toLocaleDateString('fr-FR', {
+    ? new Date(publishedAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
@@ -127,14 +94,14 @@ export function ReadingView({
         <div
           role="status"
           aria-live="polite"
-          className="fixed top-0 left-0 right-0 z-50 bg-muted border-b border-border py-1.5 text-center font-ui text-xs text-muted-foreground"
+          className="fixed top-0 left-0 right-0 z-50 bg-muted border-b border-border py-1.5 text-center font-ui text-sm text-muted-foreground"
         >
           Vous etes hors-ligne - certaines actions sont desactivees
         </div>
       )}
-      {/* Layout desktop : contenu decale a droite avec marge editoriale */}
-      <div className="w-full max-w-[1040px] mx-auto px-4 py-8 pb-32 md:py-16 md:pb-32">
-        <div className="md:grid md:grid-cols-[1fr_minmax(0,680px)] md:gap-0">
+      {/* Layout desktop : pleine largeur feed, contenu decale avec marge editoriale */}
+      <div className="w-full max-w-[1160px] mx-auto px-4 py-8 pb-32 md:py-16 md:pb-32">
+        <div className="md:grid md:grid-cols-[minmax(220px,1fr)_minmax(0,820px)] md:gap-10">
           {/* Colonne gauche desktop : navigation sticky */}
           <div className="hidden md:block pt-1">
             <div className="sticky top-20 space-y-3">
@@ -144,7 +111,7 @@ export function ReadingView({
                 className="block font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
                 data-testid="back-to-feed"
               >
-                &larr; Feed
+                Retour au Feed
               </Link>
               <SaveOfflineButton articleId={id} />
             </div>
@@ -158,7 +125,7 @@ export function ReadingView({
               className="md:hidden font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
               data-testid="back-to-feed-mobile"
             >
-              &larr; Feed
+              Retour au Feed
             </Link>
 
             {/* En-tete article */}

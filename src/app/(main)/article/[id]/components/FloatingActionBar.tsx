@@ -175,7 +175,7 @@ export function FloatingActionBar({
         {tags.length > 0 && (
           <div className="flex gap-1">
             {tags.map((t) => (
-              <span key={t} className="font-ui text-xs bg-muted text-muted-foreground px-2 py-0.5">
+              <span key={t} className="font-ui text-sm bg-muted text-muted-foreground px-2 py-0.5">
                 {t}
               </span>
             ))}

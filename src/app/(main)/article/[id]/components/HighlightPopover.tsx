@@ -72,7 +72,7 @@ export function HighlightPopover({ articleId, containerRef, onHighlightSaved }: 
         onClick={handleHighlight}
         disabled={saving}
         data-testid="highlight-btn"
-        className="font-ui text-xs text-primary-foreground hover:text-accent transition-colors disabled:opacity-50"
+        className="font-ui text-sm text-primary-foreground hover:text-accent transition-colors disabled:opacity-50"
       >
         {saving ? '...' : 'Surligner'}
       </button>

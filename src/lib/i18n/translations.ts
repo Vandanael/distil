@@ -2,7 +2,7 @@ export const translations = {
   fr: {
     nav: {
       feed: 'Feed',
-      library: 'Bibliothèque',
+      library: 'Sauvegardés',
       search: 'Recherche',
       profile: 'Profil',
     },
@@ -46,10 +46,8 @@ export const translations = {
       dismissed: 'Article masqué',
       undo: 'Annuler',
       bookmarked: 'Sauvegardé par vous',
-      positiveSent: 'Signal envoyé - plus comme ça',
-      positiveSentCoach: 'Signal enregistré. Vos retours ajustent le feed de demain.',
-      surprisedUseful: 'Bonne surprise',
-      surprisedUsefulSent: 'Merci pour le retour',
+      positiveSent: 'Pris en compte au prochain classement',
+      positiveSentCoach: 'Pris en compte au prochain classement. Vos signaux sont réinjectés chaque matin.',
       ago: 'il y a',
       yesterday: 'hier',
       now: "à l'instant",
@@ -75,7 +73,7 @@ export const translations = {
   en: {
     nav: {
       feed: 'Feed',
-      library: 'Library',
+      library: 'Saved',
       search: 'Search',
       profile: 'Profile',
     },
@@ -116,10 +114,8 @@ export const translations = {
       dismissed: 'Article hidden',
       undo: 'Undo',
       bookmarked: 'Saved by you',
-      positiveSent: 'Signal sent - more like this',
-      positiveSentCoach: "Signal sent. Your feedback tunes tomorrow's feed.",
-      surprisedUseful: 'Good surprise',
-      surprisedUsefulSent: 'Thanks for the feedback',
+      positiveSent: 'Noted for next ranking',
+      positiveSentCoach: 'Noted for next ranking. Signals feed into every morning classification.',
       ago: 'ago',
       yesterday: 'yesterday',
       now: 'just now',

@@ -8,15 +8,11 @@ type Lang = 'fr' | 'en'
 const COPY = {
   fr: {
     about: 'À propos',
-    login: 'Connexion',
-    github: 'GitHub',
     rights: 'Tous droits réservés.',
     navLabel: 'Navigation publique',
   },
   en: {
     about: 'About',
-    login: 'Sign in',
-    github: 'GitHub',
     rights: 'All rights reserved.',
     navLabel: 'Public navigation',
   },
@@ -38,21 +34,6 @@ export function PublicFooter({ lang }: { lang?: Lang } = {}) {
                 <Link href="/about" className="hover:text-accent transition-colors">
                   {t.about}
                 </Link>
-              </li>
-              <li>
-                <Link href="/login" className="hover:text-accent transition-colors">
-                  {t.login}
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Vandanael/distil"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors"
-                >
-                  {t.github}
-                </a>
               </li>
             </ul>
           </nav>

@@ -36,7 +36,7 @@ export function NoteEditor({ articleId, highlightId, highlightText, onClose }: P
       data-testid="note-editor"
     >
       {highlightText && (
-        <p className="font-body text-xs italic text-muted-foreground line-clamp-2 border-l-2 border-accent pl-2">
+        <p className="font-body text-sm italic text-muted-foreground line-clamp-2 border-l-2 border-accent pl-2">
           {highlightText}
         </p>
       )}

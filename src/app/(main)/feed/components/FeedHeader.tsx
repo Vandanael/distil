@@ -58,7 +58,7 @@ export function FeedHeader({ lastRefreshAt, topInterests }: Props) {
   }
 
   return (
-    <header className="mb-8 mt-2">
+    <header className="mb-6 mt-2">
       <div className="flex items-baseline justify-between gap-4 flex-wrap">
         <h1 className="font-ui text-base md:text-lg font-semibold text-foreground">
           {t.feed.title}
@@ -66,7 +66,7 @@ export function FeedHeader({ lastRefreshAt, topInterests }: Props) {
             <span className="font-normal text-subtle"> - {topInterests.join(', ')}</span>
           )}
         </h1>
-        <div className="flex items-center gap-2 shrink-0 ml-auto font-ui text-[13px] text-subtle">
+        <div className="flex items-center gap-2 shrink-0 ml-auto font-ui text-sm text-subtle">
           {refreshInfo && (
             <span className="text-subtle/60">
               {locale === 'fr' ? 'recupere' : 'fetched'} {refreshInfo.label}

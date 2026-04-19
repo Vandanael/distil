@@ -42,7 +42,7 @@ export function SearchBar() {
         </button>
       </div>
 
-      <div data-testid="mode-toggle" className="flex items-center gap-1 font-ui text-xs">
+      <div data-testid="mode-toggle" className="flex items-center gap-1 font-ui text-sm">
         <button
           type="button"
           onClick={() => setMode('fulltext')}

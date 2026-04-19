@@ -56,7 +56,7 @@ export function ProfileForm({ profile }: Props) {
   const selectClass =
     'h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
 
-  const labelClass = 'font-ui text-[13px] text-muted-foreground'
+  const labelClass = 'font-ui text-sm text-muted-foreground'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -102,7 +102,7 @@ export function ProfileForm({ profile }: Props) {
           data-testid="sources-input"
         />
         {sourcesSavedHint && (
-          <p className="font-ui text-xs text-muted-foreground">
+          <p className="font-ui text-sm text-muted-foreground">
             Ces sources seront incluses lors du prochain rafraîchissement.
           </p>
         )}

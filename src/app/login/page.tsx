@@ -123,7 +123,7 @@ function LoginPageInner() {
 
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-border" />
-              <span className="font-ui text-xs uppercase tracking-wider text-muted-foreground">
+              <span className="font-ui text-sm uppercase tracking-wider text-muted-foreground">
                 ou
               </span>
               <div className="h-px flex-1 bg-border" />
@@ -141,7 +141,7 @@ function LoginPageInner() {
               <form onSubmit={handleMagicLink} className="space-y-3" noValidate>
                 <Label
                   htmlFor="magic-email"
-                  className="font-ui text-xs uppercase tracking-wider text-muted-foreground"
+                  className="font-ui text-sm uppercase tracking-wider text-muted-foreground"
                 >
                   Recevoir un lien par email
                 </Label>
@@ -166,7 +166,7 @@ function LoginPageInner() {
               </form>
             )}
 
-            <p id="login-help" className="font-ui text-xs text-muted-foreground leading-relaxed">
+            <p id="login-help" className="font-ui text-sm text-muted-foreground leading-relaxed">
               Connexion rapide et securisee. Distil ne partage aucune donnee au-dela de votre email
               et ne publie rien en votre nom.
             </p>
@@ -176,7 +176,7 @@ function LoginPageInner() {
                 id="login-error"
                 role="alert"
                 aria-live="polite"
-                className="font-ui text-xs text-destructive border-l-2 border-destructive pl-3 py-1"
+                className="font-ui text-sm text-destructive border-l-2 border-destructive pl-3 py-1"
               >
                 {displayError}
               </p>

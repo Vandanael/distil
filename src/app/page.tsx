@@ -76,7 +76,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
 ]
 
 // 1 article par persona vitrine, total = HOME_FEATURED_SLUGS.length.
-const EDITION_TARGET = 3
+const EDITION_TARGET = 5
 
 type FeaturedArticle = {
   title: string | null

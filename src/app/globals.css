@@ -29,7 +29,6 @@
   --color-popover: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-match-strong: var(--match-strong);
   --color-subtle: var(--subtle);
   /* Radius 0 - coins francs, identite editoriale */
   --radius-sm: 0rem;
@@ -42,62 +41,61 @@
 }
 
 :root {
-  /* Palette Distil - Publishing vert (fond off-white editorial, pas cream papier) */
-  --background: #fafaf7; /* off-white froid : editorial numerique */
-  --foreground: #1c3028; /* vert foret fonce : encre editoriale */
-  --card: #ffffff;
-  --card-foreground: #1c3028;
-  --popover: #ffffff;
-  --popover-foreground: #1c3028;
+  /* Palette Distil G2 - Vert bouteille + stone + grenat (3 couleurs strict) */
+  --background: #eeece4; /* stone creme froid : passe-partout editorial, flatte les thumbnails */
+  --foreground: #1a3a2e; /* vert bouteille : encre botanique, signature Distil */
+  --card: #f5f3eb;
+  --card-foreground: #1a3a2e;
+  --popover: #f5f3eb;
+  --popover-foreground: #1a3a2e;
 
-  /* Primary = vert foret (autorite, CTA principal) */
-  --primary: #1c3028;
-  --primary-foreground: #fafaf7;
+  /* Primary = vert bouteille (autorite, CTA principal) */
+  --primary: #1a3a2e;
+  --primary-foreground: #eeece4;
 
-  /* Secondary = gris neutre doux (bouton secondaire discret) */
-  --secondary: #eae8e0;
-  --secondary-foreground: #1c3028;
+  /* Secondary = stone un ton plus sombre (bouton secondaire) */
+  --secondary: #dfdcce;
+  --secondary-foreground: #1a3a2e;
 
-  /* Muted */
-  --muted: #f1f1ec;
-  --muted-foreground: #587060; /* vert-gris : harmonieux avec le primaire */
-  --subtle: #3f5649; /* vert-gris contraste AA sur off-white, pour typos <= 13px */
+  /* Muted : declinaisons de stone */
+  --muted: #e6e3d5;
+  --muted-foreground: #5e5e4e; /* 5.4:1 AA sur background */
+  --subtle: #3f3f33; /* 8.3:1 AAA pour petits textes (<= 13px) */
 
-  /* Accent = orange Distil (marque, hover, emphase editoriale) */
-  /* #b84518 : ~5.1:1 sur #fafaf7 - passe WCAG AA pour tout texte */
-  --accent: #b84518;
-  --accent-foreground: #fafaf7;
+  /* Accent = grenat (marque, hover, emphase editoriale) */
+  /* #a62639 : 6.0:1 sur #eeece4 - AAA */
+  --accent: #a62639;
+  --accent-foreground: #eeece4;
 
-  --destructive: #dc2626;
-  --border: #e2e0d8;
-  --input: #e2e0d8;
-  --ring: #d94e1f; /* focus ring = orange */
-  --match-strong: #2d6a4f; /* vert emeraude : signal "match fort" score >= 80 */
+  /* Destructive : rouge presse, distinct du grenat de marque pour eviter l'ambiguite action/erreur */
+  --destructive: #c8102e;
+  --border: #d8d3c3;
+  --input: #d8d3c3;
+  --ring: #a62639; /* focus ring = grenat */
   --radius: 0rem; /* coins francs */
 }
 
 .dark {
-  /* Dark mode - palette vert foret coherente (pas de bleu marine) */
-  --background: #0d1a11;
-  --foreground: #fafaf7;
-  --card: #1c3028;
-  --card-foreground: #fafaf7;
-  --popover: #1c3028;
-  --popover-foreground: #fafaf7;
-  --primary: #eae8e0;
-  --primary-foreground: #1c3028;
+  /* Dark mode G2 - vert bouteille tres fonce + stone clair + grenat clair */
+  --background: #0e1d17; /* vert bouteille profond */
+  --foreground: #eeece4; /* stone clair : encre inversee */
+  --card: #1a3a2e;
+  --card-foreground: #eeece4;
+  --popover: #1a3a2e;
+  --popover-foreground: #eeece4;
+  --primary: #eeece4;
+  --primary-foreground: #1a3a2e;
   --secondary: #244030;
-  --secondary-foreground: #fafaf7;
-  --muted: #1a2e20; /* vert tres fonce (correction : etait bleu #1a3a6b) */
-  --muted-foreground: #8aab94; /* vert-gris clair lisible */
-  --subtle: #b7ccbe; /* vert-gris clair, contraste AA sur fond sombre */
-  --accent: #e8693d;
-  --accent-foreground: #fafaf7;
+  --secondary-foreground: #eeece4;
+  --muted: #1a3a2e;
+  --muted-foreground: #a8b4a5; /* stone-vert clair : 8:1 AAA sur fond */
+  --subtle: #d4cdb5; /* stone tres clair pour petits textes */
+  --accent: #d4616e; /* grenat clair : 5:1 AA sur fond sombre */
+  --accent-foreground: #0e1d17;
   --destructive: #ef4444;
-  --border: #2a4a38; /* vert-gris fonce (correction : etait bleu #1e3a5f) */
-  --input: #2a4a38; /* idem */
-  --ring: #e8693d;
-  --match-strong: #7fbf9e; /* vert emeraude clair : lisible sur fond sombre */
+  --border: #2a4a3a;
+  --input: #2a4a3a;
+  --ring: #d4616e;
 }
 
 @layer base {

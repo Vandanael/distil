@@ -5,11 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Teinte du score : vert = match fort (>= 80), neutre = milieu, atténué = faible.
-// La serendipity garde son label accent orange, indépendant du score.
+// Hiérarchie du score par poids typographique (palette 3 couleurs, pas de teinte dédiée).
 export function scoreColorClass(score: number | null | undefined): string {
-  if (score == null) return 'text-muted-foreground'
-  if (score >= 80) return 'text-match-strong'
-  if (score >= 60) return 'text-foreground'
-  return 'text-muted-foreground'
+  if (score == null) return 'text-muted-foreground font-semibold'
+  if (score >= 80) return 'text-foreground font-bold'
+  if (score >= 60) return 'text-foreground font-semibold'
+  return 'text-muted-foreground font-medium'
 }

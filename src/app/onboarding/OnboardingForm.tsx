@@ -96,7 +96,7 @@ export function OnboardingForm() {
     <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
       <div className="w-full max-w-lg space-y-10">
         <div className="space-y-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-accent">
+          <p className="font-ui text-sm uppercase tracking-wider text-accent">
             Bienvenue dans Distil
           </p>
           <h1 className="font-heading text-4xl md:text-5xl leading-[1.1] tracking-tight text-foreground">
@@ -113,7 +113,7 @@ export function OnboardingForm() {
           <div className="space-y-2">
             <Label
               htmlFor="profile-text"
-              className="font-ui text-xs uppercase tracking-wider text-muted-foreground"
+              className="font-ui text-sm uppercase tracking-wider text-muted-foreground"
             >
               {"Vos centres d'intérêt"}
             </Label>
@@ -127,7 +127,7 @@ export function OnboardingForm() {
               data-testid="profile-text"
               autoFocus
             />
-            <p className="font-body text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               Une phrase suffit. Plus vous êtes précis, plus le feed est pertinent.
             </p>
           </div>
@@ -135,7 +135,7 @@ export function OnboardingForm() {
           <div className="space-y-2">
             <Label
               htmlFor="source-input"
-              className="font-ui text-xs uppercase tracking-wider text-muted-foreground"
+              className="font-ui text-sm uppercase tracking-wider text-muted-foreground"
             >
               Sources préférées{' '}
               <span className="lowercase text-muted-foreground/70">(optionnel)</span>
@@ -202,7 +202,7 @@ export function OnboardingForm() {
                 ou importer un fichier OPML
               </button>
               {fileName && (
-                <span className="ml-2 font-body text-xs text-muted-foreground">{fileName}</span>
+                <span className="ml-2 font-body text-sm text-muted-foreground">{fileName}</span>
               )}
             </div>
           </div>

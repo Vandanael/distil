@@ -37,7 +37,7 @@ export default function AboutPage() {
               className="w-full h-auto"
             />
           </div>
-          <figcaption className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          <figcaption className="mt-3 font-mono text-sm uppercase tracking-[0.18em] text-muted-foreground">
             Le feed Distil. Une édition par jour, scores visibles, découvertes marquées.
           </figcaption>
         </figure>

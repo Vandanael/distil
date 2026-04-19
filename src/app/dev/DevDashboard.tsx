@@ -178,13 +178,13 @@ export function DevDashboard() {
       <div className="max-w-3xl space-y-12">
         {/* Header */}
         <div className="space-y-2 border-b border-border pb-6">
-          <p className="font-ui text-[10px] uppercase tracking-widest text-accent">
+          <p className="font-ui text-sm uppercase tracking-widest text-accent">
             Dev only - not in production
           </p>
           <h1 className="font-ui text-3xl font-semibold text-foreground">Dev Dashboard</h1>
           <p className="font-body text-sm text-muted-foreground">
             Les actions Supabase n&apos;agissent que si{' '}
-            <code className="font-ui text-xs text-foreground">.env.local</code> est configure et que
+            <code className="font-ui text-sm text-foreground">.env.local</code> est configure et que
             vous etes authentifie.
           </p>
         </div>
@@ -195,7 +195,7 @@ export function DevDashboard() {
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
               01 - Lancer un run de scoring
             </h2>
-            <p className="font-body text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               POST /api/scoring/run - une URL par ligne (max 20)
             </p>
           </div>
@@ -203,7 +203,7 @@ export function DevDashboard() {
           <div className="space-y-2">
             <Label
               htmlFor="urls"
-              className="font-ui text-[10px] uppercase tracking-wider text-muted-foreground"
+              className="font-ui text-sm uppercase tracking-wider text-muted-foreground"
             >
               URLs candidates
             </Label>
@@ -212,7 +212,7 @@ export function DevDashboard() {
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
               rows={4}
-              className="font-ui text-xs"
+              className="font-ui text-sm"
               data-testid="dev-urls"
             />
           </div>
@@ -222,7 +222,7 @@ export function DevDashboard() {
           </Button>
 
           {runResult && (
-            <div className="space-y-1 border border-border p-4 font-ui text-xs">
+            <div className="space-y-1 border border-border p-4 font-ui text-sm">
               {runResult.error ? (
                 <p className="text-destructive">{runResult.error}</p>
               ) : (
@@ -254,7 +254,7 @@ export function DevDashboard() {
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
               02 - Statut d&apos;un run
             </h2>
-            <p className="font-body text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               GET /api/scoring/status?runId=...
             </p>
           </div>
@@ -264,7 +264,7 @@ export function DevDashboard() {
               value={runId}
               onChange={(e) => setRunId(e.target.value)}
               placeholder="runId (auto-rempli apres un run)"
-              className="font-ui text-xs"
+              className="font-ui text-sm"
               data-testid="dev-run-id"
             />
             <Button
@@ -278,7 +278,7 @@ export function DevDashboard() {
           </div>
 
           {statusResult && (
-            <div className="space-y-1 border border-border p-4 font-ui text-xs">
+            <div className="space-y-1 border border-border p-4 font-ui text-sm">
               {statusResult.error ? (
                 <p className="text-destructive">{statusResult.error}</p>
               ) : (
@@ -322,7 +322,7 @@ export function DevDashboard() {
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
               03 - Tester le parsing
             </h2>
-            <p className="font-body text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               Parse une URL via Readability et retourne les metadonnees.
             </p>
           </div>
@@ -332,7 +332,7 @@ export function DevDashboard() {
               value={parseUrl}
               onChange={(e) => setParseUrl(e.target.value)}
               placeholder="https://..."
-              className="font-ui text-xs"
+              className="font-ui text-sm"
               data-testid="dev-parse-url"
             />
             <Button
@@ -346,7 +346,7 @@ export function DevDashboard() {
           </div>
 
           {parseResult !== null && (
-            <pre className="overflow-auto border border-border p-4 font-ui text-xs text-foreground max-h-64">
+            <pre className="overflow-auto border border-border p-4 font-ui text-sm text-foreground max-h-64">
               {JSON.stringify(parseResult, null, 2)}
             </pre>
           )}
@@ -358,7 +358,7 @@ export function DevDashboard() {
             <h2 className="font-ui text-sm font-semibold uppercase tracking-wider text-foreground">
               04 - Feed avec donnees fictives
             </h2>
-            <p className="font-body text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               Apercu des composants UI sans Supabase.
             </p>
           </div>
@@ -383,11 +383,11 @@ export function DevDashboard() {
               <div key={a.id} className="space-y-2 border-b border-border pb-4 last:border-0">
                 <div className="flex items-start justify-between gap-4">
                   <span className="font-ui text-sm font-semibold text-foreground">{a.title}</span>
-                  <span className="shrink-0 font-ui text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <span className="shrink-0 font-ui text-sm uppercase tracking-wider text-muted-foreground">
                     {a.siteName}
                   </span>
                 </div>
-                <p className="font-body text-xs text-muted-foreground italic">
+                <p className="font-body text-sm text-muted-foreground italic">
                   {a.rejectionReason}
                 </p>
                 <Button variant="secondary" size="sm" disabled>

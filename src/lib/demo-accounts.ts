@@ -63,8 +63,14 @@ export const DEMO_ACCOUNTS: readonly DemoAccount[] = [
   },
 ] as const
 
-// Home publique : 3 comptes vitrine (diversite thematique maximale sur 3 axes).
-export const HOME_FEATURED_SLUGS: readonly DemoAccountSlug[] = ['pm', 'consultant', 'dev']
+// Home publique : 5 comptes vitrine, 1 article par persona = bloc editorial uniforme.
+export const HOME_FEATURED_SLUGS: readonly DemoAccountSlug[] = [
+  'pm',
+  'consultant',
+  'dev',
+  'chercheur',
+  'ml',
+]
 
 export function getDemoAccountBySlug(slug: string): DemoAccount | null {
   return DEMO_ACCOUNTS.find((a) => a.slug === slug) ?? null

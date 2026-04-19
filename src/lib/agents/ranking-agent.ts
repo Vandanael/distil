@@ -1,7 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
-import { RANKING_SYSTEM_PROMPT, buildRankingUserPrompt } from './ranking-prompts'
+import {
+  RANKING_SYSTEM_PROMPT,
+  buildRankingUserPrompt,
+  MAX_SIGNALS_PER_BUCKET,
+  type RecentSignals,
+} from './ranking-prompts'
 import { parseUrl } from '@/lib/parsing/readability'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { Database } from '@/lib/supabase/database.types'
@@ -9,8 +14,8 @@ import type { RankedItem, RankingCandidate, RankingResult } from './ranking-type
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 
-const MODEL = 'gemini-3-flash'
-const FALLBACK_MODEL = 'gemini-2.5-flash'
+const MODEL = 'gemini-2.5-flash'
+const FALLBACK_MODEL = 'gemini-2.0-flash'
 
 // Seuil dur : un article Q1 < MIN_Q1_RELEVANCE est hors-sujet pour ce lecteur
 // et n'a le droit d'apparaitre dans aucun bucket. Garde-fou si le prompt rate.
@@ -127,6 +132,48 @@ export function applyCosineGuard(
   return {
     essential: keptEssential,
     surprise: [...keptSurprise, ...downgraded],
+  }
+}
+
+// Fenetre d'injection des signaux dans le prompt (ADR-012). 14 jours = cycle
+// court pour ressentir l'effet d'un clic sans diluer par de vieux feedbacks.
+const SIGNAL_WINDOW_DAYS = 14
+
+async function loadRecentSignals(
+  supabase: ServiceClient,
+  userId: string
+): Promise<RecentSignals> {
+  const cutoff = new Date(Date.now() - SIGNAL_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
+
+  const [positiveResult, rejectedResult] = await Promise.all([
+    supabase
+      .from('articles')
+      .select('title, site_name')
+      .eq('user_id', userId)
+      .eq('positive_signal', true)
+      .gte('scored_at', cutoff)
+      .order('scored_at', { ascending: false })
+      .limit(MAX_SIGNALS_PER_BUCKET),
+    supabase
+      .from('articles')
+      .select('title, site_name')
+      .eq('user_id', userId)
+      .eq('status', 'rejected')
+      .eq('rejection_reason', 'off_topic')
+      .gte('scored_at', cutoff)
+      .order('scored_at', { ascending: false })
+      .limit(MAX_SIGNALS_PER_BUCKET),
+  ])
+
+  return {
+    positive: (positiveResult.data ?? []).map((r) => ({
+      title: r.title,
+      siteName: r.site_name,
+    })),
+    rejected: (rejectedResult.data ?? []).map((r) => ({
+      title: r.title,
+      siteName: r.site_name,
+    })),
   }
 }
 
@@ -265,7 +312,7 @@ async function persistRanking(
 
   // Insert daily_ranking
   if (allRanked.length > 0) {
-    await supabase.from('daily_ranking').upsert(
+    const { error: rankingError } = await supabase.from('daily_ranking').upsert(
       allRanked.map((item) => ({
         user_id: userId,
         date,
@@ -279,6 +326,10 @@ async function persistRanking(
       })),
       { onConflict: 'user_id,date,item_id' }
     )
+    if (rankingError) {
+      const { logError } = await import('@/lib/errors/log-error')
+      await logError({ route: 'persistRanking.daily_ranking', error: rankingError, userId })
+    }
   }
 
   // Promote to articles table, then enrich with full content via Readability.
@@ -375,7 +426,10 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     }
   }
 
-  const candidates = await prefilterCandidates(supabase, userId, profile.embedding)
+  const [candidates, recentSignals] = await Promise.all([
+    prefilterCandidates(supabase, userId, profile.embedding),
+    loadRecentSignals(supabase, userId),
+  ])
 
   if (candidates.length === 0) {
     return {
@@ -401,7 +455,8 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       shortTermProfile: profile.shortTermProfile,
       fallbackText: profile.fallbackText,
     },
-    candidates
+    candidates,
+    recentSignals
   )
 
   let essential: RankedItem[] = []

@@ -30,7 +30,7 @@ export function SearchResults({ results, query }: Props) {
               </h2>
               {result.matchType === 'semantic' && result.similarity !== undefined && (
                 <span
-                  className="shrink-0 font-ui text-xs tabular-nums text-accent"
+                  className="shrink-0 font-ui text-sm tabular-nums text-accent"
                   data-testid={`similarity-badge-${result.id}`}
                 >
                   {Math.round(result.similarity * 100)}%
@@ -39,7 +39,7 @@ export function SearchResults({ results, query }: Props) {
             </div>
 
             {result.site_name && (
-              <span className="font-ui text-[13px] text-muted-foreground">{result.site_name}</span>
+              <span className="font-ui text-sm text-muted-foreground">{result.site_name}</span>
             )}
 
             {result.excerpt && (

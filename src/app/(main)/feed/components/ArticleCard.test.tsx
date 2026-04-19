@@ -78,7 +78,7 @@ describe('ArticleCard', () => {
 
   it('lien pointe vers /article/:id', () => {
     renderCard(BASE_PROPS)
-    const link = screen.getByTestId('article-card-abc-123')
+    const link = screen.getByTestId('article-card-link-abc-123')
     expect(link.getAttribute('href')).toBe('/article/abc-123')
   })
 

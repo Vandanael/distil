@@ -27,7 +27,7 @@ export function DigestToggle({ enabled: initial }: Props) {
     <div className="flex items-center justify-between">
       <div className="space-y-0.5">
         <p className="font-ui text-sm font-medium text-foreground">Email digest</p>
-        <p className="font-body text-xs text-muted-foreground">
+        <p className="font-body text-sm text-muted-foreground">
           Recevez vos 5 meilleurs articles par email chaque matin.
         </p>
       </div>

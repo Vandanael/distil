@@ -99,7 +99,7 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 text-xs transition-colors ${
+              className={`flex flex-1 flex-col items-center justify-center gap-1 text-sm transition-colors ${
                 active ? 'text-foreground bg-muted' : 'text-muted-foreground hover:text-foreground'
               }`}
               aria-current={active ? 'page' : undefined}

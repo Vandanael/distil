@@ -21,7 +21,9 @@ export function WelcomeScreen() {
 
   // Declenche le refresh puis poll jusqu'a ce que le feed ait des articles
   useEffect(() => {
-    void fetch('/api/feed/refresh', { method: 'POST' })
+    fetch('/api/feed/refresh', { method: 'POST' }).catch(() => {
+      // Refresh non-bloquant, le poll continue independamment
+    })
 
     let polls = 0
     let stopped = false
@@ -83,14 +85,14 @@ export function WelcomeScreen() {
         <button
           type="button"
           onClick={() => router.push('/feed')}
-          className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
+          className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
         >
           Voir mon feed maintenant &rarr;
         </button>
 
         {/* Astuce pedagogique boucle feedback */}
         <p className="font-body text-sm text-muted-foreground leading-[1.55] border-t border-border pt-6 text-pretty">
-          <span className="font-ui text-[13px] uppercase tracking-[0.12em] text-accent mr-2">
+          <span className="font-ui text-sm uppercase tracking-[0.12em] text-accent mr-2">
             Astuce
           </span>
           Sur chaque carte, les boutons <span className="text-foreground">+</span> et{' '}

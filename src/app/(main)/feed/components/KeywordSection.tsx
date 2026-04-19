@@ -29,7 +29,7 @@ export function KeywordSection({ groups }: Props) {
   const totalHits = groups.reduce((sum, g) => sum + g.hits.length, 0)
 
   return (
-    <section className="mt-10 border-t border-border pt-6 lg:max-w-[720px]">
+    <section className="mt-8 border-t border-border pt-5 lg:max-w-[720px]">
       <header className="mb-4">
         <h2 className="font-ui text-lg font-semibold text-foreground">Tous vos mots-cles</h2>
         <p className="mt-1 font-ui text-sm text-muted-foreground">
@@ -69,7 +69,7 @@ export function KeywordSection({ groups }: Props) {
                     <div className="font-ui text-sm font-medium text-foreground">
                       {hit.title ?? hit.url}
                     </div>
-                    <div className="mt-1 flex items-center gap-2 font-ui text-[13px] text-muted-foreground">
+                    <div className="mt-1 flex items-center gap-2 font-ui text-sm text-muted-foreground">
                       {hit.siteName && <span>{hit.siteName}</span>}
                       {hit.publishedAt && (
                         <>

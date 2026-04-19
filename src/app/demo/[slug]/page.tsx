@@ -78,7 +78,7 @@ function DemoArticleCard({ article, index }: { article: Article; index: number }
             title={article.justification ?? undefined}
           >
             Pertinence{' '}
-            <span className={`font-semibold tabular-nums ${scoreColorClass(article.score)}`}>
+            <span className={`tabular-nums ${scoreColorClass(article.score)}`}>
               {Math.round(article.score)}%
             </span>
           </span>

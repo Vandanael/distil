@@ -61,7 +61,7 @@ export function ArticleRow({
         >
           {article.is_serendipity && <span className="text-accent mr-2">{serendipityLabel}</span>}
           {relevanceLabel}{' '}
-          <span className={`tabular-nums font-semibold ${scoreColorClass(article.score)}`}>
+          <span className={`tabular-nums ${scoreColorClass(article.score)}`}>
             {Math.round(article.score)}%
           </span>
         </p>

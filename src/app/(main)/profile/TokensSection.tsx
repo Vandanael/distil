@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useLocale } from '@/lib/i18n/context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { generateBookmarkletCode } from '@/lib/bookmarklet/generate'
@@ -12,6 +13,7 @@ type Props = {
 }
 
 export function TokensSection({ tokens: initialTokens }: Props) {
+  const { locale } = useLocale()
   const [tokens, setTokens] = useState(initialTokens)
   const [newName, setNewName] = useState('')
   const [createdToken, setCreatedToken] = useState<{ token: string; id: string } | null>(null)
@@ -22,7 +24,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
   function handleQuickCreate() {
-    const name = `Bookmarklet ${new Date().toLocaleDateString('fr-FR')}`
+    const name = `Bookmarklet ${new Date().toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB')}`
     startTransition(async () => {
       const result = await createApiToken(name)
       setCreatedToken(result)
@@ -69,7 +71,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
   }
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('fr-FR', {
+    return new Date(iso).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -99,12 +101,12 @@ export function TokensSection({ tokens: initialTokens }: Props) {
       {/* Token cree : affichage one-shot */}
       {createdToken && (
         <div className="space-y-3 border border-accent/40 p-4 bg-accent/5">
-          <p className="font-ui text-xs font-semibold text-accent uppercase tracking-wider">
+          <p className="font-ui text-sm font-semibold text-accent uppercase tracking-wider">
             Bookmarklet pret
           </p>
 
           <div className="space-y-2">
-            <p className="font-ui text-xs text-muted-foreground">
+            <p className="font-ui text-sm text-muted-foreground">
               Glissez ce lien dans votre barre de favoris :
             </p>
             <div className="flex items-center gap-2 flex-wrap">
@@ -129,7 +131,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
             </div>
           </div>
 
-          <details className="text-xs">
+          <details className="text-sm">
             <summary className="font-ui text-muted-foreground cursor-pointer hover:text-foreground">
               Token brut
             </summary>
@@ -143,7 +145,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
 
           <button
             type="button"
-            className="font-ui text-xs text-muted-foreground hover:text-foreground underline"
+            className="font-ui text-sm text-muted-foreground hover:text-foreground underline"
             onClick={() => setCreatedToken(null)}
           >
             Masquer
@@ -158,7 +160,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
             <li key={token.id} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="min-w-0">
                 <p className="font-ui text-sm text-foreground truncate">{token.name}</p>
-                <p className="font-ui text-xs text-muted-foreground">
+                <p className="font-ui text-sm text-muted-foreground">
                   Cree le {formatDate(token.created_at)}
                   {token.last_used_at && ` - Utilise le ${formatDate(token.last_used_at)}`}
                 </p>
@@ -183,7 +185,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
         <button
           type="button"
           onClick={() => setShowCustomForm(true)}
-          className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
+          className="font-ui text-sm text-muted-foreground hover:text-accent transition-colors"
         >
           Creer un token personnalise
         </button>

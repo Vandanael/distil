@@ -15,13 +15,13 @@ export default function NotFound() {
             <span className="text-border" aria-hidden="true">
               |
             </span>
-            <span className="font-mono text-[11px] tracking-wider uppercase text-muted-foreground">
+            <span className="font-mono text-sm tracking-wider uppercase text-muted-foreground">
               Erreur 404
             </span>
           </div>
         </header>
 
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-5">
+        <p className="font-mono text-sm uppercase tracking-[0.22em] text-muted-foreground mb-5">
           Introuvable
         </p>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 text-balance">

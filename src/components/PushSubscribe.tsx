@@ -77,7 +77,7 @@ export function PushSubscribe() {
     <div className="flex items-center justify-between">
       <div className="space-y-0.5">
         <p className="font-ui text-sm font-medium text-foreground">Notification matinale</p>
-        <p className="font-body text-xs text-muted-foreground">
+        <p className="font-body text-sm text-muted-foreground">
           Recevez une notification quand votre veille du jour est prete.
         </p>
       </div>

@@ -47,7 +47,7 @@ export async function computePopularity(supabase: ServiceClient): Promise<number
     const similarCount = typeof count === 'number' ? count : 0
     const unpopScore = 1.0 / (1 + similarCount)
 
-    await supabase.from('item_popularity').upsert(
+    const { error: popularityError } = await supabase.from('item_popularity').upsert(
       {
         item_id: item.item_id,
         similar_count: similarCount,
@@ -56,6 +56,10 @@ export async function computePopularity(supabase: ServiceClient): Promise<number
       },
       { onConflict: 'item_id' }
     )
+    if (popularityError) {
+      const { logError } = await import('@/lib/errors/log-error')
+      await logError({ route: 'computePopularity.upsert', error: popularityError, context: { item_id: item.item_id } })
+    }
 
     computed++
   }

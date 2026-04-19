@@ -32,7 +32,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
 
   const selectClass =
     'h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
-  const labelClass = 'font-ui text-[13px] text-muted-foreground'
+  const labelClass = 'font-ui text-sm text-muted-foreground'
 
   function persistRythme(next: { daily_cap?: number; serendipity_quota?: number }) {
     startTransition(async () => {
@@ -100,7 +100,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <p className="font-ui text-sm font-medium text-foreground">Analyser des articles</p>
-            <p className="font-body text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               Collez des URLs d&apos;articles, Distil les analyse et les score.
             </p>
           </div>
@@ -117,7 +117,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
 
         {showScoringPanel && (
           <div className="space-y-3 border border-border p-4">
-            <Label className="font-ui text-[13px] text-muted-foreground">
+            <Label className="font-ui text-sm text-muted-foreground">
               URLs a analyser (une par ligne)
             </Label>
             <Textarea

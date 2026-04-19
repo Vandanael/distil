@@ -73,7 +73,7 @@ const COPY = {
     howSteps: [
       {
         kicker: 'Filtrer',
-        body: 'On lit 300 à 500 articles de votre veille chaque matin et on en garde 6 à 10. Les plus denses, les mieux sourcés.',
+        body: "On analyse jusqu'à 40 articles de votre veille chaque matin et on en garde 5 à 8. Les plus denses, les mieux sourcés.",
       },
       {
         kicker: 'Surprendre',
@@ -116,7 +116,7 @@ const COPY = {
     howSteps: [
       {
         kicker: 'Filter',
-        body: 'We read 300 to 500 articles from your feeds each morning and keep 6 to 10. The densest, the best sourced.',
+        body: 'We scan up to 40 articles from your feeds each morning and keep 5 to 8. The densest, the best sourced.',
       },
       {
         kicker: 'Surprise',

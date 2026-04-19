@@ -78,3 +78,51 @@ describe('RANKING_SYSTEM_PROMPT - densite + ref', () => {
     expect(RANKING_SYSTEM_PROMPT).toMatch(/references etablies/)
   })
 })
+
+describe('buildRankingUserPrompt - signaux recents', () => {
+  it('injecte les appreciations positives avec titre et site', () => {
+    const out = buildRankingUserPrompt(emptyProfile, [baseCandidate()], {
+      positive: [{ title: 'Article aime', siteName: 'stratechery.com' }],
+      rejected: [],
+    })
+    expect(out).toContain('SIGNAUX RECENTS')
+    expect(out).toContain('Appreciations explicites')
+    expect(out).toContain('Article aime | stratechery.com')
+  })
+
+  it('injecte les rejets avec titre et site', () => {
+    const out = buildRankingUserPrompt(emptyProfile, [baseCandidate()], {
+      positive: [],
+      rejected: [{ title: 'Article rejete', siteName: 'random.blog' }],
+    })
+    expect(out).toContain('Articles rejetes')
+    expect(out).toContain('Article rejete | random.blog')
+  })
+
+  it("n'ajoute pas de bloc signaux si listes vides", () => {
+    const out = buildRankingUserPrompt(emptyProfile, [baseCandidate()], {
+      positive: [],
+      rejected: [],
+    })
+    expect(out).not.toContain('SIGNAUX RECENTS')
+  })
+
+  it("n'ajoute pas de bloc signaux si argument omis", () => {
+    const out = buildRankingUserPrompt(emptyProfile, [baseCandidate()])
+    expect(out).not.toContain('SIGNAUX RECENTS')
+  })
+
+  it('tronque a 20 signaux par bucket', () => {
+    const many = Array.from({ length: 30 }, (_, i) => ({
+      title: `Titre ${i}`,
+      siteName: 'ex.com',
+    }))
+    const out = buildRankingUserPrompt(emptyProfile, [baseCandidate()], {
+      positive: many,
+      rejected: [],
+    })
+    expect(out).toContain('Titre 0 | ex.com')
+    expect(out).toContain('Titre 19 | ex.com')
+    expect(out).not.toContain('Titre 20 | ex.com')
+  })
+})

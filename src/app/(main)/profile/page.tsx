@@ -19,7 +19,7 @@ export default async function ProfilePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
         <div className="space-y-4 border-b border-border pb-8">
-          <p className="font-ui text-xs text-accent">Profil</p>
+          <p className="font-ui text-sm text-accent">Profil</p>
           <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
         </div>
         <TokensSection tokens={[]} />
@@ -52,7 +52,7 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
       <div className="space-y-4 border-b border-border pb-8">
-        <p className="font-ui text-xs text-accent">Profil</p>
+        <p className="font-ui text-sm text-accent">Profil</p>
         <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
         <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
@@ -79,7 +79,7 @@ export default async function ProfilePage() {
 
       {/* Parametres avances */}
       <details className="border-t border-border pt-6 group">
-        <summary className="font-ui text-xs text-muted-foreground cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-1.5">
+        <summary className="font-ui text-sm text-muted-foreground cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-1.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="12"
@@ -103,7 +103,7 @@ export default async function ProfilePage() {
           />
 
           <div className="space-y-4">
-            <p className="font-ui text-xs text-accent">Sources RSS</p>
+            <p className="font-ui text-sm text-accent">Sources RSS</p>
             <OPMLImport />
           </div>
 

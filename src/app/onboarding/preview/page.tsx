@@ -28,7 +28,7 @@ export default function OnboardingPreviewPage() {
       <div className="flex-1 px-5 md:px-8 py-12 md:py-16">
         <div className="w-full max-w-2xl mx-auto space-y-10 md:space-y-12">
           <header className="space-y-4">
-            <p className="font-ui text-xs uppercase tracking-wider text-accent">
+            <p className="font-ui text-sm uppercase tracking-wider text-accent">
               Avant de commencer
             </p>
             <h1 className="font-heading text-4xl md:text-5xl leading-[1.1] tracking-tight text-foreground">
@@ -46,7 +46,7 @@ export default function OnboardingPreviewPage() {
                 key={q.kicker}
                 className="border-t border-border pt-6 md:pt-7 space-y-3 md:space-y-4"
               >
-                <p className="font-ui text-xs uppercase tracking-wider text-accent">{q.kicker}</p>
+                <p className="font-ui text-sm uppercase tracking-wider text-accent">{q.kicker}</p>
                 <h2 className="font-ui text-2xl md:text-3xl font-bold leading-tight text-foreground">
                   {q.title}
                 </h2>

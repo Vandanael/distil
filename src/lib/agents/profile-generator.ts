@@ -104,7 +104,7 @@ async function generateForUser(
     }
 
     // Upsert profile
-    await supabase.from('user_profile_text').upsert(
+    const { error: upsertError } = await supabase.from('user_profile_text').upsert(
       {
         user_id: userId,
         static_profile: parsed.static_profile,
@@ -114,6 +114,7 @@ async function generateForUser(
       },
       { onConflict: 'user_id' }
     )
+    if (upsertError) throw new Error(`Upsert profil echoue: ${upsertError.message}`)
 
     return { userId, generated: true, error: null }
   } catch (err) {

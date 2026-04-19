@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ArticleCard } from './components/ArticleCard'
 import { EmptyFeed } from './components/EmptyFeed'
@@ -42,7 +41,6 @@ export default async function FeedPage() {
 
   let lastRefreshAt: string | null = null
   let interests: string[] = []
-  let rejectedCount = 0
   let keywordGroups: KeywordGroup[] = []
   const subScoresByItemId = new Map<string, SubScores>()
 
@@ -63,9 +61,8 @@ export default async function FeedPage() {
       interests = profileResult.data?.interests ?? []
 
       const now = new Date()
-      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
-      const [articlesResult, lastRunResult, rejectedResult] = await Promise.all([
+      const [articlesResult, lastRunResult] = await Promise.all([
         supabase
           .from('articles')
           .select(
@@ -84,17 +81,10 @@ export default async function FeedPage() {
           .order('completed_at', { ascending: false })
           .limit(1)
           .single(),
-        supabase
-          .from('articles')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('status', 'rejected')
-          .gte('scored_at', sevenDaysAgo),
       ])
 
       articles = articlesResult.data ?? []
       lastRefreshAt = lastRunResult.data?.completed_at ?? null
-      rejectedCount = rejectedResult.count ?? 0
 
       // Section "Tous vos mots-cles" : items des 48h matchant un keyword de l'user
       // et qui ne sont pas dans le feed (NOT EXISTS articles, cote RPC).
@@ -156,13 +146,11 @@ export default async function FeedPage() {
 
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3 md:py-10 w-full">
-      <div className="lg:max-w-[720px]">
-        <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
-      </div>
+      <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
       <DismissProvider>
-        <FeedShell className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2">
+        <FeedShell className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2">
           {articles.length === 0 ? (
             <div className="lg:col-span-2">
               <EmptyFeed />
@@ -198,7 +186,7 @@ export default async function FeedPage() {
                   aria-hidden="true"
                 >
                   <span className="h-px flex-1 bg-border" />
-                  <span className="font-ui text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                  <span className="font-ui text-sm uppercase tracking-[0.16em] text-muted-foreground">
                     Découverte
                   </span>
                   <span className="h-px flex-1 bg-border" />
@@ -232,18 +220,6 @@ export default async function FeedPage() {
       </DismissProvider>
 
       <KeywordSection groups={keywordGroups} />
-
-      {rejectedCount > 0 && (
-        <div className="mt-8 pt-4 border-t border-border lg:max-w-[720px]">
-          <Link
-            href="/library?tab=filtered"
-            className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
-          >
-            {rejectedCount} article{rejectedCount > 1 ? 's' : ''} filtre
-            {rejectedCount > 1 ? 's' : ''} cette semaine
-          </Link>
-        </div>
-      )}
     </div>
   )
 }
