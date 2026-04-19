@@ -33,12 +33,12 @@ export const metadata = {
 // score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
 // affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
 // cohabiter avec des articles scores et trahir la demo vide.
-// 5 articles, 5 themes distincts : culture, science, tech, geopolitique, societe.
+// 5 articles, 5 themes distincts, 4 FR + 1 EN : produit francophone par defaut.
 const FALLBACK_ARTICLES: FeaturedArticle[] = [
   {
-    title: 'The New Yorker - culture and ideas',
-    url: 'https://www.newyorker.com/culture',
-    site_name: 'The New Yorker',
+    title: 'Le Monde diplomatique',
+    url: 'https://www.monde-diplomatique.fr/',
+    site_name: 'Le Monde diplomatique',
     excerpt: null,
     score: null,
     is_serendipity: false,
@@ -46,9 +46,19 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: 'Quanta Magazine - science reporting',
-    url: 'https://www.quantamagazine.org/',
-    site_name: 'Quanta Magazine',
+    title: 'France Culture - La Suite dans les idees',
+    url: 'https://www.radiofrance.fr/franceculture',
+    site_name: 'France Culture',
+    excerpt: null,
+    score: null,
+    is_serendipity: false,
+    justification: null,
+    persona_slug: null,
+  },
+  {
+    title: 'Reporterre - le quotidien de l\'ecologie',
+    url: 'https://reporterre.net/',
+    site_name: 'Reporterre',
     excerpt: null,
     score: null,
     is_serendipity: true,
@@ -56,19 +66,9 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: 'MIT Technology Review',
-    url: 'https://www.technologyreview.com/',
-    site_name: 'MIT Technology Review',
-    excerpt: null,
-    score: null,
-    is_serendipity: false,
-    justification: null,
-    persona_slug: null,
-  },
-  {
-    title: 'Le Monde diplomatique',
-    url: 'https://www.monde-diplomatique.fr/',
-    site_name: 'Le Monde diplomatique',
+    title: 'Pour la Science',
+    url: 'https://www.pourlascience.fr/',
+    site_name: 'Pour la Science',
     excerpt: null,
     score: null,
     is_serendipity: false,

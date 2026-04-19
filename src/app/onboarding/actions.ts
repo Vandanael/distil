@@ -10,6 +10,7 @@ export type ProfileInput = {
   pinned_sources?: string[]
   daily_cap?: number
   serendipity_quota?: number
+  language?: 'fr' | 'en' | 'both'
 }
 
 export async function createProfile(input: ProfileInput) {
@@ -22,6 +23,8 @@ export async function createProfile(input: ProfileInput) {
     throw new Error('Non authentifie')
   }
 
+  const profileStructured = input.language ? { language: input.language } : null
+
   const { error } = await supabase.from('profiles').upsert({
     id: user.id,
     profile_text: input.profile_text ?? null,
@@ -31,6 +34,7 @@ export async function createProfile(input: ProfileInput) {
     serendipity_quota: input.serendipity_quota ?? 0.15,
     onboarding_completed: true,
     onboarding_method: input.method,
+    profile_structured: profileStructured,
   })
 
   if (error) {

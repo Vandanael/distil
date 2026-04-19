@@ -9,12 +9,18 @@ import { PublicHeader } from '@/components/PublicHeader'
 const QUESTIONS = [
   {
     kicker: 'Question 1',
-    title: "Vos centres d'interet",
-    body: 'Une ou deux phrases pour dire ce que vous voulez lire. Exemple : PM senior, produit, IA appliquee, startups B2B, sources primaires uniquement.',
-    hint: 'Plus vous etes precis, plus le feed est pertinent.',
+    title: 'Votre langue',
+    body: 'Francophone, anglophone ou mixte. En mode francophone, 90% de votre feed sera en francais.',
+    hint: 'Vous pouvez changer ce reglage plus tard dans votre profil.',
   },
   {
     kicker: 'Question 2',
+    title: 'Vos themes',
+    body: 'Choisissez parmi une liste de themes grand public (cinema, sciences, voyage...) ou decrivez-vous en texte libre.',
+    hint: 'Plus vous etes precis, plus le feed est pertinent.',
+  },
+  {
+    kicker: 'Question 3',
     title: 'Vos sources preferees',
     body: 'Optionnel. Des domaines que vous voulez voir remonter : lemonde.fr, paulgraham.com, stratechery.com... Ou un fichier OPML si vous en avez un.',
     hint: 'Vous pouvez passer cette question et ajouter vos sources plus tard.',

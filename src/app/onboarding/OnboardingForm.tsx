@@ -9,7 +9,29 @@ import { Label } from '@/components/ui/label'
 import { parseOPML, OPML_MAX_URLS } from '@/lib/opml'
 import { createProfile } from './actions'
 
+type Language = 'fr' | 'en' | 'both'
+
+// Themes grand public, volontairement larges. Chaque chip alimente interests[]
+// et profile_text si l'utilisateur ne saisit rien en texte libre.
+const MAINSTREAM_INTERESTS = [
+  'voyage',
+  'sport',
+  'cinéma',
+  'cuisine',
+  'santé',
+  'finance',
+  'jardinage',
+  'musique',
+  'littérature',
+  'photographie',
+  'écologie',
+  'sciences',
+  'histoire',
+] as const
+
 export function OnboardingForm() {
+  const [language, setLanguage] = useState<Language>('fr')
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([])
   const [profileText, setProfileText] = useState('')
   const [sources, setSources] = useState<string[]>([])
   const [sourceDraft, setSourceDraft] = useState('')
@@ -17,7 +39,13 @@ export function OnboardingForm() {
   const [isPending, startTransition] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const canSubmit = profileText.trim().length > 0
+  const canSubmit = selectedThemes.length > 0 || profileText.trim().length > 0
+
+  function toggleTheme(theme: string) {
+    setSelectedThemes((prev) =>
+      prev.includes(theme) ? prev.filter((t) => t !== theme) : [...prev, theme]
+    )
+  }
 
   function commitSourceDraft(value: string) {
     const parts = value
@@ -83,14 +111,39 @@ export function OnboardingForm() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     commitSourceDraft(sourceDraft)
+    // Compose profile_text depuis les chips si l'utilisateur n'a rien tapé,
+    // pour que le generateur d'embedding ait une base minimale.
+    const composedText =
+      profileText.trim().length > 0
+        ? profileText.trim()
+        : selectedThemes.length > 0
+          ? selectedThemes.join(', ')
+          : undefined
+
     startTransition(async () => {
       await createProfile({
         method: 'express',
-        profile_text: profileText.trim() || undefined,
+        profile_text: composedText,
+        interests: selectedThemes,
         pinned_sources: sources,
+        language,
       })
     })
   }
+
+  const langChipClass = (active: boolean) =>
+    `font-ui text-sm px-4 py-2 border transition-colors ${
+      active
+        ? 'border-accent bg-accent text-background'
+        : 'border-border text-muted-foreground hover:border-accent hover:text-foreground'
+    }`
+
+  const themeChipClass = (active: boolean) =>
+    `font-ui text-sm px-3 py-1.5 border transition-colors ${
+      active
+        ? 'border-accent bg-accent text-background'
+        : 'border-border text-foreground hover:border-accent'
+    }`
 
   return (
     <main className="flex min-h-full flex-col items-center justify-center p-8 bg-background">
@@ -103,32 +156,93 @@ export function OnboardingForm() {
             Votre veille en deux minutes
           </h1>
           <p className="font-body text-base text-muted-foreground">
-            Décrivez ce qui vous intéresse. Ajoutez des sources si vous en avez. Distil
-            s&apos;occupe du reste.
+            Choisissez votre langue, vos thèmes. Distil s&apos;occupe du reste.
           </p>
           <div className="h-px bg-border" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-3">
+            <Label className="font-ui text-sm uppercase tracking-wider text-muted-foreground">
+              Langue des articles
+            </Label>
+            <div className="flex flex-wrap gap-2" data-testid="language-selector">
+              <button
+                type="button"
+                onClick={() => setLanguage('fr')}
+                className={langChipClass(language === 'fr')}
+                data-testid="lang-fr"
+              >
+                Francophone
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={langChipClass(language === 'en')}
+                data-testid="lang-en"
+              >
+                Anglophone
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('both')}
+                className={langChipClass(language === 'both')}
+                data-testid="lang-both"
+              >
+                Mixte
+              </button>
+            </div>
+            <p className="font-body text-sm text-muted-foreground">
+              {language === 'fr' && 'Priorité aux sources francophones (90% du feed).'}
+              {language === 'en' && 'Priorité aux sources anglophones (90% du feed).'}
+              {language === 'both' && 'Aucun biais : tout est servi indifféremment.'}
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="font-ui text-sm uppercase tracking-wider text-muted-foreground">
+              Thèmes qui vous intéressent
+            </Label>
+            <div className="flex flex-wrap gap-2" data-testid="themes-selector">
+              {MAINSTREAM_INTERESTS.map((theme) => {
+                const active = selectedThemes.includes(theme)
+                return (
+                  <button
+                    key={theme}
+                    type="button"
+                    onClick={() => toggleTheme(theme)}
+                    aria-pressed={active}
+                    className={themeChipClass(active)}
+                    data-testid={`theme-${theme}`}
+                  >
+                    {theme}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="font-body text-sm text-muted-foreground">
+              Sélectionnez autant de thèmes que vous voulez, ou décrivez-vous en texte libre ci-dessous.
+            </p>
+          </div>
+
           <div className="space-y-2">
             <Label
               htmlFor="profile-text"
               className="font-ui text-sm uppercase tracking-wider text-muted-foreground"
             >
-              {"Vos centres d'intérêt"}
+              {"Précisez (optionnel)"}
             </Label>
             <Textarea
               id="profile-text"
-              placeholder="Ex: PM senior, produit, IA appliquée, startups B2B, sources primaires uniquement..."
+              placeholder="Ex: passionné de jazz, je grimpe en montagne, je cuisine asiatique, fan de F1..."
               value={profileText}
               onChange={(e) => setProfileText(e.target.value)}
-              rows={4}
+              rows={3}
               disabled={isPending}
               data-testid="profile-text"
-              autoFocus
             />
             <p className="font-body text-sm text-muted-foreground">
-              Une phrase suffit. Plus vous êtes précis, plus le feed est pertinent.
+              Plus vous êtes précis, plus le feed est pertinent.
             </p>
           </div>
 
