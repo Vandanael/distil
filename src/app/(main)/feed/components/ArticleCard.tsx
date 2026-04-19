@@ -205,7 +205,7 @@ export function ArticleCard({
     }
   }
 
-return (
+  return (
     <div className="relative -mx-3" data-article-card-wrapper>
       {swipeDirection === 'right' && (
         <div
@@ -276,7 +276,6 @@ return (
           aria-label={title ?? 'Sans titre'}
           data-testid={`article-card-link-${id}`}
         />
-
 
         {/* Ligne meta : source · date · duree */}
         <div className="relative flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">

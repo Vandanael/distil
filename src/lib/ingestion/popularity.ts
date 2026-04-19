@@ -58,7 +58,11 @@ export async function computePopularity(supabase: ServiceClient): Promise<number
     )
     if (popularityError) {
       const { logError } = await import('@/lib/errors/log-error')
-      await logError({ route: 'computePopularity.upsert', error: popularityError, context: { item_id: item.item_id } })
+      await logError({
+        route: 'computePopularity.upsert',
+        error: popularityError,
+        context: { item_id: item.item_id },
+      })
     }
 
     computed++

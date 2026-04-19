@@ -139,10 +139,7 @@ export function applyCosineGuard(
 // court pour ressentir l'effet d'un clic sans diluer par de vieux feedbacks.
 const SIGNAL_WINDOW_DAYS = 14
 
-async function loadRecentSignals(
-  supabase: ServiceClient,
-  userId: string
-): Promise<RecentSignals> {
+async function loadRecentSignals(supabase: ServiceClient, userId: string): Promise<RecentSignals> {
   const cutoff = new Date(Date.now() - SIGNAL_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
 
   const [positiveResult, rejectedResult] = await Promise.all([

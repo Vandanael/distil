@@ -88,7 +88,8 @@ export async function dismissArticle(
     .update({ status: 'rejected', rejection_reason: reason })
     .eq('id', articleId)
     .eq('user_id', user.id)
-  if (dismissError) await logError({ route: 'dismissArticle', error: dismissError, userId: user.id })
+  if (dismissError)
+    await logError({ route: 'dismissArticle', error: dismissError, userId: user.id })
 
   revalidatePath('/feed')
 }
