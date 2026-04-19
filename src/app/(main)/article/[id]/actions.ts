@@ -93,6 +93,28 @@ export async function dismissArticle(
   revalidatePath('/feed')
 }
 
+// Retire un article des archives sans le detruire : passe en status 'rejected'
+// + reset archived_at. L'historique reste, l'article ne remonte plus dans
+// /library ni /feed. Garde-fou .eq('status', 'archived') : refuse d'ecraser
+// un statut different (article deja remis en feed ou autre).
+export async function removeFromLibrary(articleId: string): Promise<void> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { error } = await supabase
+    .from('articles')
+    .update({ status: 'rejected', archived_at: null, rejection_reason: 'dismissed_by_user' })
+    .eq('id', articleId)
+    .eq('user_id', user.id)
+    .eq('status', 'archived')
+  if (error) await logError({ route: 'removeFromLibrary', error, userId: user.id })
+
+  revalidatePath('/library')
+}
+
 export async function addTag(articleId: string, tagName: string): Promise<void> {
   const supabase = await createClient()
   const {

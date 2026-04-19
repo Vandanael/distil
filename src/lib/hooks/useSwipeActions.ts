@@ -53,6 +53,7 @@ export function useSwipeActions({
   const startY = useRef(0)
   const locked = useRef<'horizontal' | 'vertical' | null>(null)
   const active = useRef(false)
+  const captured = useRef(false)
   const reducedMotion = useRef(
     typeof window !== 'undefined'
       ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -62,21 +63,25 @@ export function useSwipeActions({
   const reset = useCallback(() => {
     locked.current = null
     active.current = false
+    captured.current = false
     setIsSwiping(false)
     setDirection(null)
     setProgress(0)
     setStyle({})
   }, [])
 
+  // Ne pas capturer le pointer ici : un simple clic ne doit pas intercepter
+  // le pointerup, sinon le click natif sur les enfants (Link, bouton Masquer)
+  // ne se dispatche pas. La capture est differee a onPointerMove, quand on a
+  // detecte un vrai swipe horizontal.
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (!enabled || e.button !== 0) return
-      const el = e.currentTarget as HTMLElement
-      el.setPointerCapture(e.pointerId)
       startX.current = e.clientX
       startY.current = e.clientY
       locked.current = null
       active.current = true
+      captured.current = false
     },
     [enabled]
   )
@@ -94,6 +99,16 @@ export function useSwipeActions({
         if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return
         if (absDx > absDy * ANGLE_RATIO) {
           locked.current = 'horizontal'
+          // Capture une fois le swipe horizontal confirme : on garde les
+          // pointermove/up meme si le doigt sort de la card, sans bloquer
+          // les clics simples (cas ou locked reste null).
+          const el = e.currentTarget as HTMLElement
+          try {
+            el.setPointerCapture(e.pointerId)
+            captured.current = true
+          } catch {
+            // setPointerCapture peut throw si le pointer n'est plus actif
+          }
           setIsSwiping(true)
         } else {
           locked.current = 'vertical'
@@ -128,8 +143,14 @@ export function useSwipeActions({
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
       if (!active.current) return
-      const el = e.currentTarget as HTMLElement
-      el.releasePointerCapture(e.pointerId)
+      if (captured.current) {
+        const el = e.currentTarget as HTMLElement
+        try {
+          el.releasePointerCapture(e.pointerId)
+        } catch {
+          // no-op : pointer deja relache
+        }
+      }
 
       if (locked.current !== 'horizontal') {
         reset()
@@ -174,8 +195,14 @@ export function useSwipeActions({
 
   const onPointerCancel = useCallback(
     (e: React.PointerEvent) => {
-      const el = e.currentTarget as HTMLElement
-      el.releasePointerCapture(e.pointerId)
+      if (captured.current) {
+        const el = e.currentTarget as HTMLElement
+        try {
+          el.releasePointerCapture(e.pointerId)
+        } catch {
+          // no-op : pointer deja relache
+        }
+      }
       setStyle({
         transform: 'translateX(0)',
         opacity: 1,

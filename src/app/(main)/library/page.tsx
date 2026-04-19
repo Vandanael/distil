@@ -42,7 +42,7 @@ export default async function LibraryPage() {
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-8 md:py-12 space-y-8 w-full">
       <div className="flex items-baseline justify-between gap-4 flex-wrap">
-        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Sauvegardés</h1>
+        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Archives</h1>
         <span className="font-ui text-sm text-muted-foreground" data-testid="library-count">
           {saved.length} article{saved.length !== 1 ? 's' : ''}
         </span>

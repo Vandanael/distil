@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { ArticleCard } from './ArticleCard'
 import { DismissProvider } from './DismissContext'
 
@@ -109,8 +109,10 @@ describe('ArticleCard', () => {
     expect(screen.getByTestId('tag-abc-123')).toBeTruthy()
   })
 
-  it('affiche la justification inline sous l excerpt', () => {
+  it('cache la justification par defaut et l affiche via toggle Pourquoi', () => {
     renderCard({ ...BASE_PROPS, justification: 'Correspond a votre profil ML.' })
+    expect(screen.queryByTestId('justification-inline-abc-123')).toBeNull()
+    fireEvent.click(screen.getByTestId('toggle-details-abc-123'))
     expect(screen.getByTestId('justification-inline-abc-123')).toBeTruthy()
   })
 })

@@ -2,7 +2,7 @@ export const translations = {
   fr: {
     nav: {
       feed: 'Feed',
-      library: 'Sauvegardés',
+      library: 'Archives',
       search: 'Recherche',
       profile: 'Profil',
     },
@@ -73,7 +73,7 @@ export const translations = {
   en: {
     nav: {
       feed: 'Feed',
-      library: 'Saved',
+      library: 'Archive',
       search: 'Search',
       profile: 'Profile',
     },
