@@ -71,14 +71,16 @@ export function WelcomeScreen() {
         </div>
 
         {/* Message */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <p className="font-body text-lg text-foreground">
             {message}
             {dots}
           </p>
-          <p className="font-body text-sm text-muted-foreground">
-            La premiere veille demande environ 30 secondes. Vous serez redirige
-            automatiquement.
+          <p className="font-heading text-3xl md:text-4xl leading-[1.1] tracking-tight text-foreground text-balance">
+            <span className="text-accent tabular-nums">~ 30 secondes</span> pour la premiere veille.
+          </p>
+          <p className="font-body text-[15px] text-muted-foreground leading-[1.55]">
+            Vous serez redirige automatiquement.
           </p>
         </div>
 

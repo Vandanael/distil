@@ -3,12 +3,24 @@ import { PublicFooter } from '@/components/PublicFooter'
 import { PublicHeader } from '@/components/PublicHeader'
 import { BrandGlyph } from '@/components/BrandGlyph'
 
+const ABOUT_DESCRIPTION =
+  'Distil est une veille intelligente et un read-later personnel. Curation IA transparente, diversite editoriale by design.'
+
 export const metadata = {
-  title: 'A propos - Distil',
-  description:
-    'Distil est une veille intelligente et un read-later personnel. Curation IA transparente, diversite editoriale by design.',
+  title: 'A propos',
+  description: ABOUT_DESCRIPTION,
   // Page publique indexable : override le noindex par defaut du layout racine.
   robots: { index: true, follow: true },
+  openGraph: {
+    title: 'A propos de Distil',
+    description: ABOUT_DESCRIPTION,
+    url: '/about',
+  },
+  twitter: {
+    title: 'A propos de Distil',
+    description: ABOUT_DESCRIPTION,
+  },
+  alternates: { canonical: '/about' },
 }
 
 export default function AboutPage() {

@@ -38,7 +38,7 @@ function articleRow(article: DigestArticle, appUrl: string): string {
   return `
     <tr>
       <td style="padding:16px 0;border-bottom:1px solid #e2e0d8;vertical-align:top;">
-        <a href="${link}" style="color:#1c3028;text-decoration:none;font-size:16px;font-weight:600;line-height:1.4;display:block;">${escapeHtml(title)}</a>
+        <a href="${link}" style="color:#1a3a2e;text-decoration:none;font-size:16px;font-weight:600;line-height:1.4;display:block;">${escapeHtml(title)}</a>
         ${meta ? `<span style="font-size:13px;color:#587060;line-height:1.6;">${escapeHtml(meta)}</span>` : ''}
         ${article.excerpt ? `<p style="font-size:14px;color:#587060;line-height:1.5;margin:4px 0 0;">${escapeHtml(article.excerpt).slice(0, 140)}${(article.excerpt?.length ?? 0) > 140 ? '...' : ''}</p>` : ''}
       </td>
@@ -65,19 +65,19 @@ export function buildDigestHtml(data: DigestData): string {
   <meta name="color-scheme" content="light dark">
   <title>Distil - ${data.date}</title>
 </head>
-<body style="margin:0;padding:0;background:#fafaf7;font-family:-apple-system,system-ui,sans-serif;">
+<body style="margin:0;padding:0;background:#f7f8f3;font-family:-apple-system,system-ui,sans-serif;">
   <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
     <!-- Header -->
     <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
       <tr>
-        <td style="border-bottom:2px solid #1c3028;padding-bottom:12px;">
-          <a href="${data.appUrl}/feed" style="color:#d94e1f;font-size:20px;font-weight:700;text-decoration:none;">Distil</a>
+        <td style="border-bottom:2px solid #1a3a2e;padding-bottom:12px;">
+          <a href="${data.appUrl}/feed" style="color:#7A2E3A;font-size:20px;font-weight:700;text-decoration:none;">Distil</a>
           <span style="float:right;font-size:12px;color:#587060;">${escapeHtml(data.date)}</span>
         </td>
       </tr>
     </table>
 
-    <p style="font-size:14px;color:#1c3028;margin:16px 0 24px;">Votre veille du jour</p>
+    <p style="font-size:14px;color:#1a3a2e;margin:16px 0 24px;">Votre veille du jour</p>
 
     <!-- Articles -->
     <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
@@ -86,13 +86,13 @@ export function buildDigestHtml(data: DigestData): string {
 
     <!-- CTA -->
     <div style="text-align:center;margin:32px 0;">
-      <a href="${data.appUrl}/feed" style="display:inline-block;background:#1c3028;color:#fafaf7;font-size:14px;font-weight:600;padding:12px 28px;text-decoration:none;">Ouvrir Distil</a>
+      <a href="${data.appUrl}/feed" style="display:inline-block;background:#1a3a2e;color:#f7f8f3;font-size:14px;font-weight:600;padding:12px 28px;text-decoration:none;">Ouvrir Distil</a>
     </div>
 
     <!-- Footer -->
     <div style="border-top:1px solid #e2e0d8;padding-top:16px;margin-top:16px;">
       <p style="font-size:11px;color:#587060;line-height:1.5;margin:0;">
-        Cet email est envoye car vous avez active le digest dans vos <a href="${data.appUrl}/profile" style="color:#d94e1f;">preferences</a>.
+        Cet email est envoye car vous avez active le digest dans vos <a href="${data.appUrl}/profile" style="color:#7A2E3A;">preferences</a>.
         <a href="${data.unsubscribeUrl}" style="color:#587060;">Se desabonner</a>
       </p>
     </div>

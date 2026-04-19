@@ -27,10 +27,12 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
+const DEFAULT_DESCRIPTION = 'Veille intelligente. Moins de bruit, mieux lu.'
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://distil.app'),
-  title: 'Distil',
-  description: 'Veille intelligente. Moins de bruit, mieux lu.',
+  title: { default: 'Distil', template: '%s - Distil' },
+  description: DEFAULT_DESCRIPTION,
   manifest: '/manifest.webmanifest',
   // Beta privee : on coupe l'indexation le temps de tester en cercle ferme.
   robots: { index: false, follow: false, nocache: true },
@@ -39,10 +41,23 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Distil',
   },
+  openGraph: {
+    type: 'website',
+    siteName: 'Distil',
+    title: 'Distil',
+    description: DEFAULT_DESCRIPTION,
+    locale: 'fr_FR',
+    alternateLocale: 'en_GB',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Distil',
+    description: DEFAULT_DESCRIPTION,
+  },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1c3028',
+  themeColor: '#1a3a2e',
 }
 
 export default async function RootLayout({

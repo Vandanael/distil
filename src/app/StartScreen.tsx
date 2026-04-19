@@ -5,7 +5,7 @@ import { Fragment } from 'react'
 import { PublicFooter } from '@/components/PublicFooter'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ArticleRow } from '@/components/ArticleRow'
-import { DEMO_ACCOUNTS, type DemoAccountSlug } from '@/lib/demo-accounts'
+import { DEMO_ACCOUNTS, HOME_FEATURED_SLUGS, type DemoAccountSlug } from '@/lib/demo-accounts'
 import { useLocale } from '@/lib/i18n/context'
 
 // Wrappe chaque "Distil" du texte dans un span accent (le wordmark reste toujours orange).
@@ -33,29 +33,12 @@ type FeaturedArticle = {
   persona_slug: DemoAccountSlug | null
 }
 
-const PERSONA_EXAMPLES = [
-  {
-    slug: 'pm',
-    label: { fr: 'Politique & Monde', en: 'Politics & World' },
-    description: {
-      fr: 'Géopolitique, démocratie, actualité internationale',
-      en: 'Geopolitics, democracy, international news',
-    },
-  },
-  {
-    slug: 'consultant',
-    label: { fr: 'Cuisine & Gastronomie', en: 'Food & Gastronomy' },
-    description: {
-      fr: 'Techniques, chefs, restaurants, recettes',
-      en: 'Techniques, chefs, restaurants, recipes',
-    },
-  },
-  {
-    slug: 'dev',
-    label: { fr: 'Tech & Numérique', en: 'Tech & Digital' },
-    description: { fr: 'Actualité tech, outils, open source', en: 'Tech news, tools, open source' },
-  },
-]
+// Source unique : on derive PERSONA_EXAMPLES depuis DEMO_ACCOUNTS via HOME_FEATURED_SLUGS
+// pour garantir que les 5 thematiques vitrines (politique, cuisine, tech, sport, culture)
+// restent synchronisees avec la home et les pages /demo/[slug].
+const PERSONA_EXAMPLES = HOME_FEATURED_SLUGS.map(
+  (slug) => DEMO_ACCOUNTS.find((a) => a.slug === slug)!
+)
 
 const COPY = {
   fr: {
@@ -89,9 +72,9 @@ const COPY = {
     foundationsCta: 'Voir les fondations',
     examplesTitle: 'Voir un exemple',
     examplesSubtitle:
-      "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
+      "Cinq thèmes, cinq éditions d'aujourd'hui. Choisissez celui qui vous parle, ignorez le reste.",
     feedTitle: 'La veille du jour',
-    feedTitleFallback: 'Exemples éditoriaux',
+    feedTitleFallback: 'Exemples',
     feedEmpty: 'Distil analyse le web en ce moment. Revenez dans quelques minutes.',
     serendipity: 'Découverte',
     relevance: 'Pertinence',
@@ -131,9 +114,10 @@ const COPY = {
       'Method grounded in research on filter bubbles, the attention economy, and serendipity.',
     foundationsCta: 'See the foundations',
     examplesTitle: 'See an example',
-    examplesSubtitle: "Pick a topic to preview today's selection.",
+    examplesSubtitle:
+      "Five topics, five editions for today. Pick the one that speaks to you, ignore the rest.",
     feedTitle: "Today's briefing",
-    feedTitleFallback: 'Editorial samples',
+    feedTitleFallback: 'Samples',
     feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',
     serendipity: 'Discovery',
     relevance: 'Relevance',

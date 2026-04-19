@@ -4,8 +4,8 @@
   "description": "Veille intelligente. Moins de bruit, mieux lu.",
   "start_url": "/feed",
   "display": "standalone",
-  "background_color": "#fafaf7",
-  "theme_color": "#1c3028",
+  "background_color": "#f7f8f3",
+  "theme_color": "#1a3a2e",
   "orientation": "portrait",
   "icons": [
     {

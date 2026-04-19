@@ -35,7 +35,7 @@ export function PublicHeader({ contextLabel }: Props) {
         <div className="flex items-center justify-between gap-4 h-8">
           <div className="flex items-center gap-3 md:gap-5 min-w-0 h-full">
             <Link href="/" className="hover:text-foreground transition-colors">
-              <span className="font-display text-2xl md:text-3xl leading-none italic text-accent">
+              <span className="inline-block translate-y-[2px] font-display text-2xl md:text-3xl leading-none italic text-accent">
                 Distil
               </span>
             </Link>

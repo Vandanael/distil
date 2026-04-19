@@ -10,25 +10,31 @@ export const revalidate = 3600
 
 // Allowlist SEO : / et /about sont les 2 seules pages publiques indexables.
 // Tout le reste heritage du layout racine (noindex par defaut, defense en profondeur).
+const HOME_DESCRIPTION =
+  "Distil lit le web a votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversite editoriale, zero algorithme de popularite."
+
 export const metadata = {
+  title: 'Distil - votre veille quotidienne, sans le bruit',
+  description: HOME_DESCRIPTION,
   robots: { index: true, follow: true },
+  openGraph: {
+    title: 'Distil - votre veille quotidienne, sans le bruit',
+    description: HOME_DESCRIPTION,
+    url: '/',
+  },
+  twitter: {
+    title: 'Distil - votre veille quotidienne, sans le bruit',
+    description: HOME_DESCRIPTION,
+  },
+  alternates: { canonical: '/' },
 }
 
 // Fallback editorial : articles perennes, n'apparaissent QUE si aucun article
 // score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
 // affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
 // cohabiter avec des articles scores et trahir la demo vide.
+// 5 articles, 5 themes distincts : culture, science, tech, geopolitique, societe.
 const FALLBACK_ARTICLES: FeaturedArticle[] = [
-  {
-    title: 'The Atlantic - recent features in international affairs',
-    url: 'https://www.theatlantic.com/world/',
-    site_name: 'The Atlantic',
-    excerpt: null,
-    score: null,
-    is_serendipity: false,
-    justification: null,
-    persona_slug: null,
-  },
   {
     title: 'The New Yorker - culture and ideas',
     url: 'https://www.newyorker.com/culture',
@@ -50,9 +56,9 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: 'The Guardian - long reads',
-    url: 'https://www.theguardian.com/news/series/the-long-read',
-    site_name: 'The Guardian',
+    title: 'MIT Technology Review',
+    url: 'https://www.technologyreview.com/',
+    site_name: 'MIT Technology Review',
     excerpt: null,
     score: null,
     is_serendipity: false,
@@ -70,9 +76,9 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: 'MIT Technology Review',
-    url: 'https://www.technologyreview.com/',
-    site_name: 'MIT Technology Review',
+    title: 'The Guardian - long reads',
+    url: 'https://www.theguardian.com/news/series/the-long-read',
+    site_name: 'The Guardian',
     excerpt: null,
     score: null,
     is_serendipity: true,

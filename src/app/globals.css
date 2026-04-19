@@ -62,21 +62,21 @@
   --muted-foreground: #5a6358; /* 5.2:1 AA sur background */
   --subtle: #333a35; /* 9:1 AAA pour petits textes (<= 13px) */
 
-  /* Accent = grenat (marque, hover, emphase editoriale) */
-  /* #a62639 : ~5.9:1 sur #f7f8f3 - AAA conserve */
-  --accent: #a62639;
+  /* Accent = bordeaux profond (marque, hover, emphase editoriale) */
+  /* #7A2E3A : ~8.2:1 sur #f7f8f3 - AAA, archetype revue/presse, chaud-froid avec le vert bouteille */
+  --accent: #7A2E3A;
   --accent-foreground: #f7f8f3;
 
-  /* Destructive : rouge presse, distinct du grenat de marque pour eviter l'ambiguite action/erreur */
+  /* Destructive : rouge presse, distinct de l'accent de marque pour eviter l'ambiguite action/erreur */
   --destructive: #c8102e;
   --border: #d6dbcd;
   --input: #d6dbcd;
-  --ring: #a62639; /* focus ring = grenat */
+  --ring: #7A2E3A; /* focus ring = bordeaux profond */
   --radius: 0rem; /* coins francs */
 }
 
 .dark {
-  /* Dark mode G2 - vert bouteille tres fonce + stone clair + grenat clair */
+  /* Dark mode G2 - vert bouteille tres fonce + stone clair + bordeaux clair */
   --background: #0e1d17; /* vert bouteille profond */
   --foreground: #f2f4ee; /* stone clair : encre inversee */
   --card: #1a3a2e;
@@ -90,12 +90,12 @@
   --muted: #1a3a2e;
   --muted-foreground: #a8b4a5; /* stone-vert clair : 8:1 AAA sur fond */
   --subtle: #d4cdb5; /* stone tres clair pour petits textes */
-  --accent: #d4616e; /* grenat clair : 5:1 AA sur fond sombre */
+  --accent: #d46a7a; /* bordeaux clair : ~6.8:1 AA sur fond sombre */
   --accent-foreground: #0e1d17;
   --destructive: #ef4444;
   --border: #2a4a3a;
   --input: #2a4a3a;
-  --ring: #d4616e;
+  --ring: #d46a7a;
 }
 
 @layer base {

@@ -42,14 +42,22 @@ function LoginPageInner() {
     setError(null)
     setGoogleLoading(true)
     const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithOAuth({
+    // skipBrowserRedirect : avec @supabase/ssr la redirection auto n'est pas garantie
+    // (comportement variable entre versions). On navigue nous-memes vers data.url pour
+    // eviter le "double clic" cote utilisateur.
+    const { data, error: authError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        skipBrowserRedirect: true,
+      },
     })
-    if (authError) {
-      setError(authError.message)
+    if (authError || !data?.url) {
+      setError(authError?.message ?? 'Redirection Google impossible. Reessayez.')
       setGoogleLoading(false)
+      return
     }
+    window.location.href = data.url
   }
 
   async function handleMagicLink(e: React.FormEvent<HTMLFormElement>) {

@@ -14,7 +14,7 @@ export default function OgImage() {
         flexDirection: 'column',
         justifyContent: 'flex-end',
         padding: '80px',
-        backgroundColor: '#fafaf7',
+        backgroundColor: '#f7f8f3',
         position: 'relative',
       }}
     >
@@ -26,21 +26,21 @@ export default function OgImage() {
           left: 0,
           right: 0,
           height: '6px',
-          backgroundColor: '#d94e1f',
+          backgroundColor: '#7A2E3A',
         }}
       />
 
       {/* Contenu */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* Filet orange */}
-        <div style={{ width: '64px', height: '3px', backgroundColor: '#d94e1f' }} />
+        <div style={{ width: '64px', height: '3px', backgroundColor: '#7A2E3A' }} />
 
         {/* Logo */}
         <div
           style={{
             fontSize: '112px',
             fontWeight: 700,
-            color: '#1c3028',
+            color: '#1a3a2e',
             lineHeight: 1,
             letterSpacing: '-4px',
             textTransform: 'uppercase',
