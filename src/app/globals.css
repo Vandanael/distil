@@ -42,8 +42,8 @@
 }
 
 :root {
-  /* Palette Distil - Publishing vert */
-  --background: #fbf9f4; /* creme : papier */
+  /* Palette Distil - Publishing vert (fond off-white editorial, pas cream papier) */
+  --background: #fafaf7; /* off-white froid : editorial numerique */
   --foreground: #1c3028; /* vert foret fonce : encre editoriale */
   --card: #ffffff;
   --card-foreground: #1c3028;
@@ -52,25 +52,25 @@
 
   /* Primary = vert foret (autorite, CTA principal) */
   --primary: #1c3028;
-  --primary-foreground: #fbf9f4;
+  --primary-foreground: #fafaf7;
 
-  /* Secondary = creme muet (bouton secondaire discret) */
-  --secondary: #e8e4dc;
+  /* Secondary = gris neutre doux (bouton secondaire discret) */
+  --secondary: #eae8e0;
   --secondary-foreground: #1c3028;
 
   /* Muted */
-  --muted: #f0ede6;
+  --muted: #f1f1ec;
   --muted-foreground: #587060; /* vert-gris : harmonieux avec le primaire */
-  --subtle: #3f5649; /* vert-gris contraste AA sur creme, pour typos <= 13px */
+  --subtle: #3f5649; /* vert-gris contraste AA sur off-white, pour typos <= 13px */
 
   /* Accent = orange Distil (marque, hover, emphase editoriale) */
-  /* #b84518 : 5.14:1 sur #fbf9f4 - passe WCAG AA pour tout texte */
+  /* #b84518 : ~5.1:1 sur #fafaf7 - passe WCAG AA pour tout texte */
   --accent: #b84518;
-  --accent-foreground: #fbf9f4;
+  --accent-foreground: #fafaf7;
 
   --destructive: #dc2626;
-  --border: #d4cfc5;
-  --input: #d4cfc5;
+  --border: #e2e0d8;
+  --input: #e2e0d8;
   --ring: #d94e1f; /* focus ring = orange */
   --match-strong: #2d6a4f; /* vert emeraude : signal "match fort" score >= 80 */
   --radius: 0rem; /* coins francs */
@@ -79,20 +79,20 @@
 .dark {
   /* Dark mode - palette vert foret coherente (pas de bleu marine) */
   --background: #0d1a11;
-  --foreground: #fbf9f4;
+  --foreground: #fafaf7;
   --card: #1c3028;
-  --card-foreground: #fbf9f4;
+  --card-foreground: #fafaf7;
   --popover: #1c3028;
-  --popover-foreground: #fbf9f4;
-  --primary: #e8e4dc;
+  --popover-foreground: #fafaf7;
+  --primary: #eae8e0;
   --primary-foreground: #1c3028;
   --secondary: #244030;
-  --secondary-foreground: #fbf9f4;
+  --secondary-foreground: #fafaf7;
   --muted: #1a2e20; /* vert tres fonce (correction : etait bleu #1a3a6b) */
   --muted-foreground: #8aab94; /* vert-gris clair lisible */
   --subtle: #b7ccbe; /* vert-gris clair, contraste AA sur fond sombre */
   --accent: #e8693d;
-  --accent-foreground: #fbf9f4;
+  --accent-foreground: #fafaf7;
   --destructive: #ef4444;
   --border: #2a4a38; /* vert-gris fonce (correction : etait bleu #1e3a5f) */
   --input: #2a4a38; /* idem */

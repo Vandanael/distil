@@ -34,9 +34,8 @@ export function MainHeader() {
         .join(' ')
         .trim()}
     >
-      <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 pt-3">
-        <div className="border-t-2 border-foreground" aria-hidden />
-        <div className="flex items-center justify-between gap-4 min-h-10 pt-2 pb-2">
+      <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3">
+        <div className="flex items-center justify-between gap-4 min-h-10">
           <div className="flex items-center gap-3 md:gap-5 min-w-0">
             <Link href="/feed" className="hover:opacity-80 transition-opacity">
               <span className="font-display text-2xl md:text-3xl leading-none italic text-accent">

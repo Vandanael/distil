@@ -24,9 +24,7 @@ const QUESTIONS = [
 export default function OnboardingPreviewPage() {
   return (
     <main className="flex flex-1 flex-col bg-background">
-      <div className="pt-5 md:pt-10">
-        <PublicHeader contextLabel="Les 2 questions" />
-      </div>
+      <PublicHeader contextLabel="Les 2 questions" />
       <div className="flex-1 px-5 md:px-8 py-12 md:py-16">
         <div className="w-full max-w-2xl mx-auto space-y-10 md:space-y-12">
           <header className="space-y-4">

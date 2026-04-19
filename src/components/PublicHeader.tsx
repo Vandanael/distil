@@ -30,8 +30,8 @@ export function PublicHeader({ contextLabel }: Props) {
   const t = LABELS[locale]
 
   return (
-    <header className="border-t-2 border-foreground">
-      <div className="max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-5 md:px-8 pt-3">
+    <header className="border-b border-border">
+      <div className="max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-5 md:px-8 py-3">
         <div className="flex items-center justify-between gap-4 h-8">
           <div className="flex items-center gap-3 md:gap-5 min-w-0 h-full">
             <Link href="/" className="hover:text-foreground transition-colors">

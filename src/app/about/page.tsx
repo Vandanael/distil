@@ -12,9 +12,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main className="flex-1 flex flex-col bg-background">
-      <div className="pt-5 md:pt-10">
-        <PublicHeader contextLabel="À propos" />
-      </div>
+      <PublicHeader contextLabel="À propos" />
       <div className="flex-1 w-full max-w-2xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-5 md:pb-10">
         {/* Hero */}
         <BrandGlyph size={96} className="text-accent mb-8 md:mb-10" title="Distil" />

@@ -70,7 +70,7 @@ export default async function ProfilePage() {
         <form action={signOut}>
           <button
             type="submit"
-            className="font-ui text-sm text-muted-foreground hover:text-destructive transition-colors"
+            className="font-ui text-sm text-muted-foreground hover:text-destructive hover:underline underline-offset-4 transition-colors"
           >
             Se deconnecter
           </button>

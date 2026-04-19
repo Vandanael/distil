@@ -161,7 +161,7 @@ export function StartScreen({
   return (
     <main className="flex-1 flex flex-col bg-background overflow-x-clip">
       {/* Masthead partage public, pleine largeur */}
-      <div data-rise style={{ ['--rise-delay' as string]: '0' }} className="pt-5 md:pt-10">
+      <div data-rise style={{ ['--rise-delay' as string]: '0' }}>
         <PublicHeader />
       </div>
       <div className="flex-1 px-5 md:px-8 pt-8 md:pt-12">

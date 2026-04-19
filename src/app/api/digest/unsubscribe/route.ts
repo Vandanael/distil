@@ -62,7 +62,7 @@ function page(title: string, message: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} - Distil</title></head>
-<body style="margin:0;padding:40px 20px;background:#fbf9f4;font-family:-apple-system,system-ui,sans-serif;color:#1c3028;">
+<body style="margin:0;padding:40px 20px;background:#fafaf7;font-family:-apple-system,system-ui,sans-serif;color:#1c3028;">
   <div style="max-width:400px;margin:0 auto;text-align:center;">
     <p style="font-size:20px;font-weight:700;color:#d94e1f;">Distil</p>
     <h1 style="font-size:24px;margin:24px 0 8px;">${title}</h1>

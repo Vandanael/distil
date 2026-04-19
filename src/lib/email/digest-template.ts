@@ -37,7 +37,7 @@ function articleRow(article: DigestArticle, appUrl: string): string {
 
   return `
     <tr>
-      <td style="padding:16px 0;border-bottom:1px solid #e8e4dc;vertical-align:top;">
+      <td style="padding:16px 0;border-bottom:1px solid #e2e0d8;vertical-align:top;">
         <a href="${link}" style="color:#1c3028;text-decoration:none;font-size:16px;font-weight:600;line-height:1.4;display:block;">${escapeHtml(title)}</a>
         ${meta ? `<span style="font-size:13px;color:#587060;line-height:1.6;">${escapeHtml(meta)}</span>` : ''}
         ${article.excerpt ? `<p style="font-size:14px;color:#587060;line-height:1.5;margin:4px 0 0;">${escapeHtml(article.excerpt).slice(0, 140)}${(article.excerpt?.length ?? 0) > 140 ? '...' : ''}</p>` : ''}
@@ -65,7 +65,7 @@ export function buildDigestHtml(data: DigestData): string {
   <meta name="color-scheme" content="light dark">
   <title>Distil - ${data.date}</title>
 </head>
-<body style="margin:0;padding:0;background:#fbf9f4;font-family:-apple-system,system-ui,sans-serif;">
+<body style="margin:0;padding:0;background:#fafaf7;font-family:-apple-system,system-ui,sans-serif;">
   <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
     <!-- Header -->
     <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
@@ -86,11 +86,11 @@ export function buildDigestHtml(data: DigestData): string {
 
     <!-- CTA -->
     <div style="text-align:center;margin:32px 0;">
-      <a href="${data.appUrl}/feed" style="display:inline-block;background:#1c3028;color:#fbf9f4;font-size:14px;font-weight:600;padding:12px 28px;text-decoration:none;">Ouvrir Distil</a>
+      <a href="${data.appUrl}/feed" style="display:inline-block;background:#1c3028;color:#fafaf7;font-size:14px;font-weight:600;padding:12px 28px;text-decoration:none;">Ouvrir Distil</a>
     </div>
 
     <!-- Footer -->
-    <div style="border-top:1px solid #e8e4dc;padding-top:16px;margin-top:16px;">
+    <div style="border-top:1px solid #e2e0d8;padding-top:16px;margin-top:16px;">
       <p style="font-size:11px;color:#587060;line-height:1.5;margin:0;">
         Cet email est envoye car vous avez active le digest dans vos <a href="${data.appUrl}/profile" style="color:#d94e1f;">preferences</a>.
         <a href="${data.unsubscribeUrl}" style="color:#587060;">Se desabonner</a>

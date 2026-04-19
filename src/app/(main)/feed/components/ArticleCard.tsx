@@ -330,12 +330,6 @@ export function ArticleCard({
             <span>·</span>
           )}
           {readingTimeMinutes && <span className="font-ui">{readingTimeMinutes} min</span>}
-          {!isPaywall && wordCount != null && wordCount > 0 && (
-            <>
-              <span>·</span>
-              <span className="font-ui">{wordCount.toLocaleString('fr-FR')} mots</span>
-            </>
-          )}
           {isPaywall && (
             <>
               <span>·</span>
@@ -384,26 +378,23 @@ export function ArticleCard({
         {/* Bloc relevance deplie par defaut : transparence algo */}
         {tag && (
           <div className="mt-4 pt-3 border-t border-border/60 space-y-2">
-            <div className="flex items-baseline justify-between gap-3">
-              {tagLabel ? (
+            <div className="flex items-baseline gap-3">
+              {score !== null && (
                 <span
-                  data-testid={`tag-${id}`}
-                  className="font-ui text-sm text-accent"
+                  data-testid={`score-${id}`}
+                  className={`font-ui text-lg font-semibold tabular-nums ${scoreColorClass(score)}`}
                 >
+                  {Math.round(score)}
+                  <span className="text-xs text-muted-foreground font-normal">%</span>
+                </span>
+              )}
+              {tagLabel ? (
+                <span data-testid={`tag-${id}`} className="font-ui text-sm text-accent">
                   {tagLabel}
                 </span>
               ) : (
                 <span data-testid={`tag-${id}`} className="sr-only">
                   {Math.round(score ?? 0)}%
-                </span>
-              )}
-              {score !== null && (
-                <span
-                  data-testid={`score-${id}`}
-                  className={`font-ui text-lg font-semibold tabular-nums ml-auto ${scoreColorClass(score)}`}
-                >
-                  {Math.round(score)}
-                  <span className="text-xs text-muted-foreground font-normal">%</span>
                 </span>
               )}
             </div>
@@ -442,9 +433,6 @@ export function ArticleCard({
                   </dd>
                 </div>
               </dl>
-            )}
-            {isSerendipity && (
-              <p className="font-ui text-sm text-accent">{t.article.serendipityDetail}</p>
             )}
           </div>
         )}
@@ -500,7 +488,7 @@ export function ArticleCard({
               disabled={positiveSignalSent}
               aria-label={t.article.moreLikeThis}
               data-testid={`signal-${id}`}
-              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:group-hover:w-auto md:group-hover:px-3 font-ui text-sm text-muted-foreground/60 transition-[color,background-color,width,padding] hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
               title={t.article.moreLikeThis}
             >
               {positiveSignalSent ? (
@@ -534,7 +522,7 @@ export function ArticleCard({
                 </svg>
               )}
               {!positiveSignalSent && (
-                <span className="hidden md:group-hover:inline whitespace-nowrap text-xs">
+                <span className="hidden md:inline whitespace-nowrap text-xs">
                   {t.article.moreLikeThis}
                 </span>
               )}
@@ -550,7 +538,7 @@ export function ArticleCard({
               disabled={isDismissing}
               aria-label={t.article.dismiss}
               data-testid={`dismiss-${id}`}
-              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:group-hover:w-auto md:group-hover:px-3 font-ui text-sm text-muted-foreground/60 transition-[color,background-color,width,padding] hover:text-destructive hover:bg-muted disabled:opacity-20"
+              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-destructive hover:bg-muted disabled:opacity-20"
             >
               <svg
                 width="16"
@@ -567,7 +555,7 @@ export function ArticleCard({
                 <path d="m15 9-6 6" />
                 <path d="m9 9 6 6" />
               </svg>
-              <span className="hidden md:group-hover:inline whitespace-nowrap text-xs">
+              <span className="hidden md:inline whitespace-nowrap text-xs">
                 {t.article.dismissShort}
               </span>
             </button>

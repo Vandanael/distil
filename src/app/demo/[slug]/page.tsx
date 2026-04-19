@@ -145,9 +145,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="flex-1 flex flex-col bg-background">
-      <div className="pt-5 md:pt-10">
-        <PublicHeader contextLabel={`Exemple · ${persona.label.fr}`} />
-      </div>
+      <PublicHeader contextLabel={`Exemple · ${persona.label.fr}`} />
       <div className="max-w-2xl mx-auto px-5 md:px-8 pt-8 md:pt-12 pb-5 md:pb-10 w-full flex-1">
         <p className="mb-8 font-ui text-[15px] text-foreground">
           Exemple de veille
