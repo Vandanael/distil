@@ -12,6 +12,8 @@ import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
 import { scoreColorClass } from '@/lib/utils'
 import { useDismissContext } from './DismissContext'
 
+const SIGNAL_COACH_FLAG = 'distil_signal_coach_seen'
+
 type Props = {
   id: string
   title: string | null
@@ -189,7 +191,15 @@ export function ArticleCard({
     try {
       const res = await fetch(`/api/articles/${id}/signal`, { method: 'PATCH' })
       if (!res.ok) throw new Error()
-      toast.success(t.article.positiveSent)
+      const coachSeen =
+        typeof window !== 'undefined' && window.localStorage.getItem(SIGNAL_COACH_FLAG)
+      if (coachSeen) {
+        toast.success(t.article.positiveSent)
+      } else {
+        toast.success(t.article.positiveSentCoach, { duration: 6000 })
+        if (typeof window !== 'undefined')
+          window.localStorage.setItem(SIGNAL_COACH_FLAG, '1')
+      }
     } catch {
       setPositiveSignalSent(false)
       toast.error(locale === 'fr' ? "Erreur lors de l'envoi du signal." : 'Error sending signal.')
@@ -488,10 +498,10 @@ export function ArticleCard({
               type="button"
               onClick={handlePositiveSignal}
               disabled={positiveSignalSent}
-              aria-label="Plus comme ça"
+              aria-label={t.article.moreLikeThis}
               data-testid={`signal-${id}`}
-              className="inline-flex items-center justify-center h-11 w-11 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
-              title="Plus comme ca"
+              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:group-hover:w-auto md:group-hover:px-3 font-ui text-sm text-muted-foreground/60 transition-[color,background-color,width,padding] hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
+              title={t.article.moreLikeThis}
             >
               {positiveSignalSent ? (
                 <svg
@@ -523,6 +533,11 @@ export function ArticleCard({
                   <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
                 </svg>
               )}
+              {!positiveSignalSent && (
+                <span className="hidden md:group-hover:inline whitespace-nowrap text-xs">
+                  {t.article.moreLikeThis}
+                </span>
+              )}
             </button>
 
             <button
@@ -533,9 +548,9 @@ export function ArticleCard({
                 handleDismiss()
               }}
               disabled={isDismissing}
-              aria-label="Masquer cet article"
+              aria-label={t.article.dismiss}
               data-testid={`dismiss-${id}`}
-              className="inline-flex items-center justify-center h-11 w-11 font-ui text-muted-foreground/60 transition-colors hover:text-destructive hover:bg-muted disabled:opacity-20"
+              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:group-hover:w-auto md:group-hover:px-3 font-ui text-sm text-muted-foreground/60 transition-[color,background-color,width,padding] hover:text-destructive hover:bg-muted disabled:opacity-20"
             >
               <svg
                 width="16"
@@ -552,6 +567,9 @@ export function ArticleCard({
                 <path d="m15 9-6 6" />
                 <path d="m9 9 6 6" />
               </svg>
+              <span className="hidden md:group-hover:inline whitespace-nowrap text-xs">
+                {t.article.dismissShort}
+              </span>
             </button>
           </div>
         </div>

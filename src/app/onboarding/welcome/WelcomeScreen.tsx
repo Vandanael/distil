@@ -87,6 +87,16 @@ export function WelcomeScreen() {
         >
           Voir mon feed maintenant &rarr;
         </button>
+
+        {/* Astuce pedagogique boucle feedback */}
+        <p className="font-body text-sm text-muted-foreground leading-[1.55] border-t border-border pt-6 text-pretty">
+          <span className="font-ui text-[13px] uppercase tracking-[0.12em] text-accent mr-2">
+            Astuce
+          </span>
+          Sur chaque carte, les boutons <span className="text-foreground">+</span> et{' '}
+          <span className="text-foreground">×</span> ajustent votre feed du lendemain. L&apos;algo
+          écoute, c&apos;est vous qui décidez ce qui compte.
+        </p>
       </div>
     </main>
   )
