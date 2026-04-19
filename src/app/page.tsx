@@ -1,11 +1,17 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { DEMO_ACCOUNTS, HOME_FEATURED_SLUGS, type DemoAccountSlug } from '@/lib/demo-accounts'
 import { StartScreen } from './StartScreen'
 
-// Fallback editorial : 3 articles perennes pour que la homepage ne soit jamais
-// vide meme si les comptes demo ne sont pas seed ou si serviceKey est absent.
-// Choisi pour illustrer la diversite thematique (politique / culture / science).
+// Revalidation horaire : le compteur "editions livrees" se rafraichit toutes les heures,
+// suffisant pour suivre le cron digest quotidien sans battre la base a chaque visite.
+export const revalidate = 3600
+
+// Fallback editorial : articles perennes, n'apparaissent QUE si aucun article
+// score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
+// affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
+// cohabiter avec des articles scores et trahir la demo vide.
 const FALLBACK_ARTICLES: FeaturedArticle[] = [
   {
     title: 'The Atlantic - recent features in international affairs',
@@ -14,6 +20,8 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     excerpt: null,
     score: null,
     is_serendipity: false,
+    justification: null,
+    persona_slug: null,
   },
   {
     title: 'The New Yorker - culture and ideas',
@@ -22,6 +30,8 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     excerpt: null,
     score: null,
     is_serendipity: false,
+    justification: null,
+    persona_slug: null,
   },
   {
     title: 'Quanta Magazine - science reporting',
@@ -30,8 +40,42 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     excerpt: null,
     score: null,
     is_serendipity: true,
+    justification: null,
+    persona_slug: null,
+  },
+  {
+    title: 'The Guardian - long reads',
+    url: 'https://www.theguardian.com/news/series/the-long-read',
+    site_name: 'The Guardian',
+    excerpt: null,
+    score: null,
+    is_serendipity: false,
+    justification: null,
+    persona_slug: null,
+  },
+  {
+    title: 'Le Monde diplomatique',
+    url: 'https://www.monde-diplomatique.fr/',
+    site_name: 'Le Monde diplomatique',
+    excerpt: null,
+    score: null,
+    is_serendipity: false,
+    justification: null,
+    persona_slug: null,
+  },
+  {
+    title: 'MIT Technology Review',
+    url: 'https://www.technologyreview.com/',
+    site_name: 'MIT Technology Review',
+    excerpt: null,
+    score: null,
+    is_serendipity: true,
+    justification: null,
+    persona_slug: null,
   },
 ]
+
+const EDITION_TARGET = 6
 
 type FeaturedArticle = {
   title: string | null
@@ -40,6 +84,8 @@ type FeaturedArticle = {
   excerpt: string | null
   score: number | null
   is_serendipity: boolean
+  justification: string | null
+  persona_slug: DemoAccountSlug | null
 }
 
 export default async function RootPage() {
@@ -70,49 +116,61 @@ export default async function RootPage() {
 
   // Non-connecte : 1 article par persona (diversite des themes)
   let featuredArticles: FeaturedArticle[] = []
+  let editionsToday = 0
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (serviceKey) {
     const serviceClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
 
-    // IDs stables des comptes démo (créés par create-test-accounts.mjs)
-    const DEMO_USER_IDS = [
-      '795c2637-7e43-4b74-82b1-560899cf62d7', // test-pm (Politique & Monde)
-      '17e9ac27-5bc3-403c-94e4-cb2d6db1e38c', // test-consultant (Cuisine)
-      'a615fba9-490a-4dd9-a161-45f8c9b54943', // test-dev (Tech)
-    ]
+    // Compteur "editions livrees aujourd'hui" : count distinct user_id dans daily_ranking
+    // pour la date du jour. Inclut comptes demo (ils recoivent une vraie edition chaque matin).
+    const today = new Date().toISOString().slice(0, 10)
+    const { data: rankingsToday } = await serviceClient
+      .from('daily_ranking')
+      .select('user_id')
+      .eq('date', today)
+    editionsToday = new Set((rankingsToday ?? []).map((r) => r.user_id)).size
 
-    if (DEMO_USER_IDS.length > 0) {
-      // Rotation quotidienne : offset different par jour et par persona
+    const demoUserIds = HOME_FEATURED_SLUGS.map(
+      (slug) => DEMO_ACCOUNTS.find((a) => a.slug === slug)!.id
+    )
+
+    if (demoUserIds.length > 0) {
+      // Rotation quotidienne : offset different par jour et par persona,
+      // 2 articles par persona pour composer une edition denser (6 articles cible)
       const now = new Date()
       const startOfYear = new Date(now.getFullYear(), 0, 0).getTime()
       const dayOfYear = Math.floor((now.getTime() - startOfYear) / 86_400_000)
 
       const picks = await Promise.all(
-        DEMO_USER_IDS.map((uid, i) => {
+        demoUserIds.map((uid, i) => {
           const offset = (dayOfYear + i * 7) % 10
           return serviceClient
             .from('articles')
-            .select('title, url, site_name, excerpt, score, is_serendipity')
+            .select('title, url, site_name, excerpt, score, is_serendipity, justification')
             .eq('user_id', uid)
             .eq('status', 'accepted')
             .not('score', 'is', null)
             .order('score', { ascending: false })
-            .range(offset, offset)
-            .single()
+            .range(offset, offset + 1)
         })
       )
 
-      featuredArticles = picks.filter((r) => r.data !== null).map((r) => r.data!)
+      featuredArticles = picks
+        .flatMap((r, i) =>
+          (r.data ?? []).map((a) => ({ ...a, persona_slug: HOME_FEATURED_SLUGS[i] }))
+        )
+        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+        .slice(0, EDITION_TARGET)
     }
   }
 
-  // Plancher prod : si on a moins de 3 articles reels, on complete avec le
-  // fallback editorial. Garantit que la homepage n'est jamais vide.
-  if (featuredArticles.length < 3) {
-    const needed = 3 - featuredArticles.length
-    featuredArticles = [...featuredArticles, ...FALLBACK_ARTICLES.slice(0, needed)]
-  }
+  // On ne mixe plus fallback + scored : un article sans score a cote d'articles
+  // 80% trahit la demo vide (feedback panel 21 personae, sprint 35).
+  // Si on n'a aucun article score, on bascule sur le fallback editorial label
+  // "Exemples editoriaux" via le flag isFallback.
+  const isFallback = featuredArticles.length === 0
+  const articles = isFallback ? FALLBACK_ARTICLES.slice(0, EDITION_TARGET) : featuredArticles
 
-  return <StartScreen articles={featuredArticles} />
+  return <StartScreen articles={articles} isFallback={isFallback} editionsToday={editionsToday} />
 }

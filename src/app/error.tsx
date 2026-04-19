@@ -41,8 +41,7 @@ export default function GlobalError({
           Erreur technique
         </p>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 text-balance">
-          Quelque chose{' '}
-          <em className="italic text-accent">s&apos;est casse.</em>
+          Quelque chose <em className="italic text-accent">s&apos;est casse.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-12 text-pretty max-w-[48ch]">
           L&apos;incident a ete signale. Vous pouvez reessayer ou revenir a l&apos;accueil.
@@ -52,21 +51,15 @@ export default function GlobalError({
           <button
             type="button"
             onClick={reset}
-            className="group inline-flex items-center gap-3 font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
+            className="inline-flex items-center font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
           >
             Reessayer
-            <span
-              className="font-mono transition-transform group-hover:translate-x-1"
-              aria-hidden="true"
-            >
-              →
-            </span>
           </button>
           <Link
             href="/"
-            className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
+            className="font-ui text-[15px] text-subtle hover:text-accent transition-colors"
           >
-            ← Accueil
+            Accueil
           </Link>
         </div>
       </div>

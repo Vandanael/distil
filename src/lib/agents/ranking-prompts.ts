@@ -29,10 +29,11 @@ Q3. UTILITE DECOUVERTE (0-10) : Si le lecteur lisait cet item, est-ce qu'il en t
 - 1-4 : rien de nouveau pour ce lecteur
 
 Classification :
+- EXCLUSION DURE : si Q1 < 6, l'article est hors-sujet pour ce lecteur. Il n'entre NI dans essential NI dans surprise, quelles que soient les valeurs de Q2/Q3. Aucune exception.
 - ESSENTIEL (top 5) : articles ou Q1 >= 8. Trie par Q1 decroissant.
-- DECOUVERTE (top 3) : articles ou Q1 >= 5 ET Q2 entre 5 et 8 ET Q3 >= 7. Trie par Q3 decroissant.
+- DECOUVERTE (top 3) : articles ou Q1 >= 6 ET Q2 entre 5 et 8 ET Q3 >= 7. Trie par Q3 decroissant.
 - Un article ne peut PAS apparaitre dans les deux buckets.
-- Si moins de 3 decouvertes qualifient, relache Q2 a [4, 8].
+- Si moins de 3 decouvertes qualifient, relache Q2 a [4, 8]. Ne relache jamais Q1 < 6.
 
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.
 Format :

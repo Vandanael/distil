@@ -77,7 +77,9 @@ for (const feed of feeds) {
     const rows = parsed.items
       .map((item) => {
         const itemUrl = item.link ?? item.guid ?? ''
-        const rawContent = String(item['content:encoded'] ?? item.content ?? item.contentSnippet ?? '')
+        const rawContent = String(
+          item['content:encoded'] ?? item.content ?? item.contentSnippet ?? ''
+        )
         const contentText = stripHtml(rawContent)
         return {
           feed_id: feed.id,
@@ -116,4 +118,6 @@ for (const feed of feeds) {
   }
 }
 
-console.log(`\nTermine : ${summary.inserted} nouveaux items inseres (${summary.total} trouves, ${summary.errors} erreurs)`)
+console.log(
+  `\nTermine : ${summary.inserted} nouveaux items inseres (${summary.total} trouves, ${summary.errors} erreurs)`
+)

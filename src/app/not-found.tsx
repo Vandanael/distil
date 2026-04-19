@@ -25,8 +25,7 @@ export default function NotFound() {
           Introuvable
         </p>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 text-balance">
-          Cette page{' '}
-          <em className="italic text-accent">a disparu.</em>
+          Cette page <em className="italic text-accent">a disparu.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-12 text-pretty max-w-[48ch]">
           Elle n&apos;existe plus, ou l&apos;adresse est incorrecte. Rien d&apos;inquietant : le
@@ -35,15 +34,9 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="group inline-flex items-center gap-3 font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
+          className="inline-flex items-center font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
         >
           Retour a l&apos;accueil
-          <span
-            className="font-mono transition-transform group-hover:translate-x-1"
-            aria-hidden="true"
-          >
-            →
-          </span>
         </Link>
       </div>
     </main>

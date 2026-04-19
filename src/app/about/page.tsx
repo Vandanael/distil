@@ -1,6 +1,7 @@
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import Image from 'next/image'
 import { PublicFooter } from '@/components/PublicFooter'
+import { PublicHeader } from '@/components/PublicHeader'
+import { BrandGlyph } from '@/components/BrandGlyph'
 
 export const metadata = {
   title: 'A propos - Distil',
@@ -9,64 +10,70 @@ export const metadata = {
 }
 
 export default function AboutPage() {
-  const year = new Date().getFullYear()
-
   return (
-    <main className="min-h-full flex flex-col bg-background">
-      <div className="w-full max-w-2xl mx-auto flex-1 px-4 py-6 md:py-16">
-        {/* Bandeau editorial */}
-        <div className="border-t-2 border-foreground mb-8 pt-3 flex items-center justify-between">
-          <span className="font-ui text-xs text-muted-foreground">A propos</span>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Link
-              href="/"
-              className="font-ui text-xs text-muted-foreground hover:text-accent transition-colors"
-            >
-              ← Accueil
-            </Link>
-          </div>
-        </div>
-
-        {/* Masthead */}
-        <h1 className="font-ui text-5xl md:text-7xl font-bold tracking-tight text-accent leading-none mb-8">
-          Distil
+    <main className="flex-1 flex flex-col bg-background">
+      <div className="pt-5 md:pt-10">
+        <PublicHeader contextLabel="À propos" />
+      </div>
+      <div className="flex-1 w-full max-w-2xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-5 md:pb-10">
+        {/* Hero */}
+        <BrandGlyph size={96} className="text-accent mb-8 md:mb-10" title="Distil" />
+        <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-12 md:mb-16 text-balance">
+          Veille intelligente, <em className="italic text-accent">lecture souveraine.</em>
         </h1>
-        <p className="font-body text-lg md:text-xl text-muted-foreground leading-relaxed mb-12">
-          Une veille intelligente et un read-later personnel. Distil capte, filtre et organise
-          l&apos;information en ligne pour qu&apos;elle reste au service du jugement humain.
+        <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-20 md:mb-24 text-pretty">
+          <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information
+          en ligne pour qu&apos;elle reste au service du jugement humain.
         </p>
 
-        {/* Mission */}
-        <section className="border-t border-border pt-8 mb-12">
-          <h2 className="font-ui text-xs uppercase tracking-wide text-foreground font-semibold mb-6">
-            Mission
+        {/* Capture produit */}
+        <figure className="mb-14">
+          <div className="relative overflow-hidden border border-border bg-[color-mix(in_oklab,var(--color-foreground)_6%,transparent)]">
+            <Image
+              src="/screenshots/feed-dark.png"
+              alt="Capture du feed Distil en mode sombre : liste d'articles sélectionnés du jour avec score de pertinence, badge découverte et justification éditoriale."
+              width={1600}
+              height={1000}
+              priority={false}
+              sizes="(min-width: 768px) 672px, 100vw"
+              className="w-full h-auto"
+            />
+          </div>
+          <figcaption className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            Le feed Distil. Une édition par jour, scores visibles, découvertes marquées.
+          </figcaption>
+        </figure>
+
+        {/* Principes */}
+        <section className="mb-14 md:mb-16 border-t border-border pt-8 md:pt-10">
+          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-8 md:mb-10 text-balance">
+            Trois principes.
           </h2>
-          <ul className="space-y-6">
+          <ul className="space-y-8 md:space-y-10">
             <li>
-              <h3 className="font-ui text-lg font-bold text-foreground mb-1">
-                Le jugement humain pilote l&apos;algo
+              <h3 className="font-display text-2xl md:text-3xl text-accent leading-[1.15] mb-2">
+                Jugement humain
               </h3>
-              <p className="font-body text-[15px] text-muted-foreground leading-relaxed">
-                L&apos;IA propose, trie, resume. Vous decidez ce qui compte. Aucun mecanisme de
-                scoring n&apos;est opaque ni irreversible.
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+                L&apos;IA propose, trie, résume. Vous décidez ce qui compte. Aucun mécanisme de
+                scoring n&apos;est opaque ni irréversible.
               </p>
             </li>
             <li>
-              <h3 className="font-ui text-lg font-bold text-foreground mb-1">
-                Transparence comme pilier
+              <h3 className="font-display text-2xl md:text-3xl text-accent leading-[1.15] mb-2">
+                Transparence
               </h3>
-              <p className="font-body text-[15px] text-muted-foreground leading-relaxed">
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
                 Chaque score, chaque signal de curation expose sa source. Si on ne peut pas
                 expliquer pourquoi un article remonte, il ne remonte pas.
               </p>
             </li>
             <li>
-              <h3 className="font-ui text-lg font-bold text-foreground mb-1">
-                Diversite by design
+              <h3 className="font-display text-2xl md:text-3xl text-accent leading-[1.15] mb-2">
+                Diversité
               </h3>
-              <p className="font-body text-[15px] text-muted-foreground leading-relaxed">
-                Le systeme introduit activement des signaux hors-bulle. La decouverte n&apos;est pas
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+                Le système introduit activement des signaux hors-bulle. La découverte n&apos;est pas
                 un effet de bord, c&apos;est une feature de premier rang.
               </p>
             </li>
@@ -74,38 +81,38 @@ export default function AboutPage() {
         </section>
 
         {/* Contact */}
-        <section className="border-t border-border pt-8 mb-12">
-          <h2 className="font-ui text-xs uppercase tracking-wide text-foreground font-semibold mb-4">
+        <section className="mb-14 md:mb-16 border-t border-border pt-8 md:pt-10">
+          <p className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-4">
             Contact
-          </h2>
-          <p className="font-body text-[15px] text-muted-foreground leading-relaxed">
-            Pour toute question, demande ou retour :{' '}
+          </p>
+          <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+            Pour toute question, demande ou retour, ouvrez une issue sur{' '}
             <a
-              href="mailto:yvanforestier@gmail.com"
+              href="https://github.com/Vandanael/distil/issues"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
             >
-              yvanforestier@gmail.com
+              GitHub
             </a>
             .
           </p>
         </section>
 
         {/* Mentions legales */}
-        <section className="border-t border-border pt-8 mb-12">
-          <h2 className="font-ui text-xs uppercase tracking-wide text-foreground font-semibold mb-4">
-            Mentions legales
-          </h2>
-          <div className="space-y-3 font-body text-[14px] text-muted-foreground leading-relaxed">
+        <section className="border-t border-border pt-8 md:pt-10">
+          <p className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-4">
+            Mentions légales
+          </p>
+          <div className="space-y-4 font-body text-[15px] text-muted-foreground leading-[1.6] text-pretty">
             <p>
-              Responsable du traitement : Yvan Forestier. Les donnees collectees (email, profil de
-              veille, articles lus) servent exclusivement a fournir le service et ne sont jamais
-              revendues.
+              Les données collectées (email, profil de veille, articles lus) servent exclusivement à
+              fournir le service et ne sont jamais revendues.
             </p>
             <p>
-              Droit a l&apos;oubli : sur simple demande par email, votre compte et l&apos;ensemble
-              de vos donnees sont supprimes sous 30 jours.
+              Droit à l&apos;oubli : sur simple demande via une issue GitHub, votre compte et
+              l&apos;ensemble de vos données sont supprimés sous 30 jours.
             </p>
-            <p>Copyright © 2026-{year} Distil. Tous droits reserves.</p>
           </div>
         </section>
       </div>

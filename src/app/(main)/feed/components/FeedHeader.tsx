@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useLocale } from '@/lib/i18n/context'
+import { Masthead } from '@/components/Masthead'
 
 type Props = {
   today: string
@@ -65,55 +66,53 @@ export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
   }
 
   return (
-    <div className="border-t-2 border-foreground mb-10 pt-4 space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="font-ui text-sm text-muted-foreground capitalize">{formattedDate}</span>
-        <div className="flex items-center gap-2">
-          {refreshInfo && (
-            <span
-              className={`font-ui text-sm ${refreshInfo.isStale ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}
+    <div className="mb-10">
+      <Masthead
+        date={formattedDate}
+        dateSuffix={refreshInfo ? `· ${refreshInfo.label}` : undefined}
+        rightSlot={
+          <>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors disabled:opacity-50"
+              title="Rafraichir le feed"
+              aria-label="Rafraichir le feed"
             >
-              {refreshInfo.label}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={isRefreshing ? 'animate-spin' : ''}
+              >
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+              </svg>
+            </button>
+            <span className="text-border text-[15px] leading-none" aria-hidden="true">
+              |
             </span>
-          )}
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="font-ui text-xs text-muted-foreground/70 hover:text-accent transition-colors disabled:opacity-50"
-            title="Rafraichir le feed"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={isRefreshing ? 'animate-spin' : ''}
+            <Link
+              href="/profile"
+              className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors"
             >
-              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
-              <path d="M21 3v5h-5" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div className="flex items-baseline justify-between gap-4">
-        <h1 className="font-ui text-base md:text-lg font-semibold text-foreground">
-          {t.feed.title}
-          {topInterests.length > 0 && (
-            <span className="font-normal text-muted-foreground"> - {topInterests.join(', ')}</span>
-          )}
-        </h1>
-        <Link
-          href="/profile"
-          className="font-ui text-sm text-muted-foreground/70 hover:text-accent transition-colors shrink-0"
-        >
-          {t.feed.configure}
-        </Link>
-      </div>
+              {t.feed.configure}
+            </Link>
+          </>
+        }
+      />
+      <h1 className="mt-4 font-ui text-base md:text-lg font-semibold text-foreground">
+        {t.feed.title}
+        {topInterests.length > 0 && (
+          <span className="font-normal text-subtle"> - {topInterests.join(', ')}</span>
+        )}
+      </h1>
     </div>
   )
 }

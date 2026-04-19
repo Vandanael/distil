@@ -12,6 +12,10 @@ type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 const MODEL = 'gemini-3-flash'
 const FALLBACK_MODEL = 'gemini-2.5-flash'
 
+// Seuil dur : un article Q1 < MIN_Q1_RELEVANCE est hors-sujet pour ce lecteur
+// et n'a le droit d'apparaitre dans aucun bucket. Garde-fou si le prompt rate.
+export const MIN_Q1_RELEVANCE = 6
+
 type LlmRankedItem = {
   item_id: string
   q1: number
@@ -23,6 +27,10 @@ type LlmRankedItem = {
 type LlmResponse = {
   essential: LlmRankedItem[]
   surprise: LlmRankedItem[]
+}
+
+export function enforceMinRelevance(items: LlmRankedItem[]): LlmRankedItem[] {
+  return items.filter((item) => (item.q1 ?? 0) >= MIN_Q1_RELEVANCE)
 }
 
 async function loadUserProfile(
@@ -136,7 +144,7 @@ function cosineFallback(candidates: RankingCandidate[]): {
 
   const surprise: RankedItem[] = surpriseCandidates.map((c, i) => ({
     itemId: c.itemId,
-    q1: 5,
+    q1: MIN_Q1_RELEVANCE,
     q2: 7,
     q3: 6,
     justification: 'Decouverte automatique (rarete)',
@@ -217,11 +225,7 @@ async function persistRanking(
       // L'index UNIQUE sur articles(user_id, item_id) est partiel (WHERE item_id IS NOT NULL) :
       // Supabase upsert onConflict ne peut pas matcher un index partial → fail silencieux.
       // On fait delete-then-insert explicite par (user_id, item_id) qui est safe et idempotent.
-      await supabase
-        .from('articles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('item_id', item.itemId)
+      await supabase.from('articles').delete().eq('user_id', userId).eq('item_id', item.itemId)
       await supabase.from('articles').insert(articleRow)
     })
   )
@@ -302,25 +306,31 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL, userId)
     }
 
-    essential = (llmResult.essential ?? []).slice(0, 5).map((item, i) => ({
-      itemId: item.item_id,
-      q1: item.q1,
-      q2: item.q2,
-      q3: item.q3,
-      justification: item.justification,
-      bucket: 'essential' as const,
-      rank: i + 1,
-    }))
+    // Garde-fou : on purge les Q1 < 6 avant slicing. Evite qu'un hors-sujet LLM
+    // (Dezeen en Politique, p.ex.) n'occupe une place dans essential ou surprise.
+    essential = enforceMinRelevance(llmResult.essential ?? [])
+      .slice(0, 5)
+      .map((item, i) => ({
+        itemId: item.item_id,
+        q1: item.q1,
+        q2: item.q2,
+        q3: item.q3,
+        justification: item.justification,
+        bucket: 'essential' as const,
+        rank: i + 1,
+      }))
 
-    surprise = (llmResult.surprise ?? []).slice(0, 3).map((item, i) => ({
-      itemId: item.item_id,
-      q1: item.q1,
-      q2: item.q2,
-      q3: item.q3,
-      justification: item.justification,
-      bucket: 'surprise' as const,
-      rank: i + 1,
-    }))
+    surprise = enforceMinRelevance(llmResult.surprise ?? [])
+      .slice(0, 3)
+      .map((item, i) => ({
+        itemId: item.item_id,
+        q1: item.q1,
+        q2: item.q2,
+        q3: item.q3,
+        justification: item.justification,
+        bucket: 'surprise' as const,
+        rank: i + 1,
+      }))
   } catch (err) {
     // Complete LLM failure : cosine fallback
     rankError = err instanceof Error ? err.message : String(err)

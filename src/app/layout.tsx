@@ -61,7 +61,7 @@ export default async function RootLayout({
   return (
     <html
       lang={initialLocale}
-      className={`${instrumentSerif.variable} ${geist.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${instrumentSerif.variable} ${geist.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

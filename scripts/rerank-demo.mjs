@@ -48,7 +48,9 @@ try {
   console.log(`usersProcessed: ${json.usersProcessed}`)
   for (const r of json.results ?? []) {
     if (DEMO_IDS.includes(r.userId)) {
-      console.log(`  [demo] ${r.userId.slice(0, 8)} essential=${r.essential} surprise=${r.surprise} fallback=${r.fallback} error=${r.error ?? ''} (${r.durationMs}ms)`)
+      console.log(
+        `  [demo] ${r.userId.slice(0, 8)} essential=${r.essential} surprise=${r.surprise} fallback=${r.fallback} error=${r.error ?? ''} (${r.durationMs}ms)`
+      )
     }
   }
 } catch {
