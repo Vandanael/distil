@@ -149,8 +149,8 @@ export default async function RootPage() {
     )
 
     if (demoUserIds.length > 0) {
-      // Rotation quotidienne : offset different par jour et par persona,
-      // 1 article par persona pour garantir diversite thematique (3 articles cible).
+      // Rotation quotidienne : offset different par jour et par persona.
+      // Fetch top 5 par persona puis dedup site_name pour eviter 5 Le Monde a la home.
       const now = new Date()
       const startOfYear = new Date(now.getFullYear(), 0, 0).getTime()
       const dayOfYear = Math.floor((now.getTime() - startOfYear) / 86_400_000)
@@ -165,14 +165,22 @@ export default async function RootPage() {
             .eq('status', 'accepted')
             .not('score', 'is', null)
             .order('score', { ascending: false })
-            .range(offset, offset)
+            .range(offset, offset + 4)
         })
       )
 
-      featuredArticles = picks
-        .flatMap((r, i) =>
-          (r.data ?? []).map((a) => ({ ...a, persona_slug: HOME_FEATURED_SLUGS[i] }))
-        )
+      const usedSites = new Set<string>()
+      const collected: FeaturedArticle[] = []
+      picks.forEach((r, i) => {
+        const candidates = r.data ?? []
+        // Prefere un article dont le site n'a pas encore ete choisi pour une autre persona.
+        const unique = candidates.find((a) => a.site_name && !usedSites.has(a.site_name))
+        const pick = unique ?? candidates[0]
+        if (!pick) return
+        if (pick.site_name) usedSites.add(pick.site_name)
+        collected.push({ ...pick, persona_slug: HOME_FEATURED_SLUGS[i] })
+      })
+      featuredArticles = collected
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
         .slice(0, EDITION_TARGET)
     }

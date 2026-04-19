@@ -2,9 +2,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@supabase/supabase-js'
 import { prefilterCandidates } from './prefilter'
 import {
-  RANKING_SYSTEM_PROMPT,
+  getRankingSystemPrompt,
   buildRankingUserPrompt,
   MAX_SIGNALS_PER_BUCKET,
+  type RankingLocale,
   type RecentSignals,
 } from './ranking-prompts'
 import { parseUrl } from '@/lib/parsing/readability'
@@ -237,7 +238,8 @@ async function loadUserProfile(
 async function callRankingLlm(
   profilePrompt: ReturnType<typeof buildRankingUserPrompt>,
   modelId: string,
-  userId: string
+  userId: string,
+  locale: RankingLocale
 ): Promise<LlmResponse> {
   const { assertBudget, assertUserBudget, recordProviderCall, recordUserProviderCall } =
     await import('@/lib/api-budget')
@@ -250,7 +252,7 @@ async function callRankingLlm(
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({
     model: modelId,
-    systemInstruction: RANKING_SYSTEM_PROMPT,
+    systemInstruction: getRankingSystemPrompt(locale),
     generationConfig: {
       responseMimeType: 'application/json',
       maxOutputTokens: 4096,
@@ -269,10 +271,18 @@ async function callRankingLlm(
   return JSON.parse(match[0]) as LlmResponse
 }
 
-function cosineFallback(candidates: RankingCandidate[]): {
+function cosineFallback(
+  candidates: RankingCandidate[],
+  locale: RankingLocale = 'fr'
+): {
   essential: RankedItem[]
   surprise: RankedItem[]
 } {
+  const essentialLabel =
+    locale === 'en' ? 'Automatic ranking (cosine)' : 'Classement automatique (cosine)'
+  const surpriseLabel =
+    locale === 'en' ? 'Automatic discovery (rare)' : 'Decouverte automatique (rarete)'
+
   // Sort by cosine distance (closest = most relevant)
   const sorted = [...candidates].sort((a, b) => a.distance - b.distance)
 
@@ -281,7 +291,7 @@ function cosineFallback(candidates: RankingCandidate[]): {
     q1: 10 - i,
     q2: 5,
     q3: 5,
-    justification: 'Classement automatique (cosine)',
+    justification: essentialLabel,
     bucket: 'essential' as const,
     rank: i + 1,
   }))
@@ -297,7 +307,7 @@ function cosineFallback(candidates: RankingCandidate[]): {
     q1: MIN_Q1_RELEVANCE,
     q2: 7,
     q3: 6,
-    justification: 'Decouverte automatique (rarete)',
+    justification: surpriseLabel,
     bucket: 'surprise' as const,
     rank: i + 1,
   }))
@@ -471,14 +481,18 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
   let modelUsed: string | null = null
   let rankError: string | null = null
 
+  // Locale de la justification : 'en' si le lecteur a choisi l'anglais,
+  // sinon francais (valeur par defaut, couvre 'fr' et 'both').
+  const justificationLocale: RankingLocale = profile.preferredLanguage === 'en' ? 'en' : 'fr'
+
   try {
     // Try primary model first, fallback to secondary
     let llmResult: LlmResponse
     try {
-      llmResult = await callRankingLlm(userPrompt, MODEL, userId)
+      llmResult = await callRankingLlm(userPrompt, MODEL, userId, justificationLocale)
       modelUsed = MODEL
     } catch {
-      llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL, userId)
+      llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL, userId, justificationLocale)
       modelUsed = FALLBACK_MODEL
     }
 
@@ -515,7 +529,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     rankError = err instanceof Error ? err.message : String(err)
     fallback = true
     modelUsed = 'cosine_fallback'
-    const fb = cosineFallback(candidates)
+    const fb = cosineFallback(candidates, justificationLocale)
     essential = fb.essential
     surprise = fb.surprise
   }
