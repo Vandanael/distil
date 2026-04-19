@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import { DEMO_ACCOUNTS, HOME_FEATURED_SLUGS } from '@/lib/demo-accounts'
+import { DEMO_ACCOUNTS, HOME_FEATURED_SLUGS, type DemoAccountSlug } from '@/lib/demo-accounts'
 import { StartScreen } from './StartScreen'
 
 // Fallback editorial : articles perennes, n'apparaissent QUE si aucun article
@@ -17,6 +17,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     score: null,
     is_serendipity: false,
     justification: null,
+    persona_slug: null,
   },
   {
     title: 'The New Yorker - culture and ideas',
@@ -26,6 +27,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     score: null,
     is_serendipity: false,
     justification: null,
+    persona_slug: null,
   },
   {
     title: 'Quanta Magazine - science reporting',
@@ -35,6 +37,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     score: null,
     is_serendipity: true,
     justification: null,
+    persona_slug: null,
   },
   {
     title: 'The Guardian - long reads',
@@ -44,6 +47,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     score: null,
     is_serendipity: false,
     justification: null,
+    persona_slug: null,
   },
   {
     title: 'Le Monde diplomatique',
@@ -53,6 +57,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     score: null,
     is_serendipity: false,
     justification: null,
+    persona_slug: null,
   },
   {
     title: 'MIT Technology Review',
@@ -62,6 +67,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     score: null,
     is_serendipity: true,
     justification: null,
+    persona_slug: null,
   },
 ]
 
@@ -75,6 +81,7 @@ type FeaturedArticle = {
   score: number | null
   is_serendipity: boolean
   justification: string | null
+  persona_slug: DemoAccountSlug | null
 }
 
 export default async function RootPage() {
@@ -136,7 +143,9 @@ export default async function RootPage() {
       )
 
       featuredArticles = picks
-        .flatMap((r) => r.data ?? [])
+        .flatMap((r, i) =>
+          (r.data ?? []).map((a) => ({ ...a, persona_slug: HOME_FEATURED_SLUGS[i] })),
+        )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
         .slice(0, EDITION_TARGET)
     }

@@ -17,6 +17,7 @@ type Props = {
   noTitleLabel?: string
   serendipityLabel?: string
   relevanceLabel?: string
+  personaLabel?: string
   compact?: boolean
 }
 
@@ -25,10 +26,16 @@ export function ArticleRow({
   noTitleLabel = 'Sans titre',
   serendipityLabel = 'Decouverte',
   relevanceLabel = 'Pertinence',
+  personaLabel,
   compact = false,
 }: Props) {
   const inner = (
     <div className={compact ? 'space-y-1.5' : 'space-y-2'}>
+      {personaLabel && (
+        <p className="font-ui text-[14px] uppercase tracking-[0.1em] text-accent">
+          {personaLabel}
+        </p>
+      )}
       {article.site_name && (
         <p className="font-ui text-[14px] text-subtle">
           {article.site_name}
