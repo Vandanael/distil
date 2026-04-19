@@ -183,6 +183,7 @@ async function loadUserProfile(
   shortTermProfile: string | null
   fallbackText: string | null
   embedding: number[] | null
+  preferredLanguage: 'fr' | 'en' | undefined
 }> {
   const [profileTextResult, profileResult] = await Promise.all([
     supabase
@@ -192,7 +193,7 @@ async function loadUserProfile(
       .single(),
     supabase
       .from('profiles')
-      .select('profile_text, sector, interests, pinned_sources, embedding')
+      .select('profile_text, sector, interests, pinned_sources, embedding, profile_structured')
       .eq('id', userId)
       .single(),
   ])
@@ -216,12 +217,20 @@ async function loadUserProfile(
         : (p.embedding as unknown as number[])
   }
 
+  // profile_structured.language pilote le biais locale du prefilter.
+  // 'fr' | 'en' => bias 90/10 ; 'both' ou absent => pas de biais.
+  const structured = p?.profile_structured as Record<string, unknown> | null
+  const langValue = structured?.language
+  const preferredLanguage: 'fr' | 'en' | undefined =
+    langValue === 'fr' || langValue === 'en' ? langValue : undefined
+
   return {
     staticProfile: pt?.static_profile ?? null,
     longTermProfile: pt?.long_term_profile ?? null,
     shortTermProfile: pt?.short_term_profile ?? null,
     fallbackText: fallbackParts.length > 0 ? fallbackParts.join('. ') : null,
     embedding,
+    preferredLanguage,
   }
 }
 
@@ -424,7 +433,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
   }
 
   const [candidates, recentSignals] = await Promise.all([
-    prefilterCandidates(supabase, userId, profile.embedding),
+    prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage),
     loadRecentSignals(supabase, userId),
   ])
 

@@ -7,12 +7,16 @@ const LOOKBACK_HOURS = 48
 /**
  * Pre-filter items by cosine similarity to user profile embedding.
  * Returns top N candidates from the last 48h that the user hasn't seen yet.
+ *
+ * preferredLanguage biaise le pool cosine 90/10 vers la langue demandee ('fr' | 'en').
+ * 'both' ou undefined desactive le biais (comportement historique).
  */
 export async function prefilterCandidates(
   supabase: ServiceClient,
   userId: string,
   profileEmbedding: number[],
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
+  preferredLanguage?: 'fr' | 'en'
 ): Promise<RankingCandidate[]> {
   const cutoff = new Date(Date.now() - LOOKBACK_HOURS * 60 * 60 * 1000).toISOString()
 
@@ -22,6 +26,7 @@ export async function prefilterCandidates(
     target_user_id: userId,
     cutoff_time: cutoff,
     max_count: limit,
+    preferred_language: preferredLanguage ?? null,
   })
 
   if (error || !data) {

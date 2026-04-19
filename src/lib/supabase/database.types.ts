@@ -361,6 +361,7 @@ export type Database = {
           title: string | null
           site_name: string | null
           active: boolean
+          language: string
           last_fetched_at: string | null
           etag: string | null
           last_modified: string | null
@@ -373,6 +374,7 @@ export type Database = {
           title?: string | null
           site_name?: string | null
           active?: boolean
+          language?: string
           last_fetched_at?: string | null
           etag?: string | null
           last_modified?: string | null
@@ -385,6 +387,7 @@ export type Database = {
           title?: string | null
           site_name?: string | null
           active?: boolean
+          language?: string
           last_fetched_at?: string | null
           etag?: string | null
           last_modified?: string | null
@@ -664,6 +667,7 @@ export type Database = {
           cutoff_time: string
           max_count?: number
           keyword_cap?: number
+          preferred_language?: string | null
         }
         Returns: Array<{
           item_id: string
