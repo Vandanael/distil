@@ -19,11 +19,13 @@ export default function AboutPage() {
         {/* Hero */}
         <BrandGlyph size={96} className="text-accent mb-8 md:mb-10" title="Distil" />
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-12 md:mb-16 text-balance">
-          Veille intelligente, <em className="italic text-accent">lecture souveraine.</em>
+          Veille intelligente, <em className="italic text-accent">lecture sereine.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-20 md:mb-24 text-pretty">
-          <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information
-          en ligne pour qu&apos;elle reste au service du jugement humain.
+          <span className="text-accent">Distil</span>
+          {' '}
+          capte, filtre et organise l&apos;information en ligne pour qu&apos;elle reste au service
+          du jugement humain.
         </p>
 
         {/* Capture produit */}
@@ -75,6 +77,80 @@ export default function AboutPage() {
               <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
                 Le système introduit activement des signaux hors-bulle. La découverte n&apos;est pas
                 un effet de bord, c&apos;est une feature de premier rang.
+              </p>
+            </li>
+          </ul>
+        </section>
+
+        {/* Fondations */}
+        <section
+          id="fondations"
+          className="mb-14 md:mb-16 border-t border-border pt-8 md:pt-10 scroll-mt-8"
+        >
+          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-6 md:mb-8 text-balance">
+            Fondations.
+          </h2>
+          <p className="font-body text-[16px] text-muted-foreground leading-[1.6] mb-8 text-pretty">
+            Ces principes ne sortent pas d&apos;une opinion. Chacun répond à un phénomène documenté
+            par la recherche en sciences de l&apos;information.
+          </p>
+          <ul className="space-y-6 md:space-y-7">
+            <li>
+              <h3 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-2">
+                Bulles de filtres
+              </h3>
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+                La personnalisation algorithmique réduit la diversité d&apos;angles et concentre
+                l&apos;exposition sur un nombre restreint de sources. Concept popularisé par Eli
+                Pariser (2011), mesuré chaque année par le{' '}
+                <a
+                  href="https://reutersinstitute.politics.ox.ac.uk/digital-news-report"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                >
+                  Digital News Report
+                </a>{' '}
+                du Reuters Institute.
+              </p>
+            </li>
+            <li>
+              <h3 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-2">
+                Économie de l&apos;attention
+              </h3>
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+                Herbert Simon posait en 1971 qu&apos;une richesse d&apos;information crée une
+                pauvreté d&apos;attention. Publier dix fois plus ne rend pas le monde dix fois plus
+                lisible, cela rend dix fois plus difficile de distinguer ce qui compte.
+              </p>
+            </li>
+            <li>
+              <h3 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-2">
+                Sérendipité de conception
+              </h3>
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+                La découverte hors-cible peut être stimulée par un design délibéré, pas seulement
+                par le hasard. Travaux de Foster &amp; Ford (2003) sur le rôle de la sérendipité
+                dans la recherche d&apos;information ; synthèse sur{' '}
+                <a
+                  href="https://en.wikipedia.org/wiki/Serendipity_in_information_seeking"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                >
+                  Wikipedia
+                </a>
+                .
+              </p>
+            </li>
+            <li>
+              <h3 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em] mb-2">
+                Lecture profonde
+              </h3>
+              <p className="font-body text-[16px] text-muted-foreground leading-[1.6] text-pretty">
+                Les circuits cérébraux de lecture attentive se dégradent sous régime de lecture
+                fragmentée. Travaux de Maryanne Wolf, neuroscientifique, <em>Reader, Come Home</em>{' '}
+                (2018).
               </p>
             </li>
           </ul>

@@ -84,6 +84,9 @@ const COPY = {
         body: "Chaque sélection affiche son score et la raison du choix. Vous gardez la main, l'algo rend des comptes.",
       },
     ],
+    foundationsNote:
+      "Méthode enracinée dans la recherche sur les bulles de filtres, l'économie de l'attention et la sérendipité.",
+    foundationsCta: 'Voir les fondations',
     examplesTitle: 'Voir un exemple',
     examplesSubtitle:
       "Choisissez un thème pour voir à quoi ressemble votre sélection d'aujourd'hui.",
@@ -124,6 +127,9 @@ const COPY = {
         body: 'Every pick shows its score and the reason. You stay in charge, the algo is accountable.',
       },
     ],
+    foundationsNote:
+      'Method grounded in research on filter bubbles, the attention economy, and serendipity.',
+    foundationsCta: 'See the foundations',
     examplesTitle: 'See an example',
     examplesSubtitle: "Pick a topic to preview today's selection.",
     feedTitle: "Today's briefing",
@@ -290,6 +296,16 @@ export function StartScreen({
                 </li>
               ))}
             </ol>
+            <p className="font-ui text-[14px] text-subtle leading-[1.55] mt-10 md:mt-12 max-w-[52ch] text-pretty">
+              {t.foundationsNote}{' '}
+              <Link
+                href="/about#fondations"
+                className="underline underline-offset-[3px] decoration-border hover:decoration-accent hover:text-accent transition-colors"
+              >
+                {t.foundationsCta}
+              </Link>
+              .
+            </p>
           </section>
 
           {/* Voir un exemple : liens compacts, aplat full-viewport */}
