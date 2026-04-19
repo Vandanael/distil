@@ -148,8 +148,6 @@ export default async function FeedPage() {
     }
   }
 
-  // Passe une date ISO pour que FeedHeader formate selon la locale client
-  const todayIso = new Date().toISOString()
   const topInterests = interests.slice(0, 3)
 
   // Fil unique : essentiels trie par score desc, puis serendipity trie par score desc
@@ -159,7 +157,7 @@ export default async function FeedPage() {
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3 md:py-10 w-full">
       <div className="lg:max-w-[720px]">
-        <FeedHeader today={todayIso} lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
+        <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
       </div>
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
