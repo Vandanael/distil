@@ -7,21 +7,14 @@ import { toast } from 'sonner'
 import { useLocale } from '@/lib/i18n/context'
 
 type Props = {
-  today: string
   lastRefreshAt: string | null
   topInterests: string[]
 }
 
-export function FeedHeader({ today, lastRefreshAt, topInterests }: Props) {
+export function FeedHeader({ lastRefreshAt, topInterests }: Props) {
   const { locale, t } = useLocale()
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
-
-  const formattedDate = new Date(today).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  })
 
   function formatRefreshAge(isoDate: string): { label: string; isStale: boolean } {
     const diffMs = Date.now() - new Date(isoDate).getTime()

@@ -74,7 +74,6 @@ const backlog = await fetchBacklog()
 console.log(`Backlog : ${backlog.length} items a embedder`)
 
 let done = 0
-let tokens = 0
 const started = Date.now()
 
 for (let i = 0; i < backlog.length; i += BATCH_SIZE) {
