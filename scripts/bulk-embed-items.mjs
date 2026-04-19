@@ -83,7 +83,7 @@ for (let i = 0; i < backlog.length; i += BATCH_SIZE) {
     const n = await embedBatch(batch)
     done += n
     const pct = Math.round((done / backlog.length) * 100)
-    const eta = Math.round(((Date.now() - started) / done) * (backlog.length - done) / 1000)
+    const eta = Math.round((((Date.now() - started) / done) * (backlog.length - done)) / 1000)
     console.log(`[${pct}%] ${done}/${backlog.length}  (ETA ${eta}s)`)
   } catch (err) {
     console.error(`[batch ${i}] ${err.message}`)
@@ -91,4 +91,6 @@ for (let i = 0; i < backlog.length; i += BATCH_SIZE) {
   }
 }
 
-console.log(`\nTermine : ${done}/${backlog.length} embeddings en ${Math.round((Date.now() - started) / 1000)}s`)
+console.log(
+  `\nTermine : ${done}/${backlog.length} embeddings en ${Math.round((Date.now() - started) / 1000)}s`
+)

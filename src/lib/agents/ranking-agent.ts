@@ -225,11 +225,7 @@ async function persistRanking(
       // L'index UNIQUE sur articles(user_id, item_id) est partiel (WHERE item_id IS NOT NULL) :
       // Supabase upsert onConflict ne peut pas matcher un index partial → fail silencieux.
       // On fait delete-then-insert explicite par (user_id, item_id) qui est safe et idempotent.
-      await supabase
-        .from('articles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('item_id', item.itemId)
+      await supabase.from('articles').delete().eq('user_id', userId).eq('item_id', item.itemId)
       await supabase.from('articles').insert(articleRow)
     })
   )

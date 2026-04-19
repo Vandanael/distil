@@ -18,8 +18,8 @@ describe('PublicFooter', () => {
         (_, el) =>
           el?.tagName === 'P' &&
           el.textContent?.replace(/\s+/g, ' ').trim() ===
-            '© 2026-2027 Distil. Tous droits réservés.',
-      ),
+            '© 2026-2027 Distil. Tous droits réservés.'
+      )
     ).toBeTruthy()
   })
 

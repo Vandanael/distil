@@ -158,7 +158,7 @@ export default async function RootPage() {
 
       featuredArticles = picks
         .flatMap((r, i) =>
-          (r.data ?? []).map((a) => ({ ...a, persona_slug: HOME_FEATURED_SLUGS[i] })),
+          (r.data ?? []).map((a) => ({ ...a, persona_slug: HOME_FEATURED_SLUGS[i] }))
         )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
         .slice(0, EDITION_TARGET)

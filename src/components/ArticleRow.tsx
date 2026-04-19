@@ -32,9 +32,7 @@ export function ArticleRow({
   const inner = (
     <div className={compact ? 'space-y-1.5' : 'space-y-2'}>
       {personaLabel && (
-        <p className="font-ui text-[14px] uppercase tracking-[0.1em] text-accent">
-          {personaLabel}
-        </p>
+        <p className="font-ui text-[14px] uppercase tracking-[0.1em] text-accent">{personaLabel}</p>
       )}
       {article.site_name && (
         <p className="font-ui text-[14px] text-subtle">
@@ -71,7 +69,9 @@ export function ArticleRow({
     </div>
   )
 
-  const wrapperClass = compact ? 'py-4 border-b border-border last:border-0' : 'py-6 border-b border-border last:border-0'
+  const wrapperClass = compact
+    ? 'py-4 border-b border-border last:border-0'
+    : 'py-6 border-b border-border last:border-0'
 
   return (
     <li className={wrapperClass}>

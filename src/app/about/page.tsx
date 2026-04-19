@@ -17,18 +17,13 @@ export default function AboutPage() {
       </div>
       <div className="flex-1 w-full max-w-2xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-5 md:pb-10">
         {/* Hero */}
-        <BrandGlyph
-          size={96}
-          className="text-accent mb-8 md:mb-10"
-          title="Distil"
-        />
+        <BrandGlyph size={96} className="text-accent mb-8 md:mb-10" title="Distil" />
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-12 md:mb-16 text-balance">
-          Veille intelligente,{' '}
-          <em className="italic text-accent">lecture souveraine.</em>
+          Veille intelligente, <em className="italic text-accent">lecture souveraine.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-20 md:mb-24 text-pretty">
-          <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information en
-          ligne pour qu&apos;elle reste au service du jugement humain.
+          <span className="text-accent">Distil</span> capte, filtre et organise l&apos;information
+          en ligne pour qu&apos;elle reste au service du jugement humain.
         </p>
 
         {/* Capture produit */}

@@ -25,8 +25,7 @@ export default function NotFound() {
           Introuvable
         </p>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-[-0.01em] text-foreground mb-8 text-balance">
-          Cette page{' '}
-          <em className="italic text-accent">a disparu.</em>
+          Cette page <em className="italic text-accent">a disparu.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-12 text-pretty max-w-[48ch]">
           Elle n&apos;existe plus, ou l&apos;adresse est incorrecte. Rien d&apos;inquietant : le

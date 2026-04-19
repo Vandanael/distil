@@ -28,33 +28,63 @@ console.log('\n═══ 1. Items par feed (7j) : ingestes vs embeddings ══�
   const rows = []
   for (const f of feeds ?? []) {
     const [{ count: total }, { data: itemIds }] = await Promise.all([
-      sb.from('items').select('id', { count: 'exact', head: true }).eq('feed_id', f.id).gte('fetched_at', cutoff),
+      sb
+        .from('items')
+        .select('id', { count: 'exact', head: true })
+        .eq('feed_id', f.id)
+        .gte('fetched_at', cutoff),
       sb.from('items').select('id').eq('feed_id', f.id).gte('fetched_at', cutoff),
     ])
     let withEmb = 0
     if (itemIds && itemIds.length > 0) {
       const ids = itemIds.map((r) => r.id)
-      const { count } = await sb.from('item_embeddings').select('item_id', { count: 'exact', head: true }).in('item_id', ids)
+      const { count } = await sb
+        .from('item_embeddings')
+        .select('item_id', { count: 'exact', head: true })
+        .in('item_id', ids)
       withEmb = count ?? 0
     }
-    rows.push({ site: f.site_name ?? '(null)', total: total ?? 0, withEmb, pct: (total ?? 0) ? Math.round((withEmb / (total ?? 0)) * 100) : 0 })
+    rows.push({
+      site: f.site_name ?? '(null)',
+      total: total ?? 0,
+      withEmb,
+      pct: (total ?? 0) ? Math.round((withEmb / (total ?? 0)) * 100) : 0,
+    })
   }
   rows.sort((a, b) => b.total - a.total)
   console.log('site_name                                  total  emb  %   ')
   for (const r of rows) {
-    console.log(`${r.site.padEnd(42)} ${String(r.total).padStart(5)} ${String(r.withEmb).padStart(4)} ${String(r.pct).padStart(3)}%`)
+    console.log(
+      `${r.site.padEnd(42)} ${String(r.total).padStart(5)} ${String(r.withEmb).padStart(4)} ${String(r.pct).padStart(3)}%`
+    )
   }
   const totalAll = rows.reduce((a, b) => a + b.total, 0)
   const embAll = rows.reduce((a, b) => a + b.withEmb, 0)
-  console.log(`\nTotal 7j : ${totalAll} items, ${embAll} avec embedding (${totalAll ? Math.round((embAll / totalAll) * 100) : 0}%)`)
+  console.log(
+    `\nTotal 7j : ${totalAll} items, ${embAll} avec embedding (${totalAll ? Math.round((embAll / totalAll) * 100) : 0}%)`
+  )
 }
 
 console.log('\n═══ 2. Articles par compte demo (status accepted) ═══\n')
 for (const d of DEMO) {
   const [{ count: acc }, { count: rej }, { data: latest }] = await Promise.all([
-    sb.from('articles').select('id', { count: 'exact', head: true }).eq('user_id', d.id).eq('status', 'accepted'),
-    sb.from('articles').select('id', { count: 'exact', head: true }).eq('user_id', d.id).eq('status', 'rejected'),
-    sb.from('articles').select('title, site_name, score, is_serendipity, scored_at').eq('user_id', d.id).eq('status', 'accepted').order('scored_at', { ascending: false }).limit(10),
+    sb
+      .from('articles')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', d.id)
+      .eq('status', 'accepted'),
+    sb
+      .from('articles')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', d.id)
+      .eq('status', 'rejected'),
+    sb
+      .from('articles')
+      .select('title, site_name, score, is_serendipity, scored_at')
+      .eq('user_id', d.id)
+      .eq('status', 'accepted')
+      .order('scored_at', { ascending: false })
+      .limit(10),
   ])
   console.log(`[${d.slug}] ${d.theme.padEnd(10)} accepted=${acc ?? 0}  rejected=${rej ?? 0}`)
   if (!latest || latest.length === 0) {
@@ -64,7 +94,9 @@ for (const d of DEMO) {
       const dt = a.scored_at?.slice(0, 10) ?? '?'
       const tag = a.is_serendipity ? '★' : ' '
       const title = (a.title ?? '(sans titre)').slice(0, 60)
-      console.log(`  ${dt} ${tag} ${String(a.score ?? '').padStart(3)}  ${(a.site_name ?? '?').padEnd(22)} ${title}`)
+      console.log(
+        `  ${dt} ${tag} ${String(a.score ?? '').padStart(3)}  ${(a.site_name ?? '?').padEnd(22)} ${title}`
+      )
     }
   }
 }
@@ -74,7 +106,9 @@ console.log('\n═══ 3. Distribution site_name des articles montres sur la h
   const now = new Date()
   const startOfYear = new Date(now.getFullYear(), 0, 0).getTime()
   const dayOfYear = Math.floor((now.getTime() - startOfYear) / 86_400_000)
-  console.log(`(jour ${dayOfYear} de l'annee, offsets = [${DEMO.map((_, i) => (dayOfYear + i * 7) % 10).join(', ')}])`)
+  console.log(
+    `(jour ${dayOfYear} de l'annee, offsets = [${DEMO.map((_, i) => (dayOfYear + i * 7) % 10).join(', ')}])`
+  )
   for (let i = 0; i < DEMO.length; i++) {
     const d = DEMO[i]
     const offset = (dayOfYear + i * 7) % 10
@@ -90,12 +124,16 @@ console.log('\n═══ 3. Distribution site_name des articles montres sur la h
     if (error || !data) {
       console.log(`  [${d.slug}] offset=${offset}  → FALLBACK (${error?.message ?? 'null'})`)
     } else {
-      console.log(`  [${d.slug}] offset=${offset}  ${data.site_name ?? '?'}  score=${data.score}  "${(data.title ?? '').slice(0, 60)}"`)
+      console.log(
+        `  [${d.slug}] offset=${offset}  ${data.site_name ?? '?'}  score=${data.score}  "${(data.title ?? '').slice(0, 60)}"`
+      )
     }
   }
 }
 
-console.log('\n═══ 4. Distribution site_name du feed authentifie (tous users, 30 derniers articles par user) ═══\n')
+console.log(
+  '\n═══ 4. Distribution site_name du feed authentifie (tous users, 30 derniers articles par user) ═══\n'
+)
 {
   const { data: users } = await sb.from('profiles').select('id').eq('onboarding_completed', true)
   const siteAgg = new Map()

@@ -56,8 +56,7 @@ function LoginPageInner() {
               Connexion à <span className="italic text-accent">Distil</span>.
             </h1>
             <p className="font-body text-[16px] leading-[1.55] text-muted-foreground text-pretty">
-              Votre veille quotidienne,{' '}
-              <em className="italic text-foreground">sans le bruit.</em>
+              Votre veille quotidienne, <em className="italic text-foreground">sans le bruit.</em>
             </p>
           </div>
 

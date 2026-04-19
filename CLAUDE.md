@@ -22,18 +22,18 @@ Solo user, MVP d'abord : chaque fonctionnalite doit valoir son cout de complexit
 
 ## Stack technique
 
-| Couche          | Choix                                                          |
-| --------------- | -------------------------------------------------------------- |
-| Framework       | Next.js 16 App Router, React 19, TypeScript strict             |
-| Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut)   |
-| Base de donnees | Supabase : Postgres + pgvector + Auth (Google OAuth only)      |
-| IA              | Gemini 2.5 Flash (scoring, ranking v2, profile-generator)      |
-| Embeddings      | Voyage voyage-3                                                |
-| Email           | Resend + Netlify scheduled function                            |
-| Rate limiting   | Upstash Redis                                                  |
-| Tests           | Vitest (unit), Playwright (E2E)                                |
-| Observabilite   | Netlify function logs + table Supabase `error_log`             |
-| Deploy          | Netlify                                                        |
+| Couche          | Choix                                                        |
+| --------------- | ------------------------------------------------------------ |
+| Framework       | Next.js 16 App Router, React 19, TypeScript strict           |
+| Style           | Tailwind v4, shadcn/ui retokenise (pas de tokens par defaut) |
+| Base de donnees | Supabase : Postgres + pgvector + Auth (Google OAuth only)    |
+| IA              | Gemini 2.5 Flash (scoring, ranking v2, profile-generator)    |
+| Embeddings      | Voyage voyage-3                                              |
+| Email           | Resend + Netlify scheduled function                          |
+| Rate limiting   | Upstash Redis                                                |
+| Tests           | Vitest (unit), Playwright (E2E)                              |
+| Observabilite   | Netlify function logs + table Supabase `error_log`           |
+| Deploy          | Netlify                                                      |
 
 Pas de Sentry (overengineering solo) ; pas de fallback Anthropic (Gemini only). Voir ADR-010 pour la philosophie ranking.
 
