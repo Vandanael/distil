@@ -558,7 +558,7 @@ export type Database = {
           user_id: string
           article_id: string | null
           item_id: string | null
-          action: 'read_full' | 'skip' | 'saved' | 'surprised_useful'
+          action: 'skip' | 'saved'
           seconds_on_page: number | null
           created_at: string
         }
@@ -567,7 +567,7 @@ export type Database = {
           user_id: string
           article_id?: string | null
           item_id?: string | null
-          action: 'read_full' | 'skip' | 'saved' | 'surprised_useful'
+          action: 'skip' | 'saved'
           seconds_on_page?: number | null
           created_at?: string
         }
@@ -576,7 +576,7 @@ export type Database = {
           user_id?: string
           article_id?: string | null
           item_id?: string | null
-          action?: 'read_full' | 'skip' | 'saved' | 'surprised_useful'
+          action?: 'skip' | 'saved'
           seconds_on_page?: number | null
           created_at?: string
         }
