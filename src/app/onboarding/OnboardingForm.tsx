@@ -221,7 +221,8 @@ export function OnboardingForm() {
               })}
             </div>
             <p className="font-body text-sm text-muted-foreground">
-              Sélectionnez autant de thèmes que vous voulez, ou décrivez-vous en texte libre ci-dessous.
+              Sélectionnez autant de thèmes que vous voulez, ou décrivez-vous en texte libre
+              ci-dessous.
             </p>
           </div>
 
@@ -230,7 +231,7 @@ export function OnboardingForm() {
               htmlFor="profile-text"
               className="font-ui text-sm uppercase tracking-wider text-muted-foreground"
             >
-              {"Précisez (optionnel)"}
+              {'Précisez (optionnel)'}
             </Label>
             <Textarea
               id="profile-text"

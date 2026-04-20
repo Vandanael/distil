@@ -11,7 +11,7 @@ export const revalidate = 3600
 // Allowlist SEO : / et /about sont les 2 seules pages publiques indexables.
 // Tout le reste heritage du layout racine (noindex par defaut, defense en profondeur).
 const HOME_DESCRIPTION =
-  "Distil lit le web a votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversite editoriale, zero algorithme de popularite."
+  'Distil lit le web a votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversite editoriale, zero algorithme de popularite.'
 
 export const metadata = {
   title: 'Distil - votre veille quotidienne, sans le bruit',
@@ -56,7 +56,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: 'Reporterre - le quotidien de l\'ecologie',
+    title: "Reporterre - le quotidien de l'ecologie",
     url: 'https://reporterre.net/',
     site_name: 'Reporterre',
     excerpt: null,

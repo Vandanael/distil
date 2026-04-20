@@ -9,7 +9,7 @@ export function LanguageToggle() {
     <button
       type="button"
       onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
-      aria-label={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+      aria-label={locale === 'fr' ? 'EN · Switch to English' : 'FR · Passer en français'}
       className="font-ui text-sm font-medium tracking-wide text-muted-foreground hover:text-foreground transition-colors px-1.5 py-0.5 border border-transparent hover:border-border"
       data-testid="language-toggle"
     >
