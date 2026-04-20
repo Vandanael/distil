@@ -115,7 +115,7 @@ const COPY = {
     foundationsCta: 'See the foundations',
     examplesTitle: 'See an example',
     examplesSubtitle:
-      "Five topics, five editions for today. Pick the one that speaks to you, ignore the rest.",
+      'Five topics, five editions for today. Pick the one that speaks to you, ignore the rest.',
     feedTitle: "Today's briefing",
     feedTitleFallback: 'Samples',
     feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',

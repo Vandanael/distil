@@ -64,14 +64,14 @@
 
   /* Accent = bordeaux profond (marque, hover, emphase editoriale) */
   /* #7A2E3A : ~8.2:1 sur #f7f8f3 - AAA, archetype revue/presse, chaud-froid avec le vert bouteille */
-  --accent: #7A2E3A;
+  --accent: #7a2e3a;
   --accent-foreground: #f7f8f3;
 
   /* Destructive : rouge presse, distinct de l'accent de marque pour eviter l'ambiguite action/erreur */
   --destructive: #c8102e;
   --border: #d6dbcd;
   --input: #d6dbcd;
-  --ring: #7A2E3A; /* focus ring = bordeaux profond */
+  --ring: #7a2e3a; /* focus ring = bordeaux profond */
   --radius: 0rem; /* coins francs */
 }
 

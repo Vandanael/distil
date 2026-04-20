@@ -86,8 +86,7 @@ async function fetchFeed(supabase: ServiceClient, feed: Feed): Promise<IngestRes
         )
         const contentText = stripHtml(rawContent)
 
-        const rawAuthor =
-          (rawItem['dc:creator'] as string | undefined) ?? item.creator ?? null
+        const rawAuthor = (rawItem['dc:creator'] as string | undefined) ?? item.creator ?? null
 
         return {
           feed_id: feed.id,
