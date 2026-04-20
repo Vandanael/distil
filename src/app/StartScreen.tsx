@@ -216,7 +216,7 @@ export function StartScreen({
             >
               <div
                 aria-hidden
-                className="hidden lg:block pointer-events-none absolute -inset-x-6 -inset-y-8 bg-accent/[0.06]"
+                className="hidden lg:block pointer-events-none absolute -inset-x-6 -inset-y-8 bg-accent/6"
               />
               <div className="relative border-t border-border pt-4 mb-3">
                 <h2 className="font-ui text-[15px] text-accent uppercase tracking-[0.12em]">
@@ -296,7 +296,7 @@ export function StartScreen({
           <section id="examples" className="relative pt-8 md:pt-10 pb-8 md:pb-10 scroll-mt-8">
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-screen bg-accent/[0.06]"
+              className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-screen bg-accent/6"
             />
             <div className="relative">
               <div className="mb-6 md:mb-8">

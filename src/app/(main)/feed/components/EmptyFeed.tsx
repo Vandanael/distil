@@ -66,7 +66,7 @@ export function EmptyFeed() {
         <p className="font-ui text-sm text-foreground font-medium">{t.feed.errorTitle}</p>
         <p className="font-body text-sm text-muted-foreground">
           {t.feed.errorDetail}{' '}
-          <Link href="/profile" className="text-accent hover:underline">
+          <Link href="/profile" className="text-accent underline underline-offset-[3px] decoration-accent/50 hover:decoration-accent">
             {t.feed.errorLink}
           </Link>
           .
@@ -80,7 +80,7 @@ export function EmptyFeed() {
       <p className="font-ui text-sm text-foreground font-medium">{t.feed.noneTitle}</p>
       <p className="font-body text-sm text-muted-foreground leading-relaxed">
         {t.feed.noneDetail}{' '}
-        <Link href="/profile" className="text-accent hover:underline">
+        <Link href="/profile" className="text-accent underline underline-offset-[3px] decoration-accent/50 hover:decoration-accent">
           {t.feed.noneLink}
         </Link>{' '}
         {t.feed.noneEnd}

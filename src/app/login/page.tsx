@@ -86,7 +86,7 @@ function LoginPageInner() {
   }
 
   return (
-    <main className="flex flex-1 flex-col bg-background">
+    <main id="main-content" className="flex flex-1 flex-col bg-background">
       <PublicHeader contextLabel="Connexion" />
       <div className="flex-1 flex items-center justify-center px-5 md:px-8 py-12">
         <div className="w-full max-w-sm space-y-8">

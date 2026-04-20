@@ -28,7 +28,14 @@
         "robots-txt": "off",
         "unused-javascript": ["warn", { "maxLength": 2 }],
         "unused-css-rules": "off",
-        "csp-xss": "off"
+        "csp-xss": "off",
+        "bf-cache": "off",
+        "is-crawlable": "off",
+        "redirects": "off",
+        "errors-in-console": "off",
+        "legacy-javascript-insight": "off",
+        "document-latency-insight": ["warn", { "minScore": 0.5 }],
+        "network-dependency-tree-insight": ["warn", { "minScore": 0.5 }]
       }
     },
     "upload": {

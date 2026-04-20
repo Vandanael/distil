@@ -49,7 +49,7 @@ export function PublicHeader({ contextLabel }: Props) {
               {today}
             </span>
             {contextLabel && (
-              <span className="hidden sm:inline font-ui text-[15px] text-subtle/60 leading-none">
+              <span className="hidden sm:inline font-ui text-[15px] text-muted-foreground leading-none">
                 {contextLabel}
               </span>
             )}
@@ -66,7 +66,7 @@ export function PublicHeader({ contextLabel }: Props) {
             </span>
             <button
               onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
-              aria-label={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+              aria-label={locale === 'fr' ? 'FR · Switch to English' : 'EN · Passer en français'}
               className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-foreground transition-colors"
             >
               {locale.toUpperCase()}
