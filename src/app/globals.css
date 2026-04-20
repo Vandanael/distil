@@ -77,7 +77,7 @@
 
 .dark {
   /* Dark mode G2 - vert bouteille tres fonce + stone clair + bordeaux clair */
-  --background: #0e1d17; /* vert bouteille profond */
+  --background: #141917; /* noir-vert classique, moins lourd */
   --foreground: #f2f4ee; /* stone clair : encre inversee */
   --card: #1a3a2e;
   --card-foreground: #f2f4ee;
