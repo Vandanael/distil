@@ -42,7 +42,7 @@
 
 :root {
   /* Palette Distil G4 (sprint QA) - sauge ultra-claire, cards blanches */
-  --background: #f7f8f3; /* +2% luminance vs G3, moins tinte, plus frais */
+  --background: #f7f8f8; /* neutre froid, sans cast vert ni jaune */
   --foreground: #1a3a2e; /* vert bouteille : encre botanique, signature Distil */
   --card: #ffffff; /* blanc franc pour detacher les cards du fond */
   --card-foreground: #1a3a2e;
@@ -51,7 +51,7 @@
 
   /* Primary = vert bouteille (autorite, CTA principal) */
   --primary: #1a3a2e;
-  --primary-foreground: #f7f8f3;
+  --primary-foreground: #f7f8f8;
 
   /* Secondary = stone sauge un ton plus sombre (bouton secondaire) */
   --secondary: #e3e6dc;
@@ -59,7 +59,7 @@
 
   /* Muted : neutre moins sature */
   --muted: #edeee8;
-  --muted-foreground: #5a6358; /* 5.2:1 AA sur background */
+  --muted-foreground: #404d3e; /* 8.4:1 AAA sur #f7f8f8 */
   --subtle: #333a35; /* 9:1 AAA pour petits textes (<= 13px) */
 
   /* Accent = bordeaux profond (marque, hover, emphase editoriale) */
