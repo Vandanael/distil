@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { ArticleCard } from './components/ArticleCard'
 import { EmptyFeed } from './components/EmptyFeed'
+import { FirstEditionEmpty } from './components/FirstEditionEmpty'
 import { FeedShell } from './components/FeedShell'
 import { FeedHeader } from './components/FeedHeader'
 import { DismissProvider } from './components/DismissContext'
@@ -46,6 +47,7 @@ export default async function FeedPage() {
   let interests: string[] = []
   let keywordGroups: KeywordGroup[] = []
   let daysSinceLastLogin: number | undefined = undefined
+  let firstEditionEmpty = false
   const subScoresByItemId = new Map<string, SubScores>()
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -57,12 +59,13 @@ export default async function FeedPage() {
     if (user) {
       const profileResult = await supabase
         .from('profiles')
-        .select('daily_cap, interests')
+        .select('daily_cap, interests, first_edition_empty')
         .eq('id', user.id)
         .single()
 
       const dailyCap = profileResult.data?.daily_cap ?? 10
       interests = profileResult.data?.interests ?? []
+      firstEditionEmpty = profileResult.data?.first_edition_empty ?? false
 
       const now = new Date()
       const todayStart = new Date(now)
@@ -185,7 +188,11 @@ export default async function FeedPage() {
           className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2"
           articleStatuses={articles.map((a) => a.status)}
         >
-          {articles.length === 0 ? (
+          {firstEditionEmpty ? (
+            <div className="lg:col-span-2">
+              <FirstEditionEmpty />
+            </div>
+          ) : articles.length === 0 ? (
             <div className="lg:col-span-2">
               <EmptyFeed />
             </div>
