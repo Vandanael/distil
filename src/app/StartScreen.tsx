@@ -147,6 +147,116 @@ const COPY = {
   },
 }
 
+function ActionsSchema({ locale }: { locale: 'fr' | 'en' }) {
+  const c =
+    locale === 'fr'
+      ? {
+          ariaLabel: 'Schéma des 4 actions utilisateur',
+          article: 'Article du jour',
+          like: 'Plus comme ça',
+          notInterested: 'Pas intéressé',
+          toRead: 'À lire',
+          read: 'Lu',
+        }
+      : {
+          ariaLabel: '4 user action model',
+          article: "Today's article",
+          like: 'Like this',
+          notInterested: 'Not interested',
+          toRead: 'To read',
+          read: 'Done',
+        }
+
+  const accent = '#7a2e3a'
+  const W = 560
+  const H = 148
+  const articleX = W / 2
+  const articleY = 30
+  const boxW = 118
+  const boxH = 36
+  const boxY = 98
+  const actions = [c.like, c.notInterested, c.toRead, c.read]
+  const gap = (W - 4 * boxW) / 5
+  const centers = [0, 1, 2, 3].map((i) => gap * (i + 1) + boxW * i + boxW / 2)
+
+  return (
+    <figure aria-label={c.ariaLabel} className="mt-10 md:mt-12">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full max-w-[540px]"
+        aria-hidden="true"
+      >
+        <rect
+          x={articleX - 70}
+          y={articleY - 16}
+          width={140}
+          height={32}
+          fill={accent}
+          fillOpacity={0.1}
+          stroke={accent}
+          strokeWidth={1}
+          strokeOpacity={0.5}
+        />
+        <text
+          x={articleX}
+          y={articleY + 5}
+          textAnchor="middle"
+          fontSize="12"
+          fontWeight="600"
+          fill={accent}
+          style={{ fontFamily: 'var(--font-ui, sans-serif)' }}
+        >
+          {c.article}
+        </text>
+
+        {centers.map((cx, i) => (
+          <line
+            key={i}
+            x1={articleX}
+            y1={articleY + 16}
+            x2={cx}
+            y2={boxY}
+            stroke={accent}
+            strokeWidth={1}
+            strokeOpacity={0.2}
+            strokeDasharray="4 3"
+          />
+        ))}
+
+        {actions.map((label, i) => {
+          const cx = centers[i]
+          return (
+            <g key={i}>
+              <rect
+                x={cx - boxW / 2}
+                y={boxY}
+                width={boxW}
+                height={boxH}
+                fill={accent}
+                fillOpacity={0.07}
+                stroke={accent}
+                strokeWidth={1}
+                strokeOpacity={0.3}
+              />
+              <text
+                x={cx}
+                y={boxY + boxH / 2 + 5}
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="500"
+                fill={accent}
+                style={{ fontFamily: 'var(--font-ui, sans-serif)' }}
+              >
+                {label}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </figure>
+  )
+}
+
 export function StartScreen({
   articles,
   isFallback = false,
@@ -294,16 +404,6 @@ export function StartScreen({
             </p>
           </section>
 
-          {/* Encart "Vos sources, notre méthode" */}
-          <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
-            <h2 className="font-heading text-2xl md:text-3xl text-foreground leading-[1.1] tracking-tight mb-4 text-balance">
-              {t.sourcesTitle}
-            </h2>
-            <p className="font-body text-[16px] md:text-[17px] text-subtle leading-[1.6] max-w-[52ch] text-pretty">
-              {withBrand(t.sourcesBody)}
-            </p>
-          </section>
-
           {/* Methode : pitch vulgarise */}
           <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
             <h2 className="font-heading text-4xl md:text-5xl text-foreground leading-[1.1] tracking-tight mb-4 md:mb-5 text-balance max-w-[22ch]">
@@ -330,6 +430,7 @@ export function StartScreen({
                 </li>
               ))}
             </ol>
+            <ActionsSchema locale={locale} />
             <p className="font-ui text-[14px] text-subtle leading-[1.55] mt-10 md:mt-12 max-w-[52ch] text-pretty">
               {t.foundationsNote}{' '}
               <Link
@@ -339,6 +440,16 @@ export function StartScreen({
                 {t.foundationsCta}
               </Link>
               .
+            </p>
+          </section>
+
+          {/* Encart "Vos sources, notre méthode" */}
+          <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
+            <h2 className="font-heading text-2xl md:text-3xl text-foreground leading-[1.1] tracking-tight mb-4 text-balance">
+              {t.sourcesTitle}
+            </h2>
+            <p className="font-body text-[16px] md:text-[17px] text-subtle leading-[1.6] max-w-[52ch] text-pretty">
+              {withBrand(t.sourcesBody)}
             </p>
           </section>
 
