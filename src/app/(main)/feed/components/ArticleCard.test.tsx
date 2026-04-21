@@ -97,10 +97,10 @@ describe('ArticleCard', () => {
     expect(screen.getByText('Sans titre')).toBeTruthy()
   })
 
-  it('lien pointe vers /article/:id', () => {
+  it('lien pointe vers /article/:id avec marqueur from=feed', () => {
     renderCard(BASE_PROPS)
     const link = screen.getByTestId('article-card-link-abc-123')
-    expect(link.getAttribute('href')).toBe('/article/abc-123')
+    expect(link.getAttribute('href')).toBe('/article/abc-123?from=feed')
   })
 
   it('ne pas afficher le badge Paywall si wordCount null (non parse)', () => {

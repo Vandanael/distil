@@ -35,11 +35,11 @@ test.describe('Flow de lecture', () => {
     await firstCard.click()
     await expect(page).toHaveURL(/\/article\//)
 
-    // Clic sur Archiver
+    // Clic sur Ajouter a A lire
     await page.getByTestId('action-archive').click()
 
-    // La FloatingActionBar confirme l'archivage
-    await expect(page.getByText('Archive')).toBeVisible({ timeout: 5000 })
+    // La FloatingActionBar confirme l'ajout (PR-06 : "Archive" -> "A lire")
+    await expect(page.getByText('Ajouté à À lire')).toBeVisible({ timeout: 5000 })
 
     // L'article est retrouvable dans /library?tab=saved
     if (articleUrl) {
@@ -59,8 +59,8 @@ test.describe('Flow de lecture', () => {
     const dismissBtn = firstCard.getByTestId(/^dismiss-/)
     await dismissBtn.click()
 
-    // Toast "Article masque" visible
-    await expect(page.getByText('Article masque')).toBeVisible({ timeout: 3000 })
+    // Toast "Pas intéressé" visible (PR-05 : ancien "Article masque" remplace)
+    await expect(page.getByText('Pas intéressé')).toBeVisible({ timeout: 3000 })
   })
 
   test('annuler le rejet via undo', async ({ page }) => {
@@ -71,8 +71,8 @@ test.describe('Flow de lecture', () => {
     const dismissBtn = firstCard.getByTestId(/^dismiss-/)
     await dismissBtn.click()
 
-    await expect(page.getByText('Article masque')).toBeVisible({ timeout: 3000 })
-    await page.getByText('Annuler').click()
+    await expect(page.getByText('Pas intéressé')).toBeVisible({ timeout: 3000 })
+    await page.getByRole('button', { name: 'Annuler' }).click()
 
     // La carte doit reapparaitre (le dismiss a ete annule)
     if (articleId) {

@@ -1,6 +1,11 @@
 /**
  * Transparence du scoring - parcours Thomas (ML engineer, allergique au slop).
- * Verifie que le panneau de scoring et les scores rejetes sont visibles.
+ * Verifie que la page article charge correctement.
+ *
+ * Note PR-13 : le scenario "section filtres affiche les scores des articles
+ * filtres" a ete supprime - la vue dediee aux articles rejetes n'est pas dans
+ * le PRD v2 (positionnement "on filtre pour toi", pas "voici tout ce qu'on a
+ * ecarte"). Voir docs/pr-13-tests-casses.md (a supprimer apres merge).
  */
 import { test, expect } from '@playwright/test'
 import { loginAs } from './fixtures/auth'
@@ -9,21 +14,6 @@ test.describe('Transparence du scoring', () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, 'thomas-test@distil.local')
     await expect(page).toHaveURL(/\/feed/)
-  })
-
-  test('la section filtres affiche les scores des articles filtres', async ({ page }) => {
-    await page.goto('/library?tab=filtered')
-    await expect(page).toHaveURL(/\/library/)
-
-    const cards = page.getByTestId(/^rejected-card-/)
-    const count = await cards.count()
-
-    if (count > 0) {
-      // Pas d'erreur si 0 badges (articles sans score), on verifie juste l'absence d'erreur
-      await expect(page.getByTestId('rejected-articles')).toBeVisible()
-    } else {
-      await expect(page.getByText('Aucun article filtre')).toBeVisible()
-    }
   })
 
   test('un article accepte affiche le panneau de scoring', async ({ page }) => {

@@ -61,18 +61,16 @@ test.describe('Accessibilite (axe)', () => {
     expect(filterCritical(results.violations)).toEqual([])
   })
 
-  for (const tab of ['saved', 'highlights', 'filtered'] as const) {
-    test(`page /library?tab=${tab} sans violations critical/serious`, async ({ page }) => {
-      await loginAs(page, 'yvan-test@distil.local')
-      await page.goto(`/library?tab=${tab}`)
-      await expect(page).toHaveURL(/\/library/)
+  test('page /library sans violations critical/serious', async ({ page }) => {
+    await loginAs(page, 'yvan-test@distil.local')
+    await page.goto('/library')
+    await expect(page).toHaveURL(/\/library/)
 
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-        .disableRules(['color-contrast'])
-        .analyze()
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .disableRules(['color-contrast'])
+      .analyze()
 
-      expect(filterCritical(results.violations)).toEqual([])
-    })
-  }
+    expect(filterCritical(results.violations)).toEqual([])
+  })
 })

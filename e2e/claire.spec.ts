@@ -12,7 +12,12 @@ test.describe('Claire - recherche', () => {
   })
 
   test('navigue vers la recherche depuis le feed', async ({ page }) => {
-    await page.getByTestId('link-search').click()
+    // PR-13 : testid 'link-search' n'existe plus, on cible le lien Recherche dans la nav.
+    await page
+      .getByRole('navigation', { name: 'Navigation principale' })
+      .getByRole('link', { name: 'Recherche' })
+      .first()
+      .click()
     await expect(page).toHaveURL(/\/search/)
     await expect(page.getByTestId('search-input')).toBeVisible()
     await expect(page.getByTestId('mode-toggle')).toBeVisible()
