@@ -15,17 +15,57 @@ const LABELS = {
   en: { login: 'Sign in', home: 'Home' },
 } as const
 
+const WEEKDAYS = {
+  fr: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+  en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+} as const
+
+const MONTHS = {
+  fr: [
+    'janvier',
+    'février',
+    'mars',
+    'avril',
+    'mai',
+    'juin',
+    'juillet',
+    'août',
+    'septembre',
+    'octobre',
+    'novembre',
+    'décembre',
+  ],
+  en: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+} as const
+
+// Formateur manuel : on évite toLocaleDateString qui diverge entre ICU Node et ICU navigateur (hydration mismatch).
+function formatToday(date: Date, locale: 'fr' | 'en'): string {
+  const weekday = WEEKDAYS[locale][date.getDay()]
+  const day = date.getDate()
+  const month = MONTHS[locale][date.getMonth()]
+  const year = date.getFullYear()
+  return `${weekday} ${day} ${month} ${year}`
+}
+
 export function PublicHeader({ contextLabel }: Props) {
   const { locale, setLocale } = useLocale()
   const pathname = usePathname()
   const onLogin = pathname === '/login'
 
-  const today = new Date().toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+  const today = formatToday(new Date(), locale)
 
   const t = LABELS[locale]
 
