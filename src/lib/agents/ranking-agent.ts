@@ -552,7 +552,7 @@ async function persistRanking(
   )
 }
 
-async function rankForUser(supabase: ServiceClient, userId: string): Promise<RankingResult> {
+export async function rankForUser(supabase: ServiceClient, userId: string): Promise<RankingResult> {
   const start = Date.now()
   const now = new Date()
   const today = now.toISOString().slice(0, 10)
