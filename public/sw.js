@@ -1,12 +1,63 @@
 // Service Worker Distil — push notifications + cache offline
-const ARTICLE_CACHE = 'distil-articles-v1'
-const IMAGE_CACHE = 'distil-images-v1'
+const CACHE_VERSION = 'DISTIL_V2'
+const ARTICLE_CACHE = `distil-articles-${CACHE_VERSION}`
+const IMAGE_CACHE = `distil-images-${CACHE_VERSION}`
+const STATIC_CACHE = `distil-static-${CACHE_VERSION}`
+const ROUTE_CACHE = `distil-routes-${CACHE_VERSION}`
 const IMAGE_MAX = 50
+
+// Invalide les anciens caches au déploiement
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => !k.endsWith(CACHE_VERSION))
+          .map((k) => caches.delete(k))
+      )
+    )
+  )
+})
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
 
-  // Cache-First pour les pages article deja consultees
+  // Cache-first pour les assets statiques Next.js (immutable)
+  if (url.pathname.startsWith('/_next/static/') && event.request.method === 'GET') {
+    event.respondWith(
+      caches.open(STATIC_CACHE).then(async (cache) => {
+        const cached = await cache.match(event.request)
+        if (cached) return cached
+        const response = await fetch(event.request)
+        if (response.ok) cache.put(event.request, response.clone())
+        return response
+      })
+    )
+    return
+  }
+
+  // Network-first pour /feed et /library (fallback cache si offline)
+  if (
+    (url.pathname === '/feed' || url.pathname.startsWith('/library')) &&
+    event.request.method === 'GET'
+  ) {
+    event.respondWith(
+      caches.open(ROUTE_CACHE).then(async (cache) => {
+        try {
+          const response = await fetch(event.request)
+          if (response.ok) cache.put(event.request, response.clone())
+          return response
+        } catch {
+          const cached = await cache.match(event.request)
+          if (cached) return cached
+          return Response.error()
+        }
+      })
+    )
+    return
+  }
+
+  // Cache-first pour les pages article déjà consultées
   if (url.pathname.startsWith('/article/') && event.request.method === 'GET') {
     event.respondWith(
       caches.open(ARTICLE_CACHE).then(async (cache) => {
@@ -20,7 +71,7 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Cache-First pour les images passant par l'optimiseur Next.js
+  // Cache-first pour les images passant par l'optimiseur Next.js
   if (url.pathname === '/_next/image' && event.request.method === 'GET') {
     event.respondWith(
       caches.open(IMAGE_CACHE).then(async (cache) => {
