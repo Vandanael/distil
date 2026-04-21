@@ -284,7 +284,11 @@ describe('injectReservedKeywordSlots', () => {
   })
 })
 
-function llmItem(id: string, q1: number, bucket: 'essential' | 'surprise' = 'essential'): LlmRankedItem {
+function llmItem(
+  id: string,
+  q1: number,
+  bucket: 'essential' | 'surprise' = 'essential'
+): LlmRankedItem {
   return { item_id: id, q1, q2: 5, q3: 5, justification: '' }
 }
 
@@ -294,8 +298,8 @@ function makeItems(ids: string[], q1: number): LlmRankedItem[] {
 
 describe('composeEdition', () => {
   it('cas 12 qualifying → retourne 8 (6 essential + 2 surprise, aucun flag)', () => {
-    const essential = makeItems(['e1','e2','e3','e4','e5','e6','e7','e8','e9','e10'], 8)
-    const surprise = makeItems(['s1','s2'], 7)
+    const essential = makeItems(['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10'], 8)
+    const surprise = makeItems(['s1', 's2'], 7)
     const out = composeEdition(essential, surprise, [])
     expect(out.essential.length + out.surprise.length).toBe(8)
     expect(out.essential).toHaveLength(6)
@@ -305,8 +309,8 @@ describe('composeEdition', () => {
   })
 
   it('cas 6 qualifying → retourne 6 (4 essential + 2 surprise)', () => {
-    const essential = makeItems(['e1','e2','e3','e4'], 7)
-    const surprise = makeItems(['s1','s2'], 6)
+    const essential = makeItems(['e1', 'e2', 'e3', 'e4'], 7)
+    const surprise = makeItems(['s1', 's2'], 6)
     const out = composeEdition(essential, surprise, [])
     expect(out.essential.length + out.surprise.length).toBe(6)
     expect(out.essential).toHaveLength(4)
@@ -315,8 +319,8 @@ describe('composeEdition', () => {
   })
 
   it('cas 3 qualifying → retourne 5 (4 essential + 1 surprise), repêchés flaggés', () => {
-    const essential = makeItems(['e1','e2','e3'], 7)
-    const surpriseLow = makeItems(['s1','s2'], 4) // below threshold, available for repêche
+    const essential = makeItems(['e1', 'e2', 'e3'], 7)
+    const surpriseLow = makeItems(['s1', 's2'], 4) // below threshold, available for repêche
     const out = composeEdition(essential, surpriseLow, [])
     const total = out.essential.length + out.surprise.length
     expect(total).toBe(5)
@@ -328,9 +332,11 @@ describe('composeEdition', () => {
 
   it('tous les repechés ont belowNormalThreshold=true, les qualifiants false', () => {
     const essential = makeItems(['e1'], 8) // 1 qualifying
-    const surplus = makeItems(['b1','b2','b3','b4'], 4) // below threshold for repêche
+    const surplus = makeItems(['b1', 'b2', 'b3', 'b4'], 4) // below threshold for repêche
     const out = composeEdition(essential, surplus, [])
-    const qualifyingItems = [...out.essential, ...out.surprise].filter((r) => !r.belowNormalThreshold)
+    const qualifyingItems = [...out.essential, ...out.surprise].filter(
+      (r) => !r.belowNormalThreshold
+    )
     const repecheItems = [...out.essential, ...out.surprise].filter((r) => r.belowNormalThreshold)
     expect(qualifyingItems.some((r) => r.itemId === 'e1')).toBe(true)
     expect(repecheItems.every((r) => r.belowNormalThreshold)).toBe(true)
@@ -343,15 +349,15 @@ describe('composeEdition', () => {
   })
 
   it('retourne au plus maxCount items', () => {
-    const essential = makeItems(['e1','e2','e3','e4','e5','e6','e7','e8','e9','e10'], 9)
-    const surprise = makeItems(['s1','s2','s3','s4','s5'], 7)
+    const essential = makeItems(['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10'], 9)
+    const surprise = makeItems(['s1', 's2', 's3', 's4', 's5'], 7)
     const out = composeEdition(essential, surprise, [])
     expect(out.essential.length + out.surprise.length).toBeLessThanOrEqual(8)
   })
 
   it('bucket buckets correctement affectes', () => {
-    const essential = makeItems(['e1','e2','e3','e4','e5'], 8)
-    const surprise = makeItems(['s1','s2'], 7)
+    const essential = makeItems(['e1', 'e2', 'e3', 'e4', 'e5'], 8)
+    const surprise = makeItems(['s1', 's2'], 7)
     const out = composeEdition(essential, surprise, [])
     expect(out.essential.every((r) => r.bucket === 'essential')).toBe(true)
     expect(out.surprise.every((r) => r.bucket === 'surprise')).toBe(true)
@@ -359,7 +365,11 @@ describe('composeEdition', () => {
 })
 
 describe('integrateCarryOvers', () => {
-  function rankedQ1(itemId: string, q1: number, bucket: 'essential' | 'surprise' = 'essential'): RankedItem {
+  function rankedQ1(
+    itemId: string,
+    q1: number,
+    bucket: 'essential' | 'surprise' = 'essential'
+  ): RankedItem {
     return { itemId, q1, q2: 5, q3: 5, justification: '', bucket, rank: 1 }
   }
 

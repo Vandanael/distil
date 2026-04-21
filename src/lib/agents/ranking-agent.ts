@@ -159,7 +159,10 @@ export function integrateCarryOvers(
   if (numToReplace === 0) return { essential, surprise }
 
   const toDropIds = new Set(
-    [...allComposed].sort((a, b) => a.q1 - b.q1).slice(0, numToReplace).map((r) => r.itemId)
+    [...allComposed]
+      .sort((a, b) => a.q1 - b.q1)
+      .slice(0, numToReplace)
+      .map((r) => r.itemId)
   )
 
   const newEssential = essential

@@ -100,9 +100,7 @@ export function OPMLImportButton({
           <span className="font-body text-sm text-muted-foreground">{fileName}</span>
         )}
       </div>
-      {showHint && (
-        <p className="font-body text-sm text-muted-foreground">{t.forms.opmlHint}</p>
-      )}
+      {showHint && <p className="font-body text-sm text-muted-foreground">{t.forms.opmlHint}</p>}
     </div>
   )
 }

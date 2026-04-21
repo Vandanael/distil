@@ -152,10 +152,17 @@ describe('ArticleCard', () => {
 
     fireEvent.click(screen.getByTestId('dismiss-abc-123'))
 
-    const [, opts] = vi.mocked(toast.success).mock.calls[0] as [string, { action?: { onClick: () => void } }]
-    act(() => { opts?.action?.onClick() })
+    const [, opts] = vi.mocked(toast.success).mock.calls[0] as [
+      string,
+      { action?: { onClick: () => void } },
+    ]
+    act(() => {
+      opts?.action?.onClick()
+    })
 
-    act(() => { vi.advanceTimersByTime(4000) })
+    act(() => {
+      vi.advanceTimersByTime(4000)
+    })
 
     expect(vi.mocked(markNotInterested)).not.toHaveBeenCalled()
   })
@@ -172,7 +179,9 @@ describe('ArticleCard', () => {
     })
 
     // SLIDE_OUT_DURATION = 200ms avant le callback
-    act(() => { vi.advanceTimersByTime(200) })
+    act(() => {
+      vi.advanceTimersByTime(200)
+    })
 
     expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
       'Pas intéressé',
@@ -191,7 +200,9 @@ describe('ArticleCard', () => {
       fireEvent.pointerUp(card, { clientX: 100, clientY: 200, pointerId: 1 })
     })
 
-    act(() => { vi.advanceTimersByTime(200) })
+    act(() => {
+      vi.advanceTimersByTime(200)
+    })
 
     expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
       'Ajouté à À lire',
@@ -210,12 +221,21 @@ describe('ArticleCard', () => {
       fireEvent.pointerUp(card, { clientX: 100, clientY: 200, pointerId: 1 })
     })
 
-    act(() => { vi.advanceTimersByTime(200) })
+    act(() => {
+      vi.advanceTimersByTime(200)
+    })
 
-    const [, opts] = vi.mocked(toast.success).mock.calls[0] as [string, { action?: { onClick: () => void } }]
-    act(() => { opts?.action?.onClick() })
+    const [, opts] = vi.mocked(toast.success).mock.calls[0] as [
+      string,
+      { action?: { onClick: () => void } },
+    ]
+    act(() => {
+      opts?.action?.onClick()
+    })
 
-    act(() => { vi.advanceTimersByTime(4000) })
+    act(() => {
+      vi.advanceTimersByTime(4000)
+    })
 
     expect(vi.mocked(addToRead)).not.toHaveBeenCalled()
   })

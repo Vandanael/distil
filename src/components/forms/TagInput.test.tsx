@@ -3,7 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { useState } from 'react'
 import { TagInput } from './TagInput'
 
-function Wrapper({ initial = [] as string[], onChange }: { initial?: string[]; onChange?: (t: string[]) => void }) {
+function Wrapper({
+  initial = [] as string[],
+  onChange,
+}: {
+  initial?: string[]
+  onChange?: (t: string[]) => void
+}) {
   const [tags, setTags] = useState<string[]>(initial)
   return (
     <TagInput

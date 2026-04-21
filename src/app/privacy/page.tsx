@@ -3,8 +3,7 @@ import { PublicHeader } from '@/components/PublicHeader'
 
 export const metadata = {
   title: 'Privacy Policy - Distil',
-  description:
-    'Privacy policy and données personnelles - Distil news curation service.',
+  description: 'Privacy policy and données personnelles - Distil news curation service.',
   robots: { index: true, follow: true },
   alternates: { canonical: '/privacy' },
 }
@@ -14,7 +13,6 @@ export default function PrivacyPage() {
     <main className="flex-1 flex flex-col bg-background">
       <PublicHeader contextLabel="Confidentialité" />
       <div className="flex-1 w-full max-w-2xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-10 md:pb-16">
-
         {/* EN condensed */}
         <section lang="en" className="mb-14 pb-12 border-b border-border">
           <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-[-0.01em] text-foreground mb-4">
@@ -115,14 +113,20 @@ export default function PrivacyPage() {
             </p>
             <ul className="space-y-3 font-body text-[15px] text-muted-foreground leading-[1.6]">
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
-                  <strong className="text-foreground">Identité</strong> - adresse email, fournie lors
-                  de la connexion via Google OAuth.
+                  <strong className="text-foreground">Identité</strong> - adresse email, fournie
+                  lors de la connexion via Google OAuth.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Profil de veille</strong> - centres
                   d&apos;intérêt et sources RSS renseignés lors de l&apos;onboarding ou mis à jour
@@ -130,14 +134,20 @@ export default function PrivacyPage() {
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
-                  <strong className="text-foreground">Interactions avec les articles</strong> - statuts
-                  (lu, pas intéressé, à lire, plus comme ça) et horodatage associé.
+                  <strong className="text-foreground">Interactions avec les articles</strong> -
+                  statuts (lu, pas intéressé, à lire, plus comme ça) et horodatage associé.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Données techniques</strong> - logs
                   d&apos;erreurs serveur (table interne, non partagée).
@@ -156,19 +166,31 @@ export default function PrivacyPage() {
             </h3>
             <ul className="space-y-3 font-body text-[15px] text-muted-foreground leading-[1.6]">
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>Authentification et accès au service</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>Personnalisation de l&apos;édition quotidienne (scoring, ranking)</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>Amélioration du profil de veille selon vos retours</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>Envoi optionnel d&apos;emails de digest</span>
               </li>
             </ul>
@@ -193,14 +215,20 @@ export default function PrivacyPage() {
             </p>
             <ul className="space-y-3 font-body text-[15px] text-muted-foreground leading-[1.6]">
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Supabase</strong> - base de données, stockage
                   et authentification (serveurs en UE disponibles).
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Google (Gemini)</strong> - analyse sémantique
                   et scoring des articles. Les textes d&apos;articles sont transmis ; aucune donnée
@@ -208,28 +236,40 @@ export default function PrivacyPage() {
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Voyage AI</strong> - génération
                   d&apos;embeddings pour la recherche sémantique. Même cadre que Gemini.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Resend</strong> - envoi des emails de digest
                   (email uniquement).
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Upstash Redis</strong> - rate limiting (aucune
                   donnée personnelle stockée).
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   <strong className="text-foreground">Netlify</strong> - hébergement de
                   l&apos;application.

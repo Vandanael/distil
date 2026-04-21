@@ -65,9 +65,7 @@ export function OnboardingForm() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const normalized = Array.from(
-      new Set(keywords.map(normalizeKeyword).filter(Boolean))
-    )
+    const normalized = Array.from(new Set(keywords.map(normalizeKeyword).filter(Boolean)))
     // Compose profile_text depuis les tags si l'utilisateur n'a rien saisi,
     // pour que le générateur d'embedding ait une base minimale.
     const composedText =

@@ -8,7 +8,11 @@ type UseFeedKeyboardOptions = {
   onNavigate: (articleId: string) => void
 }
 
-export function useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }: UseFeedKeyboardOptions) {
+export function useFeedKeyboard({
+  onNotInterested,
+  onAddToRead,
+  onNavigate,
+}: UseFeedKeyboardOptions) {
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const prevFocusedRef = useRef<Element | null>(null)
 

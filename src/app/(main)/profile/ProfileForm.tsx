@@ -52,9 +52,7 @@ export function ProfileForm({ profile }: Props) {
     setSaveError(null)
     setSourcesSavedHint(false)
     const sourcesChanged = sources.join(',') !== profile.pinned_sources.join(',')
-    const normalizedKeywords = Array.from(
-      new Set(keywords.map(normalizeKeyword).filter(Boolean))
-    )
+    const normalizedKeywords = Array.from(new Set(keywords.map(normalizeKeyword).filter(Boolean)))
     startTransition(async () => {
       try {
         await updateProfile({
@@ -148,9 +146,7 @@ export function ProfileForm({ profile }: Props) {
           disabled={isPending}
           data-testid="sources-urllist"
         />
-        {sourcesSavedHint && (
-          <p className={hintClass}>{t.profile.sourcesSavedHint}</p>
-        )}
+        {sourcesSavedHint && <p className={hintClass}>{t.profile.sourcesSavedHint}</p>}
       </section>
 
       {/* 4. Langue */}

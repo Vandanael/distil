@@ -172,11 +172,19 @@ export default async function FeedPage() {
 
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3 md:py-10 w-full">
-      <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} hasLightHarvest={hasLightHarvest} daysSinceLastLogin={daysSinceLastLogin} />
+      <FeedHeader
+        lastRefreshAt={lastRefreshAt}
+        topInterests={topInterests}
+        hasLightHarvest={hasLightHarvest}
+        daysSinceLastLogin={daysSinceLastLogin}
+      />
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
       <DismissProvider>
-        <FeedShell className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2" articleStatuses={articles.map((a) => a.status)}>
+        <FeedShell
+          className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2"
+          articleStatuses={articles.map((a) => a.status)}
+        >
           {articles.length === 0 ? (
             <div className="lg:col-span-2">
               <EmptyFeed />

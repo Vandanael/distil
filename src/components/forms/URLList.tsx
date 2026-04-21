@@ -43,7 +43,10 @@ function sortKey(url: string): string {
     const host = new URL(url).hostname.replace(/^www\./i, '')
     return host.toLowerCase()
   } catch {
-    return url.replace(/^https?:\/\//i, '').replace(/^www\./i, '').toLowerCase()
+    return url
+      .replace(/^https?:\/\//i, '')
+      .replace(/^www\./i, '')
+      .toLowerCase()
   }
 }
 
@@ -175,7 +178,16 @@ export function URLList({
                   disabled={disabled}
                   className="shrink-0 text-muted-foreground hover:text-destructive transition-colors focus:outline-none focus-visible:text-destructive"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M18 6 6 18" />
                     <path d="m6 6 12 12" />
                   </svg>

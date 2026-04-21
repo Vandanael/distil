@@ -26,9 +26,8 @@ export const translations = {
       bucketSurprise: 'Decouverte',
       bucketSurpriseSub: 'Hors de vos habitudes',
       lightHarvest:
-        'Moisson plus légère aujourd\'hui - le seuil a été adapté pour préserver votre rendez-vous matinal.',
-      absenceBanner:
-        'Pendant votre absence, Distil a continué à trier. Reprenez ici.',
+        "Moisson plus légère aujourd'hui - le seuil a été adapté pour préserver votre rendez-vous matinal.",
+      absenceBanner: 'Pendant votre absence, Distil a continué à trier. Reprenez ici.',
       editionCompletePrefix: 'Votre édition du',
       editionCompleteSuffix: 'est complète. Rendez-vous demain matin.',
     },
@@ -124,7 +123,8 @@ export const translations = {
       sectionSourcesHint:
         'Vos flux RSS et sites de référence. Importez depuis votre lecteur actuel ou ajoutez-les manuellement.',
       sectionInterests: "Centres d'intérêt",
-      sectionInterestsHint: 'Décrivez ce qui vous intéresse. Plus vous êtes précis, mieux Distil trie.',
+      sectionInterestsHint:
+        'Décrivez ce qui vous intéresse. Plus vous êtes précis, mieux Distil trie.',
       sectionInterestsPlaceholder:
         "Ex: je suis fasciné par l'histoire des empires romain et ottoman, je suis photographe amateur et grimpeur, je travaille dans le produit chez une scale-up SaaS...",
       sectionKeywords: 'Mots-clés',
@@ -145,15 +145,15 @@ export const translations = {
     onboarding: {
       kicker: 'Bienvenue dans Distil',
       title: 'Votre veille en deux minutes',
-      subtitle:
-        "Ajoutez vos sources, décrivez vos centres d'intérêt. Distil s'occupe du reste.",
+      subtitle: "Ajoutez vos sources, décrivez vos centres d'intérêt. Distil s'occupe du reste.",
       sectionSources: 'Sources préférées',
       sectionSourcesHint:
         'Vos flux RSS et sites de référence. Importez depuis votre lecteur actuel ou ajoutez-les manuellement.',
       sectionInterests: "Centres d'intérêt",
-      sectionInterestsHint: 'Décrivez-vous en texte libre. Plus vous êtes précis, plus le feed est pertinent.',
+      sectionInterestsHint:
+        'Décrivez-vous en texte libre. Plus vous êtes précis, plus le feed est pertinent.',
       sectionInterestsPlaceholder:
-        "Ex: passionné de jazz, je grimpe en montagne, je cuisine asiatique, fan de F1...",
+        'Ex: passionné de jazz, je grimpe en montagne, je cuisine asiatique, fan de F1...',
       sectionKeywords: 'Mots-clés (optionnel)',
       sectionKeywordsHint: 'Termes précis à pousser. Cliquez sur une suggestion pour l’ajouter.',
       suggestionsLabel: 'Suggestions',
@@ -288,7 +288,8 @@ export const translations = {
       sectionSourcesHint:
         'Your RSS feeds and reference sites. Import from your current reader or add them manually.',
       sectionInterests: 'Interests',
-      sectionInterestsHint: 'Describe what interests you. The more specific, the better Distil sorts.',
+      sectionInterestsHint:
+        'Describe what interests you. The more specific, the better Distil sorts.',
       sectionInterestsPlaceholder:
         'Ex: fascinated by the history of the Roman and Ottoman empires, amateur photographer and climber, work in product at a SaaS scale-up...',
       sectionKeywords: 'Keywords',
@@ -309,12 +310,13 @@ export const translations = {
     onboarding: {
       kicker: 'Welcome to Distil',
       title: 'Your briefing in two minutes',
-      subtitle: "Add your sources, describe your interests. Distil takes care of the rest.",
+      subtitle: 'Add your sources, describe your interests. Distil takes care of the rest.',
       sectionSources: 'Preferred sources',
       sectionSourcesHint:
         'Your RSS feeds and reference sites. Import from your current reader or add them manually.',
       sectionInterests: 'Interests',
-      sectionInterestsHint: 'Describe yourself freely. The more specific, the more relevant the feed.',
+      sectionInterestsHint:
+        'Describe yourself freely. The more specific, the more relevant the feed.',
       sectionInterestsPlaceholder:
         'Ex: passionate about jazz, I climb in the mountains, I cook Asian food, F1 fan...',
       sectionKeywords: 'Keywords (optional)',

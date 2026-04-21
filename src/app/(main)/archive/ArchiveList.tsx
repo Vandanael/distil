@@ -26,7 +26,7 @@ function formatAddedDate(iso: string | null, locale: 'fr' | 'en'): string {
   const date = new Date(iso)
   const diffD = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
   const isFr = locale === 'fr'
-  if (diffD === 0) return isFr ? "Ajouté aujourd'hui" : "Added today"
+  if (diffD === 0) return isFr ? "Ajouté aujourd'hui" : 'Added today'
   if (diffD === 1) return isFr ? 'Ajouté hier' : 'Added yesterday'
   if (diffD < 7) return isFr ? `Ajouté il y a ${diffD}j` : `Added ${diffD}d ago`
   return isFr
@@ -114,78 +114,78 @@ export function ArchiveList({ articles }: Props) {
       {visibleArticles.length > 10 && (
         <p className="font-ui text-sm text-muted-foreground/70 italic">{t.library.pileWarning}</p>
       )}
-    <div
-      className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0"
-      data-testid="archive-list"
-    >
-      {visibleArticles.map((a) => (
-        <div
-          key={a.id}
-          className="group relative border-b border-border pb-6 lg:py-6 lg:mb-0 last:border-0"
-          data-testid={`archive-card-${a.id}`}
-        >
-          <Link
-            href={`/article/${a.id}?from=library`}
-            className="block space-y-2 pr-12"
-            data-testid={`archive-card-link-${a.id}`}
+      <div
+        className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0"
+        data-testid="archive-list"
+      >
+        {visibleArticles.map((a) => (
+          <div
+            key={a.id}
+            className="group relative border-b border-border pb-6 lg:py-6 lg:mb-0 last:border-0"
+            data-testid={`archive-card-${a.id}`}
           >
-            <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
-              {a.title ?? 'Sans titre'}
-            </h2>
-            <div className="flex items-center gap-3">
-              {a.site_name && (
-                <span className="font-ui text-sm text-muted-foreground">{a.site_name}</span>
-              )}
-              {a.reading_time_minutes && (
-                <span className="font-ui text-sm text-muted-foreground">
-                  {a.reading_time_minutes} min
-                </span>
-              )}
-              {a.archived_at && (
-                <span className="font-ui text-sm text-muted-foreground/60 ml-auto">
-                  {formatAddedDate(a.archived_at, locale)}
-                </span>
-              )}
-            </div>
-          </Link>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              handleRemove(a.id)
-            }}
-            aria-label={
-              locale === 'fr'
-                ? `Retirer ${a.title ?? 'cet article'} de À lire`
-                : `Remove ${a.title ?? 'this article'} from To read`
-            }
-            title={t.library.removeTitle}
-            data-testid={`archive-remove-${a.id}`}
-            className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+            <Link
+              href={`/article/${a.id}?from=library`}
+              className="block space-y-2 pr-12"
+              data-testid={`archive-card-link-${a.id}`}
             >
-              <path d="M3 6h18" />
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-              <path d="M10 11v6" />
-              <path d="M14 11v6" />
-            </svg>
-          </button>
-        </div>
-      ))}
-    </div>
+              <h2 className="font-ui text-base font-semibold text-foreground leading-snug group-hover:text-accent transition-colors">
+                {a.title ?? 'Sans titre'}
+              </h2>
+              <div className="flex items-center gap-3">
+                {a.site_name && (
+                  <span className="font-ui text-sm text-muted-foreground">{a.site_name}</span>
+                )}
+                {a.reading_time_minutes && (
+                  <span className="font-ui text-sm text-muted-foreground">
+                    {a.reading_time_minutes} min
+                  </span>
+                )}
+                {a.archived_at && (
+                  <span className="font-ui text-sm text-muted-foreground/60 ml-auto">
+                    {formatAddedDate(a.archived_at, locale)}
+                  </span>
+                )}
+              </div>
+            </Link>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleRemove(a.id)
+              }}
+              aria-label={
+                locale === 'fr'
+                  ? `Retirer ${a.title ?? 'cet article'} de À lire`
+                  : `Remove ${a.title ?? 'this article'} from To read`
+              }
+              title={t.library.removeTitle}
+              data-testid={`archive-remove-${a.id}`}
+              className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 6h18" />
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

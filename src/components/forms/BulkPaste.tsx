@@ -96,9 +96,7 @@ export function BulkPaste({
         >
           {t.forms.bulkAddButton}
         </Button>
-        {feedback && (
-          <span className="font-ui text-sm text-muted-foreground">{feedback}</span>
-        )}
+        {feedback && <span className="font-ui text-sm text-muted-foreground">{feedback}</span>}
       </div>
     </div>
   )

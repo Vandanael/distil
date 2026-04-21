@@ -13,7 +13,12 @@ type Props = {
   daysSinceLastLogin?: number
 }
 
-export function FeedHeader({ lastRefreshAt, topInterests, hasLightHarvest, daysSinceLastLogin }: Props) {
+export function FeedHeader({
+  lastRefreshAt,
+  topInterests,
+  hasLightHarvest,
+  daysSinceLastLogin,
+}: Props) {
   const { locale, t } = useLocale()
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -91,7 +96,17 @@ export function FeedHeader({ lastRefreshAt, topInterests, hasLightHarvest, daysS
             aria-label={locale === 'fr' ? 'Fermer' : 'Dismiss'}
             className="shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M18 6 6 18" />
               <path d="m6 6 12 12" />
             </svg>

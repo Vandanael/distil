@@ -21,7 +21,7 @@ function wordCount(text: string | null | undefined): number {
 export function truncateToExtract(
   htmlString: string,
   ratio: number,
-  minWords: number,
+  minWords: number
 ): ExtractResult {
   const safeRatio = Number.isFinite(ratio) && ratio > 0 ? Math.min(ratio, MAX_RATIO) : 0.3
   const safeMin = Number.isFinite(minWords) && minWords >= 0 ? minWords : 150

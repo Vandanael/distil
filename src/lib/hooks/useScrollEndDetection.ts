@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react'
 export function useScrollEndDetection(
   contentRef: React.RefObject<HTMLElement | null>,
   onReached: () => void,
-  threshold = 0.85,
+  threshold = 0.85
 ): void {
   const firedRef = useRef(false)
   const callbackRef = useRef(onReached)
@@ -59,7 +59,7 @@ export function useScrollEndDetection(
           }
         }
       },
-      { threshold: 0 },
+      { threshold: 0 }
     )
     observer.observe(sentinel)
 

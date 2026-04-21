@@ -265,10 +265,7 @@ export function ReadingView({
 
             {/* Encart "Extrait - lire sur source" : uniquement si le contenu a ete tronque */}
             {truncated && contentHtml && (
-              <div
-                data-testid="extract-cta"
-                className="border-t border-border pt-8 space-y-4"
-              >
+              <div data-testid="extract-cta" className="border-t border-border pt-8 space-y-4">
                 <p className="font-ui text-sm text-muted-foreground">
                   {t.reading.extractLabel} <span className="text-foreground">{sourceLabel}</span>
                 </p>
@@ -318,11 +315,7 @@ export function ReadingView({
                   data-testid="add-to-read-inline"
                   className="inline-flex items-center justify-center font-ui text-[15px] text-accent px-6 py-3 border border-border hover:text-foreground hover:border-foreground transition-colors disabled:opacity-60"
                 >
-                  {added
-                    ? locale === 'fr'
-                      ? 'Ajouté'
-                      : 'Added'
-                    : t.reading.addToRead}
+                  {added ? (locale === 'fr' ? 'Ajouté' : 'Added') : t.reading.addToRead}
                 </button>
               )}
             </div>

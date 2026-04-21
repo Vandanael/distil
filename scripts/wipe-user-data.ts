@@ -30,10 +30,7 @@ if (!supabaseUrl || !serviceKey) {
 const sb = createClient(supabaseUrl, serviceKey)
 
 async function deleteTable(table: string, label?: string): Promise<number> {
-  const { count, error } = await sb
-    .from(table)
-    .delete({ count: 'exact' })
-    .eq('user_id', userId)
+  const { count, error } = await sb.from(table).delete({ count: 'exact' }).eq('user_id', userId)
   if (error) {
     console.error(`  ${label ?? table} : erreur - ${error.message}`)
     process.exit(1)

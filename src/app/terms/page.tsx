@@ -2,7 +2,7 @@ import { PublicFooter } from '@/components/PublicFooter'
 import { PublicHeader } from '@/components/PublicHeader'
 
 export const metadata = {
-  title: "Terms of Use - Distil",
+  title: 'Terms of Use - Distil',
   description: "Terms of use and conditions d'utilisation - Distil news curation service.",
   robots: { index: true, follow: true },
   alternates: { canonical: '/terms' },
@@ -13,7 +13,6 @@ export default function TermsPage() {
     <main className="flex-1 flex flex-col bg-background">
       <PublicHeader contextLabel="Conditions" />
       <div className="flex-1 w-full max-w-2xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-10 md:pb-16">
-
         {/* EN condensed */}
         <section lang="en" className="mb-14 pb-12 border-b border-border">
           <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-[-0.01em] text-foreground mb-4">
@@ -28,9 +27,9 @@ export default function TermsPage() {
               available in French below.
             </p>
             <p>
-              <strong className="text-foreground">Service:</strong> Distil is a beta-stage
-              personal news curation service, accessible by invitation. It is free during the beta
-              period and may evolve or be interrupted without notice.
+              <strong className="text-foreground">Service:</strong> Distil is a beta-stage personal
+              news curation service, accessible by invitation. It is free during the beta period and
+              may evolve or be interrupted without notice.
             </p>
             <p>
               <strong className="text-foreground">Access:</strong> invitation required,
@@ -43,10 +42,9 @@ export default function TermsPage() {
               mass-requests without prior agreement are prohibited.
             </p>
             <p>
-              <strong className="text-foreground">Intellectual property:</strong> articles
-              displayed belong to their respective publishers. Distil always links back to the
-              original source. The interface, scoring algorithms, and curation logic are Distil&apos;s
-              own.
+              <strong className="text-foreground">Intellectual property:</strong> articles displayed
+              belong to their respective publishers. Distil always links back to the original
+              source. The interface, scoring algorithms, and curation logic are Distil&apos;s own.
             </p>
             <p>
               <strong className="text-foreground">Liability:</strong> provided as-is during beta,
@@ -89,9 +87,9 @@ export default function TermsPage() {
               1. Nature du service
             </h3>
             <p className="font-body text-[15px] text-muted-foreground leading-[1.6] text-pretty">
-              Distil est un service de curation de veille en version bêta, accessible sur invitation.
-              En tant que version bêta, le service peut évoluer, être interrompu ou modifié sans
-              préavis. L&apos;accès est gratuit pendant cette période.
+              Distil est un service de curation de veille en version bêta, accessible sur
+              invitation. En tant que version bêta, le service peut évoluer, être interrompu ou
+              modifié sans préavis. L&apos;accès est gratuit pendant cette période.
             </p>
           </section>
 
@@ -101,18 +99,25 @@ export default function TermsPage() {
             </h3>
             <ul className="space-y-3 font-body text-[15px] text-muted-foreground leading-[1.6]">
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>L&apos;accès est réservé aux personnes ayant reçu une invitation.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>L&apos;authentification s&apos;effectue exclusivement via Google OAuth.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
-                <span>
-                  Un compte par personne. Le partage de compte n&apos;est pas autorisé.
-                </span>
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
+                <span>Un compte par personne. Le partage de compte n&apos;est pas autorisé.</span>
               </li>
             </ul>
           </section>
@@ -126,18 +131,27 @@ export default function TermsPage() {
             </p>
             <ul className="space-y-3 font-body text-[15px] text-muted-foreground leading-[1.6]">
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>Utiliser le service à des fins commerciales sans accord préalable.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   Tenter de contourner les limites techniques ou d&apos;accéder à des données
                   d&apos;autres utilisateurs.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0" aria-hidden />
+                <span
+                  className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-border shrink-0"
+                  aria-hidden
+                />
                 <span>
                   Automatiser massivement les requêtes (scraping, bots) sans accord préalable.
                 </span>
@@ -155,8 +169,8 @@ export default function TermsPage() {
               originale pour la lecture complète.
             </p>
             <p className="font-body text-[15px] text-muted-foreground leading-[1.6] text-pretty">
-              L&apos;interface, le design, les algorithmes de scoring et de curation sont la propriété
-              de Distil.
+              L&apos;interface, le design, les algorithmes de scoring et de curation sont la
+              propriété de Distil.
             </p>
           </section>
 
@@ -166,8 +180,8 @@ export default function TermsPage() {
             </h3>
             <p className="font-body text-[15px] text-muted-foreground leading-[1.6] text-pretty">
               Distil est fourni en version bêta, sans garantie de disponibilité continue ni
-              d&apos;exhaustivité de la curation. Le service ne peut être tenu responsable du contenu
-              des articles indexés, qui relève de la responsabilité de leurs éditeurs.
+              d&apos;exhaustivité de la curation. Le service ne peut être tenu responsable du
+              contenu des articles indexés, qui relève de la responsabilité de leurs éditeurs.
             </p>
           </section>
 
