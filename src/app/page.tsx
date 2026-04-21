@@ -14,16 +14,16 @@ const HOME_DESCRIPTION =
   'Distil lit le web a votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversite editoriale, zero algorithme de popularite.'
 
 export const metadata = {
-  title: 'Distil - Le temps de trier, puis le temps de lire.',
+  title: 'Distil - votre veille quotidienne, sans le bruit',
   description: HOME_DESCRIPTION,
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'Distil - Le temps de trier, puis le temps de lire.',
+    title: 'Distil - votre veille quotidienne, sans le bruit',
     description: HOME_DESCRIPTION,
     url: '/',
   },
   twitter: {
-    title: 'Distil - Le temps de trier, puis le temps de lire.',
+    title: 'Distil - votre veille quotidienne, sans le bruit',
     description: HOME_DESCRIPTION,
   },
   alternates: { canonical: '/' },

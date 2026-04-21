@@ -42,8 +42,8 @@ const PERSONA_EXAMPLES = HOME_FEATURED_SLUGS.map(
 
 const COPY = {
   fr: {
-    taglineLead: 'Le temps de trier,',
-    taglineTail: 'puis le temps de lire.',
+    taglineLead: 'Votre veille quotidienne,',
+    taglineTail: 'sans le bruit.',
     body: "Chaque matin, on lit le web à votre place et on ne garde que ce qui compte vraiment - filtré par vos centres d'intérêt, pas par un algorithme de popularité.",
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
     cta: 'Commencer',
@@ -94,8 +94,8 @@ const COPY = {
     previewCta: 'Voir les 2 questions',
   },
   en: {
-    taglineLead: 'Time to sort,',
-    taglineTail: 'then time to read.',
+    taglineLead: 'Your daily briefing,',
+    taglineTail: 'without noise.',
     body: 'Every morning, we read the web for you and keep only what truly matters - filtered by your interests, not by a popularity algorithm.',
     format: 'One page to check each morning. Nothing in your inbox.',
     cta: 'Get started',
@@ -145,116 +145,6 @@ const COPY = {
     onboardingPromise: '1 minute, 2 questions, free during beta.',
     previewCta: 'See the 2 questions',
   },
-}
-
-function ActionsSchema({ locale }: { locale: 'fr' | 'en' }) {
-  const c =
-    locale === 'fr'
-      ? {
-          ariaLabel: 'Schéma des 4 actions utilisateur',
-          article: 'Article du jour',
-          like: 'Plus comme ça',
-          notInterested: 'Pas intéressé',
-          toRead: 'À lire',
-          read: 'Lu',
-        }
-      : {
-          ariaLabel: '4 user action model',
-          article: "Today's article",
-          like: 'Like this',
-          notInterested: 'Not interested',
-          toRead: 'To read',
-          read: 'Done',
-        }
-
-  const accent = '#7a2e3a'
-  const W = 560
-  const H = 148
-  const articleX = W / 2
-  const articleY = 30
-  const boxW = 118
-  const boxH = 36
-  const boxY = 98
-  const actions = [c.like, c.notInterested, c.toRead, c.read]
-  const gap = (W - 4 * boxW) / 5
-  const centers = [0, 1, 2, 3].map((i) => gap * (i + 1) + boxW * i + boxW / 2)
-
-  return (
-    <figure aria-label={c.ariaLabel} className="mt-10 md:mt-12">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="w-full max-w-[540px]"
-        aria-hidden="true"
-      >
-        <rect
-          x={articleX - 70}
-          y={articleY - 16}
-          width={140}
-          height={32}
-          fill={accent}
-          fillOpacity={0.1}
-          stroke={accent}
-          strokeWidth={1}
-          strokeOpacity={0.5}
-        />
-        <text
-          x={articleX}
-          y={articleY + 5}
-          textAnchor="middle"
-          fontSize="12"
-          fontWeight="600"
-          fill={accent}
-          style={{ fontFamily: 'var(--font-ui, sans-serif)' }}
-        >
-          {c.article}
-        </text>
-
-        {centers.map((cx, i) => (
-          <line
-            key={i}
-            x1={articleX}
-            y1={articleY + 16}
-            x2={cx}
-            y2={boxY}
-            stroke={accent}
-            strokeWidth={1}
-            strokeOpacity={0.2}
-            strokeDasharray="4 3"
-          />
-        ))}
-
-        {actions.map((label, i) => {
-          const cx = centers[i]
-          return (
-            <g key={i}>
-              <rect
-                x={cx - boxW / 2}
-                y={boxY}
-                width={boxW}
-                height={boxH}
-                fill={accent}
-                fillOpacity={0.07}
-                stroke={accent}
-                strokeWidth={1}
-                strokeOpacity={0.3}
-              />
-              <text
-                x={cx}
-                y={boxY + boxH / 2 + 5}
-                textAnchor="middle"
-                fontSize="11"
-                fontWeight="500"
-                fill={accent}
-                style={{ fontFamily: 'var(--font-ui, sans-serif)' }}
-              >
-                {label}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-    </figure>
-  )
 }
 
 export function StartScreen({
@@ -430,7 +320,6 @@ export function StartScreen({
                 </li>
               ))}
             </ol>
-            <ActionsSchema locale={locale} />
             <p className="font-ui text-[14px] text-subtle leading-[1.55] mt-10 md:mt-12 max-w-[52ch] text-pretty">
               {t.foundationsNote}{' '}
               <Link
