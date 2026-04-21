@@ -48,15 +48,6 @@ const COPY = {
     format: 'Une page à consulter chaque matin. Rien dans votre boîte mail.',
     cta: 'Commencer',
     loginNav: 'Connexion',
-    manifeste: [
-      "L'IA propose, trie, résume. Vous décidez ce qui compte.",
-      'Chaque score expose sa source.',
-      "La découverte est une règle, pas un effet de bord.",
-    ],
-    manifesteCta: 'En savoir plus',
-    sourcesTitle: 'Vos sources, notre méthode.',
-    sourcesBody:
-      "Vous apportez les 30 à 40 publications que vous suivez. Distil les lit à votre place chaque matin et ne garde que ce qui mérite votre temps. Vous restez maître de votre veille.",
     howTitle: 'Comment Distil trie',
     howDeck: {
       lead: 'Distil ne classe pas par likes comme Feedly, ni par viralité comme Artifact.',
@@ -100,15 +91,6 @@ const COPY = {
     format: 'One page to check each morning. Nothing in your inbox.',
     cta: 'Get started',
     loginNav: 'Sign in',
-    manifeste: [
-      'AI proposes, sorts, summarises. You decide what matters.',
-      'Every score exposes its source.',
-      'Discovery is a rule, not a side-effect.',
-    ],
-    manifesteCta: 'Learn more',
-    sourcesTitle: 'Your sources, our method.',
-    sourcesBody:
-      'You bring the 30 to 40 publications you follow. Distil reads them for you each morning and keeps only what deserves your time. You stay in charge of your reading.',
     howTitle: 'How Distil sorts',
     howDeck: {
       lead: "Distil doesn't rank by likes like Feedly, or by virality like Artifact.",
@@ -169,7 +151,7 @@ export function StartScreen({
       <div className="flex-1 w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-5 md:px-8 pt-8 md:pt-12">
         <div className="w-full">
           {/* Hero : tagline compacte, CTA, puis edition du jour (asymetrie desktop) */}
-          <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16 xl:gap-24 lg:items-start mb-16 md:mb-24 lg:mb-28 xl:mb-36">
+          <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16 xl:gap-24 lg:items-start mb-10 md:mb-14 lg:mb-16 xl:mb-20">
             <div className="relative space-y-7 md:space-y-8 mb-12 lg:mb-0">
               <h1
                 data-rise
@@ -272,28 +254,6 @@ export function StartScreen({
             </aside>
           </div>
 
-          {/* Manifeste condensé */}
-          <section className="mb-12 md:mb-16 border-t border-border pt-8 md:pt-10">
-            <ul className="space-y-2">
-              {t.manifeste.map((line, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="mt-[0.35em] w-1.5 h-1.5 rounded-full bg-accent shrink-0" aria-hidden />
-                  <p className="font-body text-[16px] md:text-[17px] text-subtle leading-[1.55] text-pretty">
-                    {line}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 font-ui text-[14px] text-subtle">
-              <Link
-                href="/about#fondations"
-                className="underline underline-offset-[3px] decoration-border hover:decoration-accent hover:text-accent transition-colors"
-              >
-                {t.manifesteCta}
-              </Link>
-            </p>
-          </section>
-
           {/* Methode : pitch vulgarise */}
           <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
             <h2 className="font-heading text-4xl md:text-5xl text-foreground leading-[1.1] tracking-tight mb-4 md:mb-5 text-balance max-w-[22ch]">
@@ -329,16 +289,6 @@ export function StartScreen({
                 {t.foundationsCta}
               </Link>
               .
-            </p>
-          </section>
-
-          {/* Encart "Vos sources, notre méthode" */}
-          <section className="mb-16 md:mb-24 border-t border-border pt-8 md:pt-10">
-            <h2 className="font-heading text-2xl md:text-3xl text-foreground leading-[1.1] tracking-tight mb-4 text-balance">
-              {t.sourcesTitle}
-            </h2>
-            <p className="font-body text-[16px] md:text-[17px] text-subtle leading-[1.6] max-w-[52ch] text-pretty">
-              {withBrand(t.sourcesBody)}
             </p>
           </section>
 

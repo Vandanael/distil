@@ -31,7 +31,7 @@ export function PublicFooter({ lang }: { lang?: Lang } = {}) {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-muted border-t border-border">
+    <footer className="bg-footer border-t border-border">
       <div className="max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-5 md:px-8 py-5 md:py-6">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
           <nav aria-label={t.navLabel}>

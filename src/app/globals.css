@@ -30,6 +30,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-subtle: var(--subtle);
+  --color-footer: var(--footer);
   /* Radius 0 - coins francs, identite editoriale */
   --radius-sm: 0rem;
   --radius-md: 0rem;
@@ -73,6 +74,8 @@
   --input: #d6dbcd;
   --ring: #7a2e3a; /* focus ring = bordeaux profond */
   --radius: 0rem; /* coins francs */
+  /* Footer : sauge claire (meme famille que --secondary), AAA sur --subtle et --accent */
+  --footer: #e3e6dc;
 }
 
 .dark {
@@ -96,6 +99,8 @@
   --border: #2a4a3a;
   --input: #2a4a3a;
   --ring: #d46a7a;
+  /* Footer en dark mode : on reste sur muted pour ne pas casser la tonalite nocturne */
+  --footer: #1a3a2e;
 }
 
 @layer base {
