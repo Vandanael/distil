@@ -104,4 +104,17 @@ describe('parseHtml', () => {
     const result = await parseHtml(html, 'https://example.com/suspect')
     expect(result.contentHtml).not.toContain('evil.example.com')
   })
+
+  it('expose htmlLang si present sur <html>', async () => {
+    const html = `<!DOCTYPE html><html lang="fr-FR"><head><title>T</title></head><body>
+      <article><h1>Titre</h1><p>${'Texte '.repeat(60)}</p></article>
+    </body></html>`
+    const result = await parseHtml(html, 'https://example.com/article')
+    expect(result.htmlLang).toBe('fr-FR')
+  })
+
+  it('expose htmlLang=null si attribut absent', async () => {
+    const result = await parseHtml(MINIMAL_HTML, 'https://example.com/article')
+    expect(result.htmlLang).toBeNull()
+  })
 })

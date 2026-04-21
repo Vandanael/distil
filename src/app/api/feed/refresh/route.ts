@@ -1,21 +1,30 @@
 /**
  * POST /api/feed/refresh
- * Pipeline complet : discovery -> dedup -> parse -> score -> insert
- * Lance une recherche d'articles depuis les sources et intérêts du profil utilisateur.
+ * Pipeline découverte agent (discovery -> parse -> ingest) pour le user authentifié.
+ * Route déclenchable manuellement (bookmarklet, push futur), rate-limitée.
+ *
+ * Depuis la migration 00031, les articles découverts alimentent la table
+ * `items` + `item_embeddings` (pool unifié avec les items RSS), pas directement
+ * `articles`. Le ranking (cron rank) décide ensuite ce qui entre dans l'édition.
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createHash } from 'crypto'
 import { runDiscoveryAgent } from '@/lib/agents/discovery-agent'
-import { runScoringAgent } from '@/lib/agents/scoring-agent'
-import { parseUrl } from '@/lib/parsing/readability'
+import { parseUrl, type ParsedArticle } from '@/lib/parsing/readability'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
+import { resolveLanguage, type SupportedLanguage } from '@/lib/parsing/language'
 import { checkRefreshRateLimit } from '@/lib/rate-limit'
 import { enforceRateLimit } from '@/lib/api-rate-limit'
-import type { ArticleCandidate, UserProfile } from '@/lib/agents/types'
+import type { UserProfile } from '@/lib/agents/types'
 
-// Pipeline complet (discovery -> parse -> score -> embed) prend 30-60s selon la charge
-// Gemini. Netlify applique le timeout indique ici a la route handler Next.js.
+// Pipeline découverte + parse + embeddings peut prendre 30-60s selon Gemini.
 export const maxDuration = 90
+
+function contentHash(url: string, title: string | null, content: string): string {
+  const raw = `${url}|${title ?? ''}|${content.slice(0, 500)}`
+  return createHash('sha256').update(raw).digest('hex')
+}
 
 export async function POST(request: Request) {
   const blocked = await enforceRateLimit('expensive', request)
@@ -39,7 +48,6 @@ export async function POST(request: Request) {
     )
   }
 
-  // Charger le profil
   const { data: profile } = await supabase
     .from('profiles')
     .select(
@@ -62,29 +70,36 @@ export async function POST(request: Request) {
     serendipityQuota: profile.serendipity_quota ?? 0.15,
   }
 
-  // Charger les URLs déjà connues pour éviter les doublons
-  const { data: existingArticles } = await supabase
-    .from('articles')
+  const structured = profile.profile_structured as Record<string, unknown> | null
+  const rawLang = structured?.language
+  const profileLanguage: 'fr' | 'en' | 'both' | null =
+    rawLang === 'fr' || rawLang === 'en' || rawLang === 'both' ? rawLang : null
+
+  // Feeds fictifs agent (un par langue, seedés migration 00031).
+  const { data: agentFeeds } = await supabase
+    .from('feeds')
+    .select('id, language')
+    .eq('kind', 'agent')
+
+  const agentFeedByLang = new Map<SupportedLanguage, string>()
+  for (const f of agentFeeds ?? []) {
+    if (f.language === 'fr' || f.language === 'en') {
+      agentFeedByLang.set(f.language, f.id)
+    }
+  }
+  if (!agentFeedByLang.has('fr') || !agentFeedByLang.has('en')) {
+    return NextResponse.json({ error: 'Feeds agent introuvables (FR ou EN)' }, { status: 503 })
+  }
+
+  // URLs déjà ingérées par ce user (7j) : dedup avant discovery LLM.
+  const { data: existingItems } = await supabase
+    .from('items')
     .select('url')
     .eq('user_id', user.id)
-    .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // 7 derniers jours
+    .gte('fetched_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
 
-  const knownUrls = (existingArticles ?? []).map((a) => a.url)
+  const knownUrls = (existingItems ?? []).map((i) => i.url)
 
-  // Signaux negatifs : articles rejetes comme hors sujet (30 derniers jours)
-  const { data: dismissed } = await supabase
-    .from('articles')
-    .select('title, site_name')
-    .eq('user_id', user.id)
-    .eq('rejection_reason', 'off_topic')
-    .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-    .limit(15)
-
-  const negativeExamples = (dismissed ?? [])
-    .map((a) => [a.title, a.site_name].filter(Boolean).join(' - '))
-    .filter(Boolean)
-
-  // Créer le scoring_run
   const { data: run, error: runError } = await supabase
     .from('scoring_runs')
     .insert({ user_id: user.id, agent_type: 'messages' })
@@ -95,8 +110,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Impossible de créer le run' }, { status: 500 })
   }
 
+  const startedAt = Date.now()
+
   try {
-    // 1. Discovery : trouver des URLs d'articles
     const discovery = await runDiscoveryAgent(userProfile, knownUrls)
 
     if (discovery.urls.length === 0) {
@@ -105,149 +121,116 @@ export async function POST(request: Request) {
         .update({
           completed_at: new Date().toISOString(),
           error: discovery.error ?? 'Aucun article découvert',
+          duration_ms: Date.now() - startedAt,
         })
         .eq('id', run.id)
 
       return NextResponse.json({
         runId: run.id,
         discovered: 0,
-        accepted: 0,
-        rejected: 0,
+        ingested: 0,
         error: discovery.error ?? 'Aucun article découvert',
       })
     }
 
-    // 2. Parser les URLs en parallèle (échecs ignorés individuellement)
     const parsedResults = await Promise.allSettled(
       discovery.urls.slice(0, 20).map((url) => parseUrl(url))
     )
 
-    const candidates: ArticleCandidate[] = parsedResults
-      .filter(
-        (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
-          r.status === 'fulfilled'
-      )
-      .map((r) => ({
-        url: r.value.url,
-        title: r.value.title,
-        excerpt: r.value.excerpt,
-        contentText: r.value.contentText,
-        siteName: r.value.siteName,
-        author: r.value.author ?? null,
-        publishedAt: r.value.publishedAt ?? null,
-        wordCount: r.value.wordCount,
-      }))
-      .filter((c) => c.contentText.length > 200) // filtre les pages sans contenu
+    const parsed: ParsedArticle[] = parsedResults
+      .filter((r): r is PromiseFulfilledResult<ParsedArticle> => r.status === 'fulfilled')
+      .map((r) => r.value)
+      .filter((c) => c.contentText.length > 200)
 
-    if (candidates.length === 0) {
+    if (parsed.length === 0) {
       await supabase
         .from('scoring_runs')
-        .update({ completed_at: new Date().toISOString(), error: 'Aucun article parsable' })
+        .update({
+          completed_at: new Date().toISOString(),
+          error: 'Aucun article parsable',
+          duration_ms: Date.now() - startedAt,
+        })
         .eq('id', run.id)
 
       return NextResponse.json({
         runId: run.id,
         discovered: discovery.urls.length,
-        accepted: 0,
-        rejected: 0,
+        ingested: 0,
         error: 'Aucun article parsable',
       })
     }
 
-    // 3. Scorer les candidats (avec signaux negatifs)
-    const scoringResult = await runScoringAgent({
-      profile: userProfile,
-      candidates,
-      runId: run.id,
-      userId: user.id,
-      negativeExamples,
+    const itemRows = parsed.map((p) => {
+      const lang = resolveLanguage({
+        htmlLang: p.htmlLang,
+        contentText: p.contentText,
+        profileLanguage,
+      })
+      const feedId = agentFeedByLang.get(lang) as string
+      return {
+        feed_id: feedId,
+        user_id: user.id,
+        url: p.url,
+        title: p.title,
+        author: p.author,
+        published_at: p.publishedAt,
+        content_text: p.contentText.slice(0, 50_000),
+        content_hash: contentHash(p.url, p.title, p.contentText),
+        word_count: p.wordCount,
+      }
     })
 
-    const accepted = scoringResult.scored.filter((a) => a.accepted)
-    const rejected = scoringResult.scored.filter((a) => !a.accepted)
+    const { data: insertedItems } = await supabase
+      .from('items')
+      .upsert(itemRows, { onConflict: 'content_hash', ignoreDuplicates: true })
+      .select('id, content_text')
 
-    // 4. Persister en base
-    if (scoringResult.scored.length > 0) {
-      const parsedByUrl = new Map(
-        parsedResults
-          .filter(
-            (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof parseUrl>>> =>
-              r.status === 'fulfilled'
-          )
-          .map((r) => [r.value.url, r.value])
+    // Embeddings Voyage pour les items nouvellement insérés uniquement.
+    if (insertedItems && insertedItems.length > 0 && process.env.VOYAGE_API_KEY) {
+      await Promise.allSettled(
+        insertedItems
+          .filter((i) => i.content_text)
+          .map(async (item) => {
+            const embedding = await generateEmbedding(item.content_text as string, user.id)
+            await supabase
+              .from('item_embeddings')
+              .upsert(
+                { item_id: item.id, embedding: JSON.stringify(embedding) },
+                { onConflict: 'item_id', ignoreDuplicates: true }
+              )
+          })
       )
-
-      const { data: insertedArticles } = await supabase
-        .from('articles')
-        .upsert(
-          scoringResult.scored.map((scored) => {
-            const parsed = parsedByUrl.get(scored.url)
-            return {
-              user_id: user.id,
-              url: scored.url,
-              title: parsed?.title ?? null,
-              author: parsed?.author ?? null,
-              site_name: parsed?.siteName ?? null,
-              published_at: parsed?.publishedAt ?? null,
-              content_html: parsed?.contentHtml ?? null,
-              content_text: parsed?.contentText ?? null,
-              excerpt: parsed?.excerpt ?? null,
-              word_count: parsed?.wordCount ?? null,
-              reading_time_minutes: parsed?.readingTimeMinutes ?? null,
-              score: scored.score,
-              justification: scored.justification,
-              is_serendipity: scored.isSerendipity,
-              rejection_reason: scored.rejectionReason,
-              status: scored.accepted ? 'pending' : 'not_interested',
-              origin: 'agent',
-              scored_at: new Date().toISOString(),
-            }
-          }),
-          { onConflict: 'user_id,url', ignoreDuplicates: true }
-        )
-        .select('id, url, content_text, status')
-
-      // Embeddings : await pour garantir l'execution avant fin de la requete HTTP.
-      if (insertedArticles && process.env.VOYAGE_API_KEY) {
-        await Promise.allSettled(
-          insertedArticles
-            .filter((a) => a.status === 'pending' && a.content_text)
-            .map(async (article) => {
-              const embedding = await generateEmbedding(article.content_text as string, user.id)
-              await supabase.from('articles').update({ embedding }).eq('id', article.id)
-            })
-        )
-      }
     }
 
-    // Mettre à jour le scoring_run
+    const ingestedCount = insertedItems?.length ?? 0
+
     await supabase
       .from('scoring_runs')
       .update({
         completed_at: new Date().toISOString(),
-        articles_analyzed: scoringResult.scored.length,
-        articles_accepted: accepted.length,
-        articles_rejected: rejected.length,
-        agent_type: scoringResult.agentType,
-        error: scoringResult.error,
-        duration_ms: scoringResult.durationMs,
+        articles_analyzed: parsed.length,
+        articles_accepted: ingestedCount,
+        articles_rejected: parsed.length - ingestedCount,
+        duration_ms: Date.now() - startedAt,
       })
       .eq('id', run.id)
 
     return NextResponse.json({
       runId: run.id,
       discovered: discovery.urls.length,
-      parsed: candidates.length,
-      accepted: accepted.length,
-      rejected: rejected.length,
-      durationMs: scoringResult.durationMs,
-      error: scoringResult.error,
+      parsed: parsed.length,
+      ingested: ingestedCount,
+      durationMs: Date.now() - startedAt,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     await supabase
       .from('scoring_runs')
-      .update({ completed_at: new Date().toISOString(), error: message })
+      .update({
+        completed_at: new Date().toISOString(),
+        error: message,
+        duration_ms: Date.now() - startedAt,
+      })
       .eq('id', run.id)
     return NextResponse.json({ error: message }, { status: 500 })
   }

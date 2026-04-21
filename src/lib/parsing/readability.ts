@@ -142,7 +142,7 @@ function promoteLazyImages(root: Element): void {
   }
 }
 
-type ParsedArticle = {
+export type ParsedArticle = {
   url: string
   title: string | null
   author: string | null
@@ -154,6 +154,7 @@ type ParsedArticle = {
   wordCount: number
   readingTimeMinutes: number
   ogImageUrl: string | null
+  htmlLang: string | null
 }
 
 const WORDS_PER_MINUTE = 238
@@ -192,6 +193,8 @@ export function parseHtml(html: string, url: string): ParsedArticle {
     document.querySelector('meta[name="twitter:image"]')?.getAttribute('content') ??
     null
 
+  const htmlLang = document.documentElement.getAttribute('lang')
+
   return {
     url,
     title: article.title ? decodeHtmlEntities(article.title) : null,
@@ -204,5 +207,6 @@ export function parseHtml(html: string, url: string): ParsedArticle {
     wordCount,
     readingTimeMinutes,
     ogImageUrl,
+    htmlLang,
   }
 }
