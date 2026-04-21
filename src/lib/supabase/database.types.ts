@@ -31,6 +31,7 @@ export type Database = {
           onboarding_method: string | null
           embedding: number[] | null
           digest_email: boolean
+          first_edition_empty: boolean
           created_at: string | null
           updated_at: string | null
         }
@@ -49,6 +50,7 @@ export type Database = {
           onboarding_method?: string | null
           embedding?: string | number[] | null
           digest_email?: boolean
+          first_edition_empty?: boolean
           created_at?: string | null
           updated_at?: string | null
         }
@@ -67,6 +69,7 @@ export type Database = {
           onboarding_method?: string | null
           embedding?: string | number[] | null
           digest_email?: boolean
+          first_edition_empty?: boolean
           created_at?: string | null
           updated_at?: string | null
         }
