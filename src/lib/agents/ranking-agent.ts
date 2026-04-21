@@ -12,6 +12,7 @@ import { parseUrl } from '@/lib/parsing/readability'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { Database } from '@/lib/supabase/database.types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
+import { resolveRssRatio, RSS_RELEVANCE_DISTANCE_MAX, type DiscoveryMode } from '@/lib/ranking/weights'
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 
@@ -176,33 +177,76 @@ export function integrateCarryOvers(
 }
 
 /**
- * Compose l'edition finale avec plancher 5 / plafond 8 et ratio 75/25.
+ * Compose l'edition finale avec plancher 5 / plafond 8 et ratio essentiel/surprise 75/25.
  * Si moins de 5 articles qualifiants (Q1 >= MIN_Q1_RELEVANCE), repêche par Q1
  * desc parmi les items LLM sous le seuil et les flagge below_normal_threshold.
+ *
+ * Le parametre rssRatio gouverne le split des slots essentiels entre items
+ * RSS et items de decouverte agent. Overflow : si un bucket manque de stock,
+ * l'autre absorbe les slots libres. Le bucket surprise n'est pas contraint
+ * par rssRatio (is_serendipity est orthogonal a source_kind).
  */
+export type ComposeEditionOpts = {
+  minCount?: number
+  maxCount?: number
+  essentialRatio?: number
+  rssRatio?: number
+}
+
 export function composeEdition(
   essential: LlmRankedItem[],
   surprise: LlmRankedItem[],
-  _candidates: RankingCandidate[],
-  minCount = 5,
-  maxCount = 8,
-  targetRatio = 0.75
+  candidates: RankingCandidate[],
+  opts: ComposeEditionOpts = {}
 ): { essential: RankedItem[]; surprise: RankedItem[] } {
+  const minCount = opts.minCount ?? 5
+  const maxCount = opts.maxCount ?? 8
+  const essentialRatio = opts.essentialRatio ?? 0.75
+  const rssRatio = opts.rssRatio ?? 1
   const qEssential = enforceMinRelevance(essential)
   const qSurprise = enforceMinRelevance(surprise)
   const qualifying = qEssential.length + qSurprise.length
 
   const target = Math.max(minCount, Math.min(maxCount, qualifying))
-  const targetEssential = Math.ceil(target * targetRatio)
-  const targetSurprise = target - targetEssential
+  const targetEssential = Math.ceil(target * essentialRatio)
 
-  const takenQE = Math.min(targetEssential, qEssential.length)
-  // Les slots essential non remplis sont cedés à surprise avant repêche
+  const kindById = new Map(candidates.map((c) => [c.itemId, c.sourceKind]))
+  const kindOf = (itemId: string): 'rss' | 'agent' => kindById.get(itemId) ?? 'rss'
+
+  // Split essential par source_kind selon rssRatio. Si le pool d'un kind est
+  // insuffisant, les slots libres basculent sur l'autre kind (overflow).
+  const targetEssentialRss = Math.round(targetEssential * rssRatio)
+  const targetEssentialAgent = targetEssential - targetEssentialRss
+
+  const qERss = qEssential.filter((i) => kindOf(i.item_id) === 'rss')
+  const qEAgent = qEssential.filter((i) => kindOf(i.item_id) === 'agent')
+
+  const pickedRss = qERss.slice(0, targetEssentialRss)
+  const pickedAgent = qEAgent.slice(0, targetEssentialAgent)
+
+  const deficitRss = targetEssentialRss - pickedRss.length
+  const deficitAgent = targetEssentialAgent - pickedAgent.length
+  const overflowFromAgent =
+    deficitRss > 0 ? qEAgent.slice(pickedAgent.length, pickedAgent.length + deficitRss) : []
+  const overflowFromRss =
+    deficitAgent > 0 ? qERss.slice(pickedRss.length, pickedRss.length + deficitAgent) : []
+
+  const pickedIds = new Set([
+    ...pickedRss.map((i) => i.item_id),
+    ...pickedAgent.map((i) => i.item_id),
+    ...overflowFromAgent.map((i) => i.item_id),
+    ...overflowFromRss.map((i) => i.item_id),
+  ])
+  // Preserve l'ordre LLM original dans l'edition finale.
+  const essentialOrdered = qEssential.filter((i) => pickedIds.has(i.item_id))
+  const takenQE = essentialOrdered.length
+
+  // Les slots essential non remplis sont cedés à surprise avant repêche.
   const remainingAfterEssential = target - takenQE
   const takenQS = Math.min(remainingAfterEssential, qSurprise.length)
   const remaining = target - takenQE - takenQS
 
-  const essentialItems: RankedItem[] = qEssential.slice(0, takenQE).map((item, i) => ({
+  const essentialItems: RankedItem[] = essentialOrdered.map((item, i) => ({
     itemId: item.item_id,
     q1: item.q1,
     q2: item.q2,
@@ -211,6 +255,7 @@ export function composeEdition(
     bucket: 'essential' as const,
     rank: i + 1,
     belowNormalThreshold: false,
+    sourceKind: kindOf(item.item_id),
   }))
 
   const surpriseItems: RankedItem[] = qSurprise.slice(0, takenQS).map((item, i) => ({
@@ -222,6 +267,7 @@ export function composeEdition(
     bucket: 'surprise' as const,
     rank: i + 1,
     belowNormalThreshold: false,
+    sourceKind: kindOf(item.item_id),
   }))
 
   if (remaining > 0) {
@@ -245,6 +291,7 @@ export function composeEdition(
         bucket: 'essential',
         rank: essentialItems.length + 1,
         belowNormalThreshold: true,
+        sourceKind: kindOf(item.item_id),
       })
     })
 
@@ -258,6 +305,7 @@ export function composeEdition(
         bucket: 'surprise',
         rank: surpriseItems.length + 1,
         belowNormalThreshold: true,
+        sourceKind: kindOf(item.item_id),
       })
     })
 
@@ -321,6 +369,9 @@ async function loadUserProfile(
   fallbackText: string | null
   embedding: number[] | null
   preferredLanguage: 'fr' | 'en' | undefined
+  discoveryMode: DiscoveryMode
+  dailyCap: number
+  coldStart: boolean
 }> {
   const [profileTextResult, profileResult] = await Promise.all([
     supabase
@@ -330,7 +381,9 @@ async function loadUserProfile(
       .single(),
     supabase
       .from('profiles')
-      .select('profile_text, sector, interests, pinned_sources, embedding, profile_structured')
+      .select(
+        'profile_text, sector, interests, pinned_sources, embedding, profile_structured, discovery_mode, daily_cap'
+      )
       .eq('id', userId)
       .single(),
   ])
@@ -361,6 +414,13 @@ async function loadUserProfile(
   const preferredLanguage: 'fr' | 'en' | undefined =
     langValue === 'fr' || langValue === 'en' ? langValue : undefined
 
+  const pinned = (p?.pinned_sources as string[] | null | undefined) ?? []
+  const interestsList = interests ?? []
+  // Cold start : profil vide de tout signal exploitable par l'agent.
+  // Dans ce cas, on force rssRatio = 1 pour que le ranker reste cantonne aux RSS.
+  const coldStart =
+    interestsList.length === 0 && pinned.length === 0 && !(p?.profile_text && p.profile_text.trim())
+
   return {
     staticProfile: pt?.static_profile ?? null,
     longTermProfile: pt?.long_term_profile ?? null,
@@ -368,7 +428,24 @@ async function loadUserProfile(
     fallbackText: fallbackParts.length > 0 ? fallbackParts.join('. ') : null,
     embedding,
     preferredLanguage,
+    discoveryMode: (p?.discovery_mode as DiscoveryMode | null) ?? 'active',
+    dailyCap: p?.daily_cap ?? 8,
+    coldStart,
   }
+}
+
+async function countRelevantRss(
+  supabase: ServiceClient,
+  userId: string,
+  embedding: number[]
+): Promise<number> {
+  const { data, error } = await supabase.rpc('count_relevant_rss', {
+    target_user_id: userId,
+    user_embedding: JSON.stringify(embedding),
+    distance_max: RSS_RELEVANCE_DISTANCE_MAX,
+  })
+  if (error || typeof data !== 'number') return 0
+  return data
 }
 
 async function loadCarryOverCandidates(
@@ -611,10 +688,20 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
     }
   }
 
-  const [candidates, recentSignals] = await Promise.all([
+  const [candidates, recentSignals, rssAvailable] = await Promise.all([
     prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage),
     loadRecentSignals(supabase, userId),
+    countRelevantRss(supabase, userId, profile.embedding),
   ])
+
+  // Ponderation adaptative : ratio de slots essentiels reserves aux items RSS.
+  // Depend du mode de decouverte, de la taille du pool RSS pertinent et du cold start.
+  const rssRatio = resolveRssRatio({
+    rssAvailable,
+    dailyCap: profile.dailyCap,
+    mode: profile.discoveryMode,
+    coldStart: profile.coldStart,
+  })
 
   if (candidates.length === 0) {
     return {
@@ -675,7 +762,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       candidates
     )
 
-    const composed = composeEdition(guarded.essential, guarded.surprise, candidates)
+    const composed = composeEdition(guarded.essential, guarded.surprise, candidates, { rssRatio })
     essential = composed.essential
     surprise = composed.surprise
   } catch (err) {

@@ -32,6 +32,7 @@ function candidate(
     isKeywordHit: false,
     matchedKeywords: [],
     keywordRank: 0,
+    sourceKind: 'rss',
     ...overrides,
   }
 }
@@ -361,6 +362,184 @@ describe('composeEdition', () => {
     const out = composeEdition(essential, surprise, [])
     expect(out.essential.every((r) => r.bucket === 'essential')).toBe(true)
     expect(out.surprise.every((r) => r.bucket === 'surprise')).toBe(true)
+  })
+})
+
+describe('composeEdition - split RSS/agent par rssRatio', () => {
+  function rssCand(id: string): RankingCandidate {
+    return candidate(id, 0.3, { sourceKind: 'rss' })
+  }
+  function agentCand(id: string): RankingCandidate {
+    return candidate(id, 0.3, { sourceKind: 'agent' })
+  }
+
+  it('rssRatio 1.0 : aucun slot essentiel ne va a l agent (cold start / sources_first sature)', () => {
+    // 8 essentials LLM : 4 RSS + 4 agent. rssRatio = 1 => les 6 essentiels sont RSS only.
+    const essential = [
+      ...makeItems(['r1', 'r2', 'r3', 'r4'], 8),
+      ...makeItems(['a1', 'a2', 'a3', 'a4'], 8),
+    ]
+    const surprise = makeItems(['s1', 's2'], 7)
+    const candidates = [
+      rssCand('r1'),
+      rssCand('r2'),
+      rssCand('r3'),
+      rssCand('r4'),
+      agentCand('a1'),
+      agentCand('a2'),
+      agentCand('a3'),
+      agentCand('a4'),
+      agentCand('s1'),
+      agentCand('s2'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 1 })
+    // 10 qualifying -> target = 8 ; targetEssential = ceil(8 * 0.75) = 6
+    expect(out.essential).toHaveLength(6)
+    const rssKinds = out.essential.filter((r) => r.sourceKind === 'rss')
+    const agentKinds = out.essential.filter((r) => r.sourceKind === 'agent')
+    // 4 RSS disponibles, 2 slots restants debordent sur agent (overflow)
+    expect(rssKinds).toHaveLength(4)
+    expect(agentKinds).toHaveLength(2)
+  })
+
+  it('rssRatio 0.75 : 75% essentiels RSS, 25% agent', () => {
+    const essential = [
+      ...makeItems(['r1', 'r2', 'r3', 'r4', 'r5'], 8),
+      ...makeItems(['a1', 'a2', 'a3'], 8),
+    ]
+    const surprise = makeItems(['s1', 's2', 's3'], 7)
+    const candidates = [
+      rssCand('r1'),
+      rssCand('r2'),
+      rssCand('r3'),
+      rssCand('r4'),
+      rssCand('r5'),
+      agentCand('a1'),
+      agentCand('a2'),
+      agentCand('a3'),
+      agentCand('s1'),
+      agentCand('s2'),
+      agentCand('s3'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.75 })
+    // targetEssential = 6 ; round(6 * 0.75) = 5 RSS + 1 agent
+    expect(out.essential).toHaveLength(6)
+    expect(out.essential.filter((r) => r.sourceKind === 'rss')).toHaveLength(5)
+    expect(out.essential.filter((r) => r.sourceKind === 'agent')).toHaveLength(1)
+  })
+
+  it('rssRatio 0.5 : split 50/50 essentiels', () => {
+    const essential = [
+      ...makeItems(['r1', 'r2', 'r3', 'r4'], 8),
+      ...makeItems(['a1', 'a2', 'a3', 'a4'], 8),
+    ]
+    const surprise = makeItems(['s1', 's2'], 7)
+    const candidates = [
+      rssCand('r1'),
+      rssCand('r2'),
+      rssCand('r3'),
+      rssCand('r4'),
+      agentCand('a1'),
+      agentCand('a2'),
+      agentCand('a3'),
+      agentCand('a4'),
+      agentCand('s1'),
+      agentCand('s2'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.5 })
+    expect(out.essential).toHaveLength(6)
+    expect(out.essential.filter((r) => r.sourceKind === 'rss')).toHaveLength(3)
+    expect(out.essential.filter((r) => r.sourceKind === 'agent')).toHaveLength(3)
+  })
+
+  it('rssRatio 0.25 : 25% RSS, 75% agent essentiels', () => {
+    const essential = [
+      ...makeItems(['r1', 'r2', 'r3'], 8),
+      ...makeItems(['a1', 'a2', 'a3', 'a4', 'a5'], 8),
+    ]
+    const surprise = makeItems(['s1', 's2', 's3'], 7)
+    const candidates = [
+      rssCand('r1'),
+      rssCand('r2'),
+      rssCand('r3'),
+      agentCand('a1'),
+      agentCand('a2'),
+      agentCand('a3'),
+      agentCand('a4'),
+      agentCand('a5'),
+      agentCand('s1'),
+      agentCand('s2'),
+      agentCand('s3'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.25 })
+    // round(6 * 0.25) = 2 RSS + 4 agent
+    expect(out.essential).toHaveLength(6)
+    expect(out.essential.filter((r) => r.sourceKind === 'rss')).toHaveLength(2)
+    expect(out.essential.filter((r) => r.sourceKind === 'agent')).toHaveLength(4)
+  })
+
+  it('overflow agent vers RSS quand pool agent insuffisant', () => {
+    // rssRatio 0.25 => 2 RSS + 4 agent theoriques, mais 1 seul agent disponible
+    const essential = [
+      ...makeItems(['r1', 'r2', 'r3', 'r4', 'r5'], 8),
+      ...makeItems(['a1'], 8),
+    ]
+    const surprise = makeItems(['s1', 's2', 's3'], 7)
+    const candidates = [
+      rssCand('r1'),
+      rssCand('r2'),
+      rssCand('r3'),
+      rssCand('r4'),
+      rssCand('r5'),
+      agentCand('a1'),
+      rssCand('s1'),
+      rssCand('s2'),
+      rssCand('s3'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.25 })
+    expect(out.essential).toHaveLength(6)
+    expect(out.essential.filter((r) => r.sourceKind === 'agent')).toHaveLength(1)
+    expect(out.essential.filter((r) => r.sourceKind === 'rss')).toHaveLength(5)
+  })
+
+  it('overflow RSS vers agent quand pool RSS insuffisant', () => {
+    // rssRatio 0.75 => 5 RSS + 1 agent theoriques, mais 1 seul RSS disponible
+    const essential = [
+      ...makeItems(['r1'], 8),
+      ...makeItems(['a1', 'a2', 'a3', 'a4', 'a5'], 8),
+    ]
+    const surprise = makeItems(['s1', 's2', 's3'], 7)
+    const candidates = [
+      rssCand('r1'),
+      agentCand('a1'),
+      agentCand('a2'),
+      agentCand('a3'),
+      agentCand('a4'),
+      agentCand('a5'),
+      agentCand('s1'),
+      agentCand('s2'),
+      agentCand('s3'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.75 })
+    expect(out.essential).toHaveLength(6)
+    expect(out.essential.filter((r) => r.sourceKind === 'rss')).toHaveLength(1)
+    expect(out.essential.filter((r) => r.sourceKind === 'agent')).toHaveLength(5)
+  })
+
+  it('sourceKind propage sur surprise (pas de contrainte de ratio)', () => {
+    const essential = makeItems(['r1', 'r2', 'r3', 'r4'], 8)
+    const surprise = [...makeItems(['s1'], 7), ...makeItems(['a1'], 7)]
+    const candidates = [
+      rssCand('r1'),
+      rssCand('r2'),
+      rssCand('r3'),
+      rssCand('r4'),
+      rssCand('s1'),
+      agentCand('a1'),
+    ]
+    const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.5 })
+    expect(out.surprise.some((r) => r.sourceKind === 'rss')).toBe(true)
+    expect(out.surprise.some((r) => r.sourceKind === 'agent')).toBe(true)
   })
 })
 

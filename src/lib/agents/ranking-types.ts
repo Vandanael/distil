@@ -1,3 +1,5 @@
+export type SourceKind = 'rss' | 'agent'
+
 export type RankingCandidate = {
   itemId: string
   url: string
@@ -12,6 +14,7 @@ export type RankingCandidate = {
   isKeywordHit: boolean
   matchedKeywords: string[]
   keywordRank: number
+  sourceKind: SourceKind
 }
 
 export type RankedItem = {
@@ -23,6 +26,7 @@ export type RankedItem = {
   bucket: 'essential' | 'surprise'
   rank: number
   belowNormalThreshold?: boolean
+  sourceKind?: SourceKind
 }
 
 export type RankingResult = {

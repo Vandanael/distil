@@ -17,6 +17,7 @@ function baseCandidate(overrides: Partial<RankingCandidate> = {}): RankingCandid
     isKeywordHit: false,
     matchedKeywords: [],
     keywordRank: 0,
+    sourceKind: 'rss',
     ...overrides,
   }
 }

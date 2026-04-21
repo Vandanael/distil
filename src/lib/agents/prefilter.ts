@@ -54,6 +54,7 @@ export async function prefilterCandidates(
       isKeywordHit: false,
       matchedKeywords: [],
       keywordRank: 0,
+      sourceKind: 'rss',
     }))
   }
 
@@ -71,5 +72,6 @@ export async function prefilterCandidates(
     isKeywordHit: Boolean(row.is_keyword_hit),
     matchedKeywords: Array.isArray(row.matched_keywords) ? (row.matched_keywords as string[]) : [],
     keywordRank: typeof row.keyword_rank === 'number' ? row.keyword_rank : 0,
+    sourceKind: row.source_kind === 'agent' ? 'agent' : 'rss',
   }))
 }
