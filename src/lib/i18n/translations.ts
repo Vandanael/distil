@@ -98,7 +98,7 @@ export const translations = {
       tagAddPlaceholder: 'Ajouter un mot-clé...',
       tagRemoveAria: 'Supprimer',
       tagDuplicate: 'Déjà présent',
-      urlAddPlaceholder: 'lemonde.fr, paulgraham.com...',
+      urlAddPlaceholder: 'https://lemonde.fr',
       urlAddButton: 'Ajouter',
       urlInvalid: 'URL invalide',
       urlCounter: 'sur',
@@ -122,7 +122,7 @@ export const translations = {
       heading: 'Préférences',
       sectionSources: 'Sources préférées',
       sectionSourcesHint:
-        'Vos flux RSS et sites de référence. Distil les suit en priorité.',
+        'Vos flux RSS et sites de référence. Importez depuis votre lecteur actuel ou ajoutez-les manuellement.',
       sectionInterests: "Centres d'intérêt",
       sectionInterestsHint: 'Décrivez ce qui vous intéresse. Plus vous êtes précis, mieux Distil trie.',
       sectionInterestsPlaceholder:
@@ -148,7 +148,8 @@ export const translations = {
       subtitle:
         "Ajoutez vos sources, décrivez vos centres d'intérêt. Distil s'occupe du reste.",
       sectionSources: 'Sources préférées',
-      sectionSourcesHint: 'Ajoutez vos flux RSS et sites de référence, ou importez un OPML.',
+      sectionSourcesHint:
+        'Vos flux RSS et sites de référence. Importez depuis votre lecteur actuel ou ajoutez-les manuellement.',
       sectionInterests: "Centres d'intérêt",
       sectionInterestsHint: 'Décrivez-vous en texte libre. Plus vous êtes précis, plus le feed est pertinent.',
       sectionInterestsPlaceholder:
@@ -261,7 +262,7 @@ export const translations = {
       tagAddPlaceholder: 'Add a keyword...',
       tagRemoveAria: 'Remove',
       tagDuplicate: 'Already added',
-      urlAddPlaceholder: 'nytimes.com, paulgraham.com...',
+      urlAddPlaceholder: 'https://example.com',
       urlAddButton: 'Add',
       urlInvalid: 'Invalid URL',
       urlCounter: 'of',
@@ -284,7 +285,8 @@ export const translations = {
     profile: {
       heading: 'Preferences',
       sectionSources: 'Preferred sources',
-      sectionSourcesHint: 'Your RSS feeds and reference sites. Distil tracks them first.',
+      sectionSourcesHint:
+        'Your RSS feeds and reference sites. Import from your current reader or add them manually.',
       sectionInterests: 'Interests',
       sectionInterestsHint: 'Describe what interests you. The more specific, the better Distil sorts.',
       sectionInterestsPlaceholder:
@@ -309,7 +311,8 @@ export const translations = {
       title: 'Your briefing in two minutes',
       subtitle: "Add your sources, describe your interests. Distil takes care of the rest.",
       sectionSources: 'Preferred sources',
-      sectionSourcesHint: 'Add your RSS feeds and reference sites, or import an OPML.',
+      sectionSourcesHint:
+        'Your RSS feeds and reference sites. Import from your current reader or add them manually.',
       sectionInterests: 'Interests',
       sectionInterestsHint: 'Describe yourself freely. The more specific, the more relevant the feed.',
       sectionInterestsPlaceholder:

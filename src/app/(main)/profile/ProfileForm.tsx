@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { TagInput } from '@/components/forms/TagInput'
 import { URLList } from '@/components/forms/URLList'
-import { BulkPaste } from '@/components/forms/BulkPaste'
 import { OPMLImportButton } from '@/components/forms/OPMLImportButton'
 import { useLocale } from '@/lib/i18n/context'
 import { normalizeKeyword } from '@/lib/keywords'
@@ -88,32 +87,7 @@ export function ProfileForm({ profile }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* 1. Sources préférées */}
-      <section className="space-y-3">
-        <div className="space-y-1">
-          <Label className={labelClass}>{t.profile.sectionSources}</Label>
-          <p className={hintClass}>{t.profile.sectionSourcesHint}</p>
-        </div>
-        <URLList
-          value={sources}
-          onChange={setSources}
-          maxUrls={SOURCES_MAX}
-          showCounter
-          disabled={isPending}
-          data-testid="sources-urllist"
-        />
-        <BulkPaste onParse={mergeSources} disabled={isPending} data-testid="sources-bulk" />
-        <OPMLImportButton
-          onImport={(urls) => mergeSources(urls)}
-          disabled={isPending}
-          data-testid="sources-opml"
-        />
-        {sourcesSavedHint && (
-          <p className={hintClass}>{t.profile.sourcesSavedHint}</p>
-        )}
-      </section>
-
-      {/* 2. Centres d'intérêt */}
+      {/* 1. Centres d'intérêt */}
       <section className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="profile-text" className={labelClass}>
@@ -126,10 +100,10 @@ export function ProfileForm({ profile }: Props) {
           placeholder={t.profile.sectionInterestsPlaceholder}
           value={profileText}
           onChange={(e) => setProfileText(e.target.value.slice(0, PROFILE_TEXT_MAX))}
-          rows={8}
+          rows={10}
           disabled={isPending}
           data-testid="profile-text"
-          className="min-h-[12rem]"
+          className="min-h-[15rem] resize-y"
         />
         <div className="flex justify-end">
           <span className={`font-ui text-sm ${charCountColor}`}>
@@ -138,7 +112,7 @@ export function ProfileForm({ profile }: Props) {
         </div>
       </section>
 
-      {/* 3. Mots-clés */}
+      {/* 2. Mots-clés */}
       <section className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="keywords" className={labelClass}>
@@ -153,6 +127,30 @@ export function ProfileForm({ profile }: Props) {
           disabled={isPending}
           data-testid="keywords-taginput"
         />
+      </section>
+
+      {/* 3. Sources préférées */}
+      <section className="space-y-3">
+        <div className="space-y-1">
+          <Label className={labelClass}>{t.profile.sectionSources}</Label>
+          <p className={hintClass}>{t.profile.sectionSourcesHint}</p>
+        </div>
+        <OPMLImportButton
+          onImport={(urls) => mergeSources(urls)}
+          disabled={isPending}
+          data-testid="sources-opml"
+        />
+        <URLList
+          value={sources}
+          onChange={setSources}
+          maxUrls={SOURCES_MAX}
+          showCounter
+          disabled={isPending}
+          data-testid="sources-urllist"
+        />
+        {sourcesSavedHint && (
+          <p className={hintClass}>{t.profile.sourcesSavedHint}</p>
+        )}
       </section>
 
       {/* 4. Langue */}

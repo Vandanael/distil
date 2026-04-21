@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { TagInput } from '@/components/forms/TagInput'
 import { URLList } from '@/components/forms/URLList'
-import { BulkPaste } from '@/components/forms/BulkPaste'
 import { OPMLImportButton } from '@/components/forms/OPMLImportButton'
 import { useLocale } from '@/lib/i18n/context'
 import { normalizeKeyword } from '@/lib/keywords'
@@ -129,28 +128,7 @@ export function OnboardingForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* 1. Sources préférées */}
-          <div className="space-y-3">
-            <Label className={labelClass}>{t.onboarding.sectionSources}</Label>
-            <p className={hintClass}>{t.onboarding.sectionSourcesHint}</p>
-            <URLList
-              value={sources}
-              onChange={setSources}
-              maxUrls={SOURCES_MAX}
-              showCounter
-              disabled={isPending}
-              data-testid="sources-urllist"
-            />
-            <BulkPaste onParse={mergeSources} disabled={isPending} data-testid="sources-bulk" />
-            <OPMLImportButton
-              onImport={(urls) => mergeSources(urls)}
-              disabled={isPending}
-              showHint={false}
-              data-testid="sources-opml"
-            />
-          </div>
-
-          {/* 2. Centres d'intérêt */}
+          {/* 1. Centres d'intérêt */}
           <div className="space-y-2">
             <Label htmlFor="profile-text" className={labelClass}>
               {t.onboarding.sectionInterests}
@@ -161,10 +139,10 @@ export function OnboardingForm() {
               placeholder={t.onboarding.sectionInterestsPlaceholder}
               value={profileText}
               onChange={(e) => setProfileText(e.target.value.slice(0, PROFILE_TEXT_MAX))}
-              rows={8}
+              rows={10}
               disabled={isPending}
               data-testid="profile-text"
-              className="min-h-[10rem]"
+              className="min-h-[15rem] resize-y"
             />
             <div className="flex justify-end">
               <span className={`font-ui text-sm ${charCountColor}`}>
@@ -173,7 +151,7 @@ export function OnboardingForm() {
             </div>
           </div>
 
-          {/* 3. Mots-clés */}
+          {/* 2. Mots-clés */}
           <div className="space-y-3">
             <Label htmlFor="keywords" className={labelClass}>
               {t.onboarding.sectionKeywords}
@@ -208,6 +186,25 @@ export function OnboardingForm() {
                 })}
               </div>
             </div>
+          </div>
+
+          {/* 3. Sources préférées */}
+          <div className="space-y-3">
+            <Label className={labelClass}>{t.onboarding.sectionSources}</Label>
+            <p className={hintClass}>{t.onboarding.sectionSourcesHint}</p>
+            <OPMLImportButton
+              onImport={(urls) => mergeSources(urls)}
+              disabled={isPending}
+              data-testid="sources-opml"
+            />
+            <URLList
+              value={sources}
+              onChange={setSources}
+              maxUrls={SOURCES_MAX}
+              showCounter
+              disabled={isPending}
+              data-testid="sources-urllist"
+            />
           </div>
 
           {/* 4. Langue */}
