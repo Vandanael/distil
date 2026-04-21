@@ -7,7 +7,6 @@ import { PushSubscribe } from '@/components/PushSubscribe'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { listApiTokens } from './token-actions'
 import { signOut } from './actions'
-import { OPMLImport } from './OPMLImport'
 import { DigestToggle } from './DigestToggle'
 
 export default async function ProfilePage() {
@@ -101,11 +100,6 @@ export default async function ProfilePage() {
             dailyCap={profile.daily_cap ?? 10}
             serendipityQuota={profile.serendipity_quota ?? 0.15}
           />
-
-          <div className="space-y-4">
-            <p className="font-ui text-sm text-accent">Sources RSS</p>
-            <OPMLImport />
-          </div>
 
           <div className="flex items-center justify-between">
             <span className="font-ui text-sm text-foreground">Theme</span>

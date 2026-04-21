@@ -2,10 +2,14 @@
 
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { splitInterestsFromCsv } from '@/lib/keywords'
+import { TagInput } from '@/components/forms/TagInput'
+import { URLList } from '@/components/forms/URLList'
+import { BulkPaste } from '@/components/forms/BulkPaste'
+import { OPMLImportButton } from '@/components/forms/OPMLImportButton'
+import { useLocale } from '@/lib/i18n/context'
+import { normalizeKeyword } from '@/lib/keywords'
 import { updateProfile } from './actions'
 
 type ProfileData = {
@@ -17,32 +21,47 @@ type ProfileData = {
 
 type Props = { profile: ProfileData }
 
+const PROFILE_TEXT_MAX = 1000
+const SOURCES_MAX = 50
+
 export function ProfileForm({ profile }: Props) {
+  const { t } = useLocale()
+  const [sources, setSources] = useState<string[]>(profile.pinned_sources)
   const [profileText, setProfileText] = useState(profile.profile_text ?? '')
-  const [interests, setInterests] = useState(profile.interests.join(', '))
-  const [sources, setSources] = useState(profile.pinned_sources.join(', '))
+  const [keywords, setKeywords] = useState<string[]>(profile.interests)
   const [language, setLanguage] = useState<'fr' | 'en' | 'both'>(profile.language ?? 'both')
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [sourcesSavedHint, setSourcesSavedHint] = useState(false)
   const [isPending, startTransition] = useTransition()
 
+  function mergeSources(incoming: string[]) {
+    const seen = new Set(sources)
+    const merged = [...sources]
+    for (const url of incoming) {
+      if (!seen.has(url) && merged.length < SOURCES_MAX) {
+        merged.push(url)
+        seen.add(url)
+      }
+    }
+    setSources(merged)
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSaved(false)
     setSaveError(null)
     setSourcesSavedHint(false)
-    const newSources = sources
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    const sourcesChanged = newSources.join(',') !== profile.pinned_sources.join(',')
+    const sourcesChanged = sources.join(',') !== profile.pinned_sources.join(',')
+    const normalizedKeywords = Array.from(
+      new Set(keywords.map(normalizeKeyword).filter(Boolean))
+    )
     startTransition(async () => {
       try {
         await updateProfile({
           profile_text: profileText || undefined,
-          interests: splitInterestsFromCsv(interests),
-          pinned_sources: newSources,
+          interests: normalizedKeywords,
+          pinned_sources: sources,
           language,
         })
         setSaved(true)
@@ -57,60 +76,89 @@ export function ProfileForm({ profile }: Props) {
     'h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
 
   const labelClass = 'font-ui text-sm text-muted-foreground'
+  const hintClass = 'font-body text-sm text-muted-foreground'
+
+  const charCount = profileText.length
+  const charCountColor =
+    charCount > PROFILE_TEXT_MAX * 0.9
+      ? 'text-destructive'
+      : charCount > PROFILE_TEXT_MAX * 0.75
+        ? 'text-accent'
+        : 'text-muted-foreground'
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="profile-text" className={labelClass}>
-          {"Centres d'interet"}
-        </Label>
-        <Textarea
-          id="profile-text"
-          placeholder="Decrivez ce qui vous interesse..."
-          value={profileText}
-          onChange={(e) => setProfileText(e.target.value)}
-          rows={3}
-          disabled={isPending}
-          data-testid="profile-text"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="interests" className={labelClass}>
-          Mots-cles
-        </Label>
-        <Input
-          id="interests"
-          placeholder="machine learning, produit, geopolitique..."
-          value={interests}
-          onChange={(e) => setInterests(e.target.value)}
-          disabled={isPending}
-          data-testid="interests-input"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="sources" className={labelClass}>
-          Sources preferees
-        </Label>
-        <Input
-          id="sources"
-          placeholder="lemonde.fr, paulgraham.com..."
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* 1. Sources préférées */}
+      <section className="space-y-3">
+        <div className="space-y-1">
+          <Label className={labelClass}>{t.profile.sectionSources}</Label>
+          <p className={hintClass}>{t.profile.sectionSourcesHint}</p>
+        </div>
+        <URLList
           value={sources}
-          onChange={(e) => setSources(e.target.value)}
+          onChange={setSources}
+          maxUrls={SOURCES_MAX}
+          showCounter
           disabled={isPending}
-          data-testid="sources-input"
+          data-testid="sources-urllist"
+        />
+        <BulkPaste onParse={mergeSources} disabled={isPending} data-testid="sources-bulk" />
+        <OPMLImportButton
+          onImport={(urls) => mergeSources(urls)}
+          disabled={isPending}
+          data-testid="sources-opml"
         />
         {sourcesSavedHint && (
-          <p className="font-ui text-sm text-muted-foreground">
-            Ces sources seront incluses lors du prochain rafraîchissement.
-          </p>
+          <p className={hintClass}>{t.profile.sourcesSavedHint}</p>
         )}
-      </div>
+      </section>
 
-      <div className="space-y-2">
+      {/* 2. Centres d'intérêt */}
+      <section className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="profile-text" className={labelClass}>
+            {t.profile.sectionInterests}
+          </Label>
+          <p className={hintClass}>{t.profile.sectionInterestsHint}</p>
+        </div>
+        <Textarea
+          id="profile-text"
+          placeholder={t.profile.sectionInterestsPlaceholder}
+          value={profileText}
+          onChange={(e) => setProfileText(e.target.value.slice(0, PROFILE_TEXT_MAX))}
+          rows={8}
+          disabled={isPending}
+          data-testid="profile-text"
+          className="min-h-[12rem]"
+        />
+        <div className="flex justify-end">
+          <span className={`font-ui text-sm ${charCountColor}`}>
+            {charCount} / {PROFILE_TEXT_MAX} {t.profile.charCount}
+          </span>
+        </div>
+      </section>
+
+      {/* 3. Mots-clés */}
+      <section className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="keywords" className={labelClass}>
+            {t.profile.sectionKeywords}
+          </Label>
+          <p className={hintClass}>{t.profile.sectionKeywordsHint}</p>
+        </div>
+        <TagInput
+          id="keywords"
+          value={keywords}
+          onChange={setKeywords}
+          disabled={isPending}
+          data-testid="keywords-taginput"
+        />
+      </section>
+
+      {/* 4. Langue */}
+      <section className="space-y-3">
         <Label htmlFor="language" className={labelClass}>
-          Langue des articles
+          {t.profile.sectionLanguage}
         </Label>
         <select
           id="language"
@@ -120,17 +168,17 @@ export function ProfileForm({ profile }: Props) {
           data-testid="language-select"
           className={selectClass}
         >
-          <option value="both">Francais et anglais</option>
-          <option value="fr">Francais uniquement</option>
-          <option value="en">Anglais uniquement</option>
+          <option value="both">{t.profile.langBoth}</option>
+          <option value="fr">{t.profile.langFr}</option>
+          <option value="en">{t.profile.langEn}</option>
         </select>
-      </div>
+      </section>
 
       <div className="flex items-center gap-4 pt-2">
         <Button type="submit" disabled={isPending} data-testid="save-profile">
-          {isPending ? 'Enregistrement...' : 'Enregistrer'}
+          {isPending ? t.profile.saving : t.profile.save}
         </Button>
-        {saved && <span className="font-ui text-sm text-muted-foreground">Profil mis à jour.</span>}
+        {saved && <span className="font-ui text-sm text-muted-foreground">{t.profile.saved}</span>}
         {saveError && (
           <p role="alert" className="font-ui text-sm text-destructive">
             {saveError}
