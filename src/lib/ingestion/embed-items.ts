@@ -50,45 +50,33 @@ export async function embedNewItems(): Promise<EmbedResult> {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-  // Find items without embeddings
-  const { data: items, error } = await supabase.rpc('get_items_without_embeddings', {
-    max_count: MAX_ITEMS_PER_RUN,
-  })
+  // Candidats : items recents avec content_text, non deja embeddes.
+  const { data: rawItems } = await supabase
+    .from('items')
+    .select('id, content_text')
+    .not('content_text', 'is', null)
+    .filter('content_text', 'neq', '')
+    .order('fetched_at', { ascending: false })
+    .limit(MAX_ITEMS_PER_RUN)
 
-  // Fallback if RPC not yet created : raw query
-  let itemsToEmbed: Array<{ id: string; content_text: string }>
-
-  if (error || !items) {
-    const { data: rawItems } = await supabase
-      .from('items')
-      .select('id, content_text')
-      .not('content_text', 'is', null)
-      .filter('content_text', 'neq', '')
-      .order('fetched_at', { ascending: false })
-      .limit(MAX_ITEMS_PER_RUN)
-
-    // Filter out items that already have embeddings
-    if (!rawItems || rawItems.length === 0) {
-      return {
-        itemsEmbedded: 0,
-        popularityComputed: 0,
-        rateLimited: false,
-        error: null,
-        durationMs: Date.now() - start,
-      }
+  if (!rawItems || rawItems.length === 0) {
+    return {
+      itemsEmbedded: 0,
+      popularityComputed: 0,
+      rateLimited: false,
+      error: null,
+      durationMs: Date.now() - start,
     }
-
-    const ids = rawItems.map((i) => i.id)
-    const { data: existing } = await supabase
-      .from('item_embeddings')
-      .select('item_id')
-      .in('item_id', ids)
-
-    const existingSet = new Set((existing ?? []).map((e) => e.item_id))
-    itemsToEmbed = rawItems.filter((i) => !existingSet.has(i.id))
-  } else {
-    itemsToEmbed = items as Array<{ id: string; content_text: string }>
   }
+
+  const ids = rawItems.map((i) => i.id)
+  const { data: existing } = await supabase
+    .from('item_embeddings')
+    .select('item_id')
+    .in('item_id', ids)
+
+  const existingSet = new Set((existing ?? []).map((e) => e.item_id))
+  const itemsToEmbed = rawItems.filter((i) => !existingSet.has(i.id))
 
   if (itemsToEmbed.length === 0) {
     return {
