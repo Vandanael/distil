@@ -53,7 +53,7 @@ export async function generateEmbeddingBatch(
     throw new EmbeddingError('VOYAGE_API_KEY non configurée')
   }
 
-  const inputs = texts.map(truncate)
+  const inputs = texts.map((t) => truncate(t))
 
   const response = await fetch(VOYAGE_API_URL, {
     method: 'POST',

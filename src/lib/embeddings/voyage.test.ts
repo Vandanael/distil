@@ -44,6 +44,24 @@ describe('generateEmbeddingBatch', () => {
     expect(result[1]).toEqual(embedding2)
   })
 
+  it('envoie les textes intacts à Voyage (pas de troncature par index)', async () => {
+    const fetchMock = mockFetch(200, {
+      data: [
+        { embedding: FAKE_EMBEDDING, index: 0 },
+        { embedding: FAKE_EMBEDDING, index: 1 },
+      ],
+      model: 'voyage-3',
+      usage: { total_tokens: 100 },
+    })
+    global.fetch = fetchMock
+
+    await generateEmbeddingBatch(['premier texte', 'deuxième texte'])
+
+    const call = fetchMock.mock.calls[0]
+    const body = JSON.parse(call[1].body as string) as { input: string[] }
+    expect(body.input).toEqual(['premier texte', 'deuxième texte'])
+  })
+
   it('lance EmbeddingRateLimitError sur HTTP 429', async () => {
     global.fetch = mockFetch(429, {})
     await expect(generateEmbeddingBatch(['test'])).rejects.toThrow(EmbeddingRateLimitError)
