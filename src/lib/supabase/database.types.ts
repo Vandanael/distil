@@ -32,6 +32,7 @@ export type Database = {
           embedding: number[] | null
           digest_email: boolean
           first_edition_empty: boolean
+          discovery_mode: 'active' | 'sources_first'
           created_at: string | null
           updated_at: string | null
         }
@@ -51,6 +52,7 @@ export type Database = {
           embedding?: string | number[] | null
           digest_email?: boolean
           first_edition_empty?: boolean
+          discovery_mode?: 'active' | 'sources_first'
           created_at?: string | null
           updated_at?: string | null
         }
@@ -70,6 +72,7 @@ export type Database = {
           embedding?: string | number[] | null
           digest_email?: boolean
           first_edition_empty?: boolean
+          discovery_mode?: 'active' | 'sources_first'
           created_at?: string | null
           updated_at?: string | null
         }
@@ -374,6 +377,7 @@ export type Database = {
           site_name: string | null
           active: boolean
           language: string
+          kind: 'rss' | 'agent'
           last_fetched_at: string | null
           etag: string | null
           last_modified: string | null
@@ -387,6 +391,7 @@ export type Database = {
           site_name?: string | null
           active?: boolean
           language?: string
+          kind?: 'rss' | 'agent'
           last_fetched_at?: string | null
           etag?: string | null
           last_modified?: string | null
@@ -400,6 +405,7 @@ export type Database = {
           site_name?: string | null
           active?: boolean
           language?: string
+          kind?: 'rss' | 'agent'
           last_fetched_at?: string | null
           etag?: string | null
           last_modified?: string | null
@@ -412,6 +418,7 @@ export type Database = {
         Row: {
           id: string
           feed_id: string
+          user_id: string | null
           guid: string | null
           url: string
           title: string | null
@@ -426,6 +433,7 @@ export type Database = {
         Insert: {
           id?: string
           feed_id: string
+          user_id?: string | null
           guid?: string | null
           url: string
           title?: string | null
@@ -440,6 +448,7 @@ export type Database = {
         Update: {
           id?: string
           feed_id?: string
+          user_id?: string | null
           guid?: string | null
           url?: string
           title?: string | null
@@ -695,7 +704,17 @@ export type Database = {
           is_keyword_hit: boolean
           matched_keywords: string[]
           keyword_rank: number
+          source_kind: 'rss' | 'agent'
         }>
+      }
+      count_relevant_rss: {
+        Args: {
+          target_user_id: string
+          user_embedding: string | number[]
+          distance_max?: number
+          lookback_days?: number
+        }
+        Returns: number
       }
       list_keyword_hits: {
         Args: {
