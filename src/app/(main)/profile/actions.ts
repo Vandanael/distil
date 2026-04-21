@@ -101,6 +101,23 @@ export async function toggleDigestEmail(enabled: boolean) {
   revalidatePath('/profile')
 }
 
+export async function toggleDiscoveryMode(mode: 'active' | 'sources_first') {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Non authentifie')
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ discovery_mode: mode })
+    .eq('id', user.id)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/profile')
+  revalidatePath('/feed')
+}
+
 export async function updatePinnedSources(
   urls: string[]
 ): Promise<{ added: number; total: number }> {

@@ -24,6 +24,7 @@ type Props = {
   justification: string | null
   isSerendipity: boolean
   origin: string
+  sourceKind?: 'rss' | 'agent' | null
   publishedAt: string | null
   scoredAt: string | null
   wordCount: number | null
@@ -91,6 +92,7 @@ export function ArticleCard({
   justification,
   isSerendipity,
   origin,
+  sourceKind = null,
   publishedAt,
   scoredAt,
   wordCount,
@@ -356,6 +358,15 @@ export function ArticleCard({
               data-testid={`carry-over-badge-${id}`}
             >
               · {carryOverLabel}
+            </span>
+          )}
+          {sourceKind === 'agent' && (
+            <span
+              className="whitespace-nowrap font-ui text-sm text-muted-foreground/70"
+              data-testid={`discovery-badge-${id}`}
+              title={t.article.originAgentTitle}
+            >
+              · {t.article.originAgent}
             </span>
           )}
         </div>

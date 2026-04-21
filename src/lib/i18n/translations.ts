@@ -40,6 +40,8 @@ export const translations = {
       tagMatch: 'Match',
       tagDiscovery: 'Découverte',
       tagDetails: 'Pourquoi ?',
+      originAgent: 'Découverte',
+      originAgentTitle: 'Article trouvé au-delà de vos flux RSS',
       relevance: 'Pertinence',
       subScoreQ1: 'Pertinence',
       subScoreQ2: 'Inattendu',
@@ -141,6 +143,11 @@ export const translations = {
       signOut: 'Se déconnecter',
       advanced: 'Paramètres avancés',
       theme: 'Thème',
+      sectionDiscovery: 'Découverte au-delà de vos sources',
+      sectionDiscoveryHint:
+        'Distil cherche activement des articles pertinents au-delà de vos flux RSS.',
+      discoveryOn: 'Articles variés, environ 1/3 de découverte chaque jour',
+      discoveryOff: 'Priorité totale à vos flux, découverte uniquement si nécessaire',
     },
     onboarding: {
       kicker: 'Bienvenue dans Distil',
@@ -206,6 +213,8 @@ export const translations = {
       tagMatch: 'Match',
       tagDiscovery: 'Discovery',
       tagDetails: 'Why?',
+      originAgent: 'Discovery',
+      originAgentTitle: 'Article found beyond your RSS feeds',
       relevance: 'Relevance',
       subScoreQ1: 'Relevance',
       subScoreQ2: 'Unexpected',
@@ -306,6 +315,11 @@ export const translations = {
       signOut: 'Sign out',
       advanced: 'Advanced settings',
       theme: 'Theme',
+      sectionDiscovery: 'Discovery beyond your sources',
+      sectionDiscoveryHint:
+        'Distil actively searches for relevant articles beyond your RSS feeds.',
+      discoveryOn: 'Varied articles, around 1/3 discovery each day',
+      discoveryOff: 'Full priority to your feeds, discovery only if needed',
     },
     onboarding: {
       kicker: 'Welcome to Distil',

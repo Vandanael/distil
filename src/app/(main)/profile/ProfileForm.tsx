@@ -10,12 +10,14 @@ import { OPMLImportButton } from '@/components/forms/OPMLImportButton'
 import { useLocale } from '@/lib/i18n/context'
 import { normalizeKeyword } from '@/lib/keywords'
 import { updateProfile } from './actions'
+import { DiscoveryToggle } from './DiscoveryToggle'
 
 type ProfileData = {
   profile_text: string | null
   interests: string[]
   pinned_sources: string[]
   language?: 'fr' | 'en' | 'both'
+  discovery_mode: 'active' | 'sources_first'
 }
 
 type Props = { profile: ProfileData }
@@ -149,7 +151,10 @@ export function ProfileForm({ profile }: Props) {
         {sourcesSavedHint && <p className={hintClass}>{t.profile.sourcesSavedHint}</p>}
       </section>
 
-      {/* 4. Langue */}
+      {/* 4. Decouverte : toggle autonome (sauvegarde immediate, independante du submit) */}
+      <DiscoveryToggle mode={profile.discovery_mode} />
+
+      {/* 5. Langue */}
       <section className="space-y-3">
         <Label htmlFor="language" className={labelClass}>
           {t.profile.sectionLanguage}

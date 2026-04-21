@@ -36,7 +36,7 @@ export default async function ProfilePage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, profile_structured, digest_email'
+      'profile_text, interests, pinned_sources, daily_cap, serendipity_quota, profile_structured, digest_email, discovery_mode'
     )
     .eq('id', user.id)
     .single()
@@ -62,6 +62,7 @@ export default async function ProfilePage() {
           interests: profile.interests ?? [],
           pinned_sources: profile.pinned_sources ?? [],
           language,
+          discovery_mode: profile.discovery_mode ?? 'active',
         }}
       />
 

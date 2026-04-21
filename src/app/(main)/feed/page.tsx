@@ -49,6 +49,7 @@ export default async function FeedPage() {
   let daysSinceLastLogin: number | undefined = undefined
   let firstEditionEmpty = false
   const subScoresByItemId = new Map<string, SubScores>()
+  const sourceKindByItemId = new Map<string, 'rss' | 'agent'>()
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const supabase = await createClient()
@@ -150,17 +151,29 @@ export default async function FeedPage() {
       // Jointure cote appli via item_id pour alimenter le popover de pertinence.
       const itemIds = articles.map((a) => a.item_id).filter((id): id is string => id !== null)
       if (itemIds.length > 0) {
-        const { data: rankingRows } = await supabase
-          .from('daily_ranking')
-          .select('item_id, q1_relevance, q2_unexpected, q3_discovery')
-          .eq('user_id', user.id)
-          .in('item_id', itemIds)
-        for (const row of rankingRows ?? []) {
+        const [rankingResult, itemsResult] = await Promise.all([
+          supabase
+            .from('daily_ranking')
+            .select('item_id, q1_relevance, q2_unexpected, q3_discovery')
+            .eq('user_id', user.id)
+            .in('item_id', itemIds),
+          // Remonte feeds.kind pour distinguer les items RSS des items agent (badge Decouverte).
+          supabase.from('items').select('id, feeds(kind)').in('id', itemIds),
+        ])
+        for (const row of rankingResult.data ?? []) {
           subScoresByItemId.set(row.item_id, {
             q1: row.q1_relevance,
             q2: row.q2_unexpected,
             q3: row.q3_discovery,
           })
+        }
+        for (const row of itemsResult.data ?? []) {
+          // Supabase PostgREST type la relation parent en array, un seul element attendu (FK 1:1).
+          const feedsRel = row.feeds as { kind: string } | { kind: string }[] | null
+          const feed = Array.isArray(feedsRel) ? feedsRel[0] : feedsRel
+          if (feed?.kind === 'rss' || feed?.kind === 'agent') {
+            sourceKindByItemId.set(row.id, feed.kind)
+          }
         }
       }
     }
@@ -211,6 +224,7 @@ export default async function FeedPage() {
                   justification={a.justification}
                   isSerendipity={a.is_serendipity}
                   origin={a.origin}
+                  sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
                   publishedAt={a.published_at}
                   scoredAt={a.scored_at}
                   wordCount={a.word_count}
@@ -248,6 +262,7 @@ export default async function FeedPage() {
                   justification={a.justification}
                   isSerendipity={a.is_serendipity}
                   origin={a.origin}
+                  sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
                   publishedAt={a.published_at}
                   scoredAt={a.scored_at}
                   wordCount={a.word_count}
