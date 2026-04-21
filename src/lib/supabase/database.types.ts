@@ -100,6 +100,9 @@ export type Database = {
           read_at: string | null
           archived_at: string | null
           digest_sent_at: string | null
+          below_normal_threshold: boolean
+          carry_over_count: number
+          last_shown_in_edition_at: string | null
           embedding: number[] | null
           created_at: string
           updated_at: string
@@ -131,6 +134,9 @@ export type Database = {
           read_at?: string | null
           archived_at?: string | null
           digest_sent_at?: string | null
+          below_normal_threshold?: boolean
+          carry_over_count?: number
+          last_shown_in_edition_at?: string | null
           embedding?: string | number[] | null
           created_at?: string
           updated_at?: string
@@ -162,6 +168,9 @@ export type Database = {
           read_at?: string | null
           archived_at?: string | null
           digest_sent_at?: string | null
+          below_normal_threshold?: boolean
+          carry_over_count?: number
+          last_shown_in_edition_at?: string | null
           embedding?: string | number[] | null
           created_at?: string
           updated_at?: string

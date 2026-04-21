@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     .from('articles')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'accepted')
+    .eq('status', 'pending')
 
   return NextResponse.json({ count: count ?? 0 }, { headers: { 'Cache-Control': 'no-store' } })
 }

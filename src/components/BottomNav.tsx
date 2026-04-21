@@ -35,15 +35,13 @@ const ICONS: Record<string, (active: boolean) => React.ReactNode> = {
       width="20"
       height="20"
       viewBox="0 0 24 24"
-      fill="none"
+      fill={active ? 'currentColor' : 'none'}
       stroke="currentColor"
       aria-hidden="true"
       strokeWidth={active ? 2.5 : 2}
       strokeLinecap="square"
     >
-      <path d="M4 4h4v16H4z" />
-      <path d="M10 4h4v16h-4z" />
-      <path d="m16.5 4.5 3.5 1-4 15-3.5-1z" />
+      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
     </svg>
   ),
   '/search': (active) => (

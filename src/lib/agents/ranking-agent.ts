@@ -156,7 +156,7 @@ async function loadRecentSignals(supabase: ServiceClient, userId: string): Promi
       .from('articles')
       .select('title, site_name')
       .eq('user_id', userId)
-      .eq('status', 'rejected')
+      .in('status', ['not_interested', 'rejected'])
       .eq('rejection_reason', 'off_topic')
       .gte('scored_at', cutoff)
       .order('scored_at', { ascending: false })
@@ -368,7 +368,7 @@ async function persistRanking(
         score: item.q1 * 10,
         justification: item.justification,
         is_serendipity: item.bucket === 'surprise',
-        status: 'accepted',
+        status: 'pending',
         origin: 'agent',
         scored_at: new Date().toISOString(),
       }

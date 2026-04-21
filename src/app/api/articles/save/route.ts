@@ -234,7 +234,7 @@ export async function POST(request: Request) {
       justification: scored.justification,
       is_serendipity: scored.isSerendipity,
       rejection_reason: scored.rejectionReason,
-      status: scored.accepted ? 'accepted' : 'rejected',
+      status: scored.accepted ? 'pending' : 'not_interested',
       origin: 'bookmarklet',
       scored_at: new Date().toISOString(),
     })

@@ -14,16 +14,16 @@ const HOME_DESCRIPTION =
   'Distil lit le web a votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversite editoriale, zero algorithme de popularite.'
 
 export const metadata = {
-  title: 'Distil - votre veille quotidienne, sans le bruit',
+  title: 'Distil - Le temps de trier, puis le temps de lire.',
   description: HOME_DESCRIPTION,
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'Distil - votre veille quotidienne, sans le bruit',
+    title: 'Distil - Le temps de trier, puis le temps de lire.',
     description: HOME_DESCRIPTION,
     url: '/',
   },
   twitter: {
-    title: 'Distil - votre veille quotidienne, sans le bruit',
+    title: 'Distil - Le temps de trier, puis le temps de lire.',
     description: HOME_DESCRIPTION,
   },
   alternates: { canonical: '/' },
@@ -162,7 +162,7 @@ export default async function RootPage() {
             .from('articles')
             .select('title, url, site_name, excerpt, score, is_serendipity, justification')
             .eq('user_id', uid)
-            .eq('status', 'accepted')
+            .eq('status', 'pending')
             .not('score', 'is', null)
             .order('score', { ascending: false })
             .range(offset, offset + 4)

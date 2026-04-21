@@ -43,7 +43,7 @@ async function generateForUser(
         .from('articles')
         .select('title, site_name, positive_signal')
         .eq('user_id', userId)
-        .in('status', ['accepted', 'read', 'archived'])
+        .in('status', ['pending', 'read', 'to_read'])
         .gte('scored_at', thirtyDaysAgo)
         .order('scored_at', { ascending: false })
         .limit(50),

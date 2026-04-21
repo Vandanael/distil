@@ -33,10 +33,10 @@ describe('useFeedKeyboard', () => {
   })
 
   it('j deplace le focus vers le bas', () => {
-    const onDismiss = vi.fn()
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
 
@@ -45,10 +45,10 @@ describe('useFeedKeyboard', () => {
   })
 
   it('k deplace le focus vers le haut', () => {
-    const onDismiss = vi.fn()
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('j')
@@ -60,10 +60,10 @@ describe('useFeedKeyboard', () => {
   })
 
   it('Enter navigue vers l article focus', () => {
-    const onDismiss = vi.fn()
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('Enter')
@@ -71,24 +71,24 @@ describe('useFeedKeyboard', () => {
     expect(onNavigate).toHaveBeenCalledWith('a1')
   })
 
-  it('d appelle onDismiss avec le bon id', () => {
-    const onDismiss = vi.fn()
+  it('d appelle onNotInterested avec le bon id', () => {
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('j')
     pressKey('d')
 
-    expect(onDismiss).toHaveBeenCalledWith('a2')
+    expect(onNotInterested).toHaveBeenCalledWith('a2')
   })
 
   it('Escape retire le focus', () => {
-    const onDismiss = vi.fn()
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('Escape')
@@ -98,10 +98,10 @@ describe('useFeedKeyboard', () => {
   })
 
   it('ignore les touches quand focus dans un input', () => {
-    const onDismiss = vi.fn()
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     const input = document.createElement('input')
     document.body.appendChild(input)
@@ -114,36 +114,36 @@ describe('useFeedKeyboard', () => {
     document.body.removeChild(input)
   })
 
-  it('ArrowLeft appelle onDismiss comme d', () => {
-    const onDismiss = vi.fn()
+  it('ArrowLeft appelle onNotInterested comme d', () => {
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('ArrowLeft')
 
-    expect(onDismiss).toHaveBeenCalledWith('a1')
+    expect(onNotInterested).toHaveBeenCalledWith('a1')
   })
 
-  it('ArrowRight appelle onArchive', () => {
-    const onDismiss = vi.fn()
+  it('ArrowRight appelle onAddToRead', () => {
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('j')
     pressKey('ArrowRight')
 
-    expect(onArchive).toHaveBeenCalledWith('a2')
+    expect(onAddToRead).toHaveBeenCalledWith('a2')
   })
 
   it('j ne depasse pas la derniere carte', () => {
-    const onDismiss = vi.fn()
+    const onNotInterested = vi.fn()
     const onNavigate = vi.fn()
-    const onArchive = vi.fn()
-    renderHook(() => useFeedKeyboard({ onDismiss, onArchive, onNavigate }))
+    const onAddToRead = vi.fn()
+    renderHook(() => useFeedKeyboard({ onNotInterested, onAddToRead, onNavigate }))
 
     pressKey('j')
     pressKey('j')

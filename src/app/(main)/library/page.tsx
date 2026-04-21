@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { ArchiveList } from '../archive/ArchiveList'
 
@@ -12,6 +13,10 @@ type SavedArticle = {
 }
 
 export default async function LibraryPage() {
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('locale')?.value === 'en' ? 'en' : 'fr'
+  const isFr = locale === 'fr'
+
   let saved: SavedArticle[] = []
   let hasNotes = false
 
@@ -26,7 +31,7 @@ export default async function LibraryPage() {
         .from('articles')
         .select('id, title, site_name, url, reading_time_minutes, archived_at, score')
         .eq('user_id', user.id)
-        .eq('status', 'archived')
+        .eq('status', 'to_read')
         .order('archived_at', { ascending: false })
         .limit(200)
       saved = data ?? []
@@ -42,9 +47,11 @@ export default async function LibraryPage() {
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-8 md:py-12 space-y-8 w-full">
       <div className="flex items-baseline justify-between gap-4 flex-wrap">
-        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Archives</h1>
+        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">
+          {isFr ? 'À lire' : 'To read'}
+        </h1>
         <span className="font-ui text-sm text-muted-foreground" data-testid="library-count">
-          {saved.length} article{saved.length !== 1 ? 's' : ''}
+          {isFr ? 'À lire' : 'To read'} ({saved.length})
         </span>
       </div>
 

@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useFeedKeyboard } from '@/lib/hooks/useFeedKeyboard'
-import { archiveArticle, dismissArticle } from '@/app/(main)/article/[id]/actions'
+import { addToRead, markNotInterested } from '@/app/(main)/article/[id]/actions'
 import { useLocale } from '@/lib/i18n/context'
 import { useDismissContext } from './DismissContext'
 
@@ -19,13 +19,13 @@ export function FeedShell({ className, children }: Props) {
   const { dismissById, undoById } = useDismissContext()
   const timerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
-  const handleDismiss = useCallback(
+  const handleNotInterested = useCallback(
     (articleId: string) => {
       dismissById(articleId)
 
       if (timerRef.current[articleId]) clearTimeout(timerRef.current[articleId])
 
-      toast.success(t.article.dismissed, {
+      toast.success(t.article.notInterestedToast, {
         action: {
           label: t.article.undo,
           onClick: () => {
@@ -38,20 +38,20 @@ export function FeedShell({ className, children }: Props) {
       })
 
       timerRef.current[articleId] = setTimeout(async () => {
-        await dismissArticle(articleId)
+        await markNotInterested(articleId)
         delete timerRef.current[articleId]
       }, 4000)
     },
     [dismissById, undoById, t]
   )
 
-  const handleArchive = useCallback(
+  const handleAddToRead = useCallback(
     (articleId: string) => {
       dismissById(articleId)
 
       if (timerRef.current[articleId]) clearTimeout(timerRef.current[articleId])
 
-      toast.success(locale === 'fr' ? 'Archive' : 'Archived', {
+      toast.success(t.article.addedToRead, {
         action: {
           label: t.article.undo,
           onClick: () => {
@@ -64,11 +64,11 @@ export function FeedShell({ className, children }: Props) {
       })
 
       timerRef.current[articleId] = setTimeout(async () => {
-        await archiveArticle(articleId)
+        await addToRead(articleId)
         delete timerRef.current[articleId]
       }, 4000)
     },
-    [dismissById, undoById, locale, t]
+    [dismissById, undoById, t]
   )
 
   const handleNavigate = useCallback(
@@ -79,8 +79,8 @@ export function FeedShell({ className, children }: Props) {
   )
 
   useFeedKeyboard({
-    onDismiss: handleDismiss,
-    onArchive: handleArchive,
+    onNotInterested: handleNotInterested,
+    onAddToRead: handleAddToRead,
     onNavigate: handleNavigate,
   })
 
@@ -92,7 +92,7 @@ export function FeedShell({ className, children }: Props) {
         aria-hidden="true"
         className="hidden md:block font-ui text-sm text-muted-foreground/40 pt-6 lg:col-span-2 select-none"
       >
-        ↑↓ naviguer · Enter ouvrir · ← rejeter · → archiver
+        ↑↓ naviguer · Enter ouvrir · d/← pas intéressé · → à lire
       </p>
     </div>
   )

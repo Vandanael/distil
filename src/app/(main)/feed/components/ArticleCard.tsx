@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRef, useState, useTransition, useEffect } from 'react'
 import { toast } from 'sonner'
-import { archiveArticle, dismissArticle } from '@/app/(main)/article/[id]/actions'
+import { addToRead, markNotInterested } from '@/app/(main)/article/[id]/actions'
 import { useSwipeActions } from '@/lib/hooks/useSwipeActions'
 import { useLocale } from '@/lib/i18n/context'
 import { isReferenceDomain } from '@/lib/agents/sources'
@@ -98,7 +98,7 @@ export function ArticleCard({
   const publishedLabel = formatPublishedDate(publishedAt, locale)
   const retrievedLabel = retrievedRelative
     ? locale === 'fr'
-      ? `recupere ${retrievedRelative}`
+      ? `récupéré ${retrievedRelative}`
       : `fetched ${retrievedRelative}`
     : null
   const isPaywall = wordCount === 0
@@ -123,20 +123,20 @@ export function ArticleCard({
     direction: swipeDirection,
     progress: swipeProgress,
   } = useSwipeActions({
-    onSwipeLeft: () => handleDismiss(),
-    onSwipeRight: () => handleArchive(),
+    onSwipeLeft: () => handleNotInterested(),
+    onSwipeRight: () => handleAddToRead(),
     enabled: !dismissed,
   })
 
   if (dismissed || dismissedIds.has(id)) return null
 
-  function handleDismiss() {
+  function handleNotInterested() {
     const reason = isRead ? 'already_read' : 'off_topic'
     setDismissed(true)
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
-    toast.success(t.article.dismissed, {
+    toast.success(t.article.notInterestedToast, {
       action: {
         label: t.article.undo,
         onClick: () => {
@@ -151,18 +151,18 @@ export function ArticleCard({
     undoRef.current = setTimeout(() => {
       if (!cancelledRef.current) {
         startDismissTransition(async () => {
-          await dismissArticle(id, reason)
+          await markNotInterested(id, reason)
         })
       }
     }, 4000)
   }
 
-  function handleArchive() {
+  function handleAddToRead() {
     setDismissed(true)
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
-    toast.success(locale === 'fr' ? 'Archive' : 'Archived', {
+    toast.success(t.article.addedToRead, {
       action: {
         label: t.article.undo,
         onClick: () => {
@@ -177,7 +177,7 @@ export function ArticleCard({
     undoRef.current = setTimeout(() => {
       if (!cancelledRef.current) {
         startDismissTransition(async () => {
-          await archiveArticle(id)
+          await addToRead(id)
         })
       }
     }, 4000)
@@ -230,7 +230,7 @@ export function ArticleCard({
               <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
               <path d="M10 12h4" />
             </svg>
-            {locale === 'fr' ? 'Archiver' : 'Archive'}
+            {t.article.addToReadShort}
           </span>
         </div>
       )}
@@ -242,7 +242,7 @@ export function ArticleCard({
           data-testid={`swipe-dismiss-indicator-${id}`}
         >
           <span className="flex items-center gap-2 font-ui text-sm font-semibold">
-            {locale === 'fr' ? 'Supprimer' : 'Dismiss'}
+            {t.article.notInterestedShort}
             <svg
               width="18"
               height="18"
@@ -278,12 +278,12 @@ export function ArticleCard({
         />
 
         {/* Ligne meta : source · date · duree */}
-        <div className="pointer-events-none relative flex items-center gap-1.5 mb-2 text-sm text-muted-foreground">
+        <div className="pointer-events-none relative flex flex-wrap items-center gap-1.5 mb-2 text-sm text-muted-foreground">
           {origin === 'bookmarklet' && (
             <span
               className="text-accent shrink-0"
               data-testid={`origin-badge-${id}`}
-              title="Sauvegarde par vous"
+              title="Ajouté par vous"
             >
               <svg
                 width="14"
@@ -298,7 +298,7 @@ export function ArticleCard({
             </span>
           )}
           {siteName && (
-            <span className="font-ui">
+            <span className="font-ui whitespace-nowrap">
               {siteName}
               {isReferenceDomain(siteName) && (
                 <span className="ml-1 text-sm text-accent/70" title="Source de reference">
@@ -307,25 +307,32 @@ export function ArticleCard({
               )}
             </span>
           )}
-          {siteName && (publishedLabel || retrievedLabel) && <span>·</span>}
-          {publishedLabel && <span className="font-ui">{publishedLabel}</span>}
-          {publishedLabel && retrievedLabel && <span>·</span>}
-          {retrievedLabel && (
-            <span className="font-ui text-muted-foreground/70">{retrievedLabel}</span>
+          {publishedLabel && (
+            <span className="whitespace-nowrap font-ui">
+              {siteName && '· '}
+              {publishedLabel}
+            </span>
           )}
-          {readingTimeMinutes && (publishedLabel || retrievedLabel || siteName) && <span>·</span>}
-          {readingTimeMinutes && <span className="font-ui">{readingTimeMinutes} min</span>}
+          {retrievedLabel && (
+            <span className="whitespace-nowrap font-ui text-muted-foreground/70">
+              {(siteName || publishedLabel) && '· '}
+              {retrievedLabel}
+            </span>
+          )}
+          {readingTimeMinutes && (
+            <span className="whitespace-nowrap font-ui">
+              {(siteName || publishedLabel || retrievedLabel) && '· '}
+              {readingTimeMinutes} min
+            </span>
+          )}
           {isPaywall && (
-            <>
-              <span>·</span>
-              <span
-                className="text-destructive/70"
-                data-testid={`paywall-badge-${id}`}
-                title="Contenu non accessible - article probablement derriere un paywall"
-              >
-                Paywall
-              </span>
-            </>
+            <span
+              className="whitespace-nowrap text-destructive/70"
+              data-testid={`paywall-badge-${id}`}
+              title="Contenu non accessible - article probablement derriere un paywall"
+            >
+              · Paywall
+            </span>
           )}
         </div>
 
@@ -510,10 +517,10 @@ export function ArticleCard({
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                handleDismiss()
+                handleNotInterested()
               }}
               disabled={isDismissing}
-              aria-label={t.article.dismiss}
+              aria-label={t.article.notInterested}
               data-testid={`dismiss-${id}`}
               className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-destructive hover:bg-muted disabled:opacity-20"
             >
@@ -533,7 +540,7 @@ export function ArticleCard({
                 <path d="m9 9 6 6" />
               </svg>
               <span className="hidden md:inline whitespace-nowrap text-sm">
-                {t.article.dismissShort}
+                {t.article.notInterestedShort}
               </span>
             </button>
           </div>

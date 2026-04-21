@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
         .from('articles')
         .select('id, title, site_name, excerpt, score, reading_time_minutes')
         .eq('user_id', profile.id)
-        .eq('status', 'accepted')
+        .eq('status', 'pending')
         .is('read_at', null)
         .is('archived_at', null)
         .is('digest_sent_at', null)

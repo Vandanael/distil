@@ -69,7 +69,7 @@ export function FeedHeader({ lastRefreshAt, topInterests }: Props) {
         <div className="flex items-center gap-2 shrink-0 ml-auto font-ui text-sm text-subtle">
           {refreshInfo && (
             <span className="text-subtle/60">
-              {locale === 'fr' ? 'recupere' : 'fetched'} {refreshInfo.label}
+              {locale === 'fr' ? 'récupéré' : 'fetched'} {refreshInfo.label}
             </span>
           )}
           <button

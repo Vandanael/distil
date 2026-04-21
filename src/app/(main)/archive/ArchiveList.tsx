@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useLocale } from '@/lib/i18n/context'
-import { removeFromLibrary } from '@/app/(main)/article/[id]/actions'
+import { removeFromToRead } from '@/app/(main)/article/[id]/actions'
 
 type Article = {
   id: string
@@ -21,25 +21,23 @@ type PendingRemoval = {
   cancelled: boolean
 }
 
-function formatArchivedDate(iso: string | null, locale: 'fr' | 'en'): string {
+function formatAddedDate(iso: string | null, locale: 'fr' | 'en'): string {
   if (!iso) return ''
   const date = new Date(iso)
   const diffD = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
   const isFr = locale === 'fr'
-  if (diffD === 0) return isFr ? "aujourd'hui" : 'today'
-  if (diffD === 1) return isFr ? 'hier' : 'yesterday'
-  if (diffD < 7) return isFr ? `il y a ${diffD}j` : `${diffD}d ago`
-  return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+  if (diffD === 0) return isFr ? "Ajouté aujourd'hui" : "Added today"
+  if (diffD === 1) return isFr ? 'Ajouté hier' : 'Added yesterday'
+  if (diffD < 7) return isFr ? `Ajouté il y a ${diffD}j` : `Added ${diffD}d ago`
+  return isFr
+    ? `Ajouté le ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`
+    : `Added ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
 }
 
 type Props = { articles: Article[] }
 
 export function ArchiveList({ articles }: Props) {
-  const { locale } = useLocale()
+  const { locale, t } = useLocale()
   const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set())
   // Timers et flags d'annulation par article : on referme proprement si le
   // composant unmount ou si l'utilisateur clique Annuler avant les 4s.
@@ -70,12 +68,12 @@ export function ArchiveList({ articles }: Props) {
         const current = pendingRef.current.get(id)
         pendingRef.current.delete(id)
         if (current?.cancelled) return
-        void removeFromLibrary(id)
+        void removeFromToRead(id)
       }, 4000),
     }
     pendingRef.current.set(id, entry)
 
-    toast.success(locale === 'fr' ? 'Retiré des archives' : 'Removed from archive', {
+    toast.success(t.library.removeToast, {
       action: {
         label: locale === 'fr' ? 'Annuler' : 'Undo',
         onClick: () => {
@@ -102,20 +100,20 @@ export function ArchiveList({ articles }: Props) {
   if (visibleArticles.length === 0) {
     return (
       <div className="space-y-3 py-8">
-        <p className="font-ui text-sm text-muted-foreground">
-          Aucun article archive pour l&apos;instant.
-        </p>
-        <p className="font-body text-sm text-muted-foreground">
-          Archivez un article depuis la vue lecture pour le retrouver ici.
-        </p>
+        <p className="font-ui text-sm text-muted-foreground">{t.library.empty}</p>
+        <p className="font-body text-sm text-muted-foreground">{t.library.emptyDetail}</p>
         <Link href="/feed" className="font-ui text-sm text-accent hover:underline">
-          Retour au Feed
+          {t.library.emptyBack}
         </Link>
       </div>
     )
   }
 
   return (
+    <div className="space-y-6">
+      {visibleArticles.length > 10 && (
+        <p className="font-ui text-sm text-muted-foreground/70 italic">{t.library.pileWarning}</p>
+      )}
     <div
       className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0"
       data-testid="archive-list"
@@ -145,7 +143,7 @@ export function ArchiveList({ articles }: Props) {
               )}
               {a.archived_at && (
                 <span className="font-ui text-sm text-muted-foreground/60 ml-auto">
-                  {formatArchivedDate(a.archived_at, locale)}
+                  {formatAddedDate(a.archived_at, locale)}
                 </span>
               )}
             </div>
@@ -160,10 +158,10 @@ export function ArchiveList({ articles }: Props) {
             }}
             aria-label={
               locale === 'fr'
-                ? `Retirer ${a.title ?? 'cet article'} des archives`
-                : `Remove ${a.title ?? 'this article'} from archive`
+                ? `Retirer ${a.title ?? 'cet article'} de À lire`
+                : `Remove ${a.title ?? 'this article'} from To read`
             }
-            title={locale === 'fr' ? 'Retirer des archives' : 'Remove from archive'}
+            title={t.library.removeTitle}
             data-testid={`archive-remove-${a.id}`}
             className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
           >
@@ -187,6 +185,7 @@ export function ArchiveList({ articles }: Props) {
           </button>
         </div>
       ))}
+    </div>
     </div>
   )
 }

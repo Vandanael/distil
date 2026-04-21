@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { archiveArticle } from '../actions'
+import { addToRead } from '../actions'
 import { NoteEditor } from './NoteEditor'
 import { TagInput } from './TagInput'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
@@ -51,7 +51,7 @@ export function FloatingActionBar({
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
-    toast.success('Article archivé', {
+    toast.success('Ajouté à À lire', {
       action: {
         label: 'Annuler',
         onClick: () => {
@@ -67,10 +67,10 @@ export function FloatingActionBar({
       if (cancelledRef.current) return
       startTransition(async () => {
         try {
-          await archiveArticle(articleId)
+          await addToRead(articleId)
         } catch {
           setArchived(false)
-          toast.error('Archivage echoue')
+          toast.error('Échec de l\u2019ajout à À lire')
         }
       })
     }, 4000)
@@ -79,7 +79,7 @@ export function FloatingActionBar({
   if (archived) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center border-t border-border bg-background px-8 py-4">
-        <span className="font-ui text-sm text-muted-foreground">Archive.</span>
+        <span className="font-ui text-sm text-muted-foreground">Ajouté à votre pile.</span>
       </div>
     )
   }
@@ -189,10 +189,10 @@ export function FloatingActionBar({
           disabled={isPending || !isOnline}
           className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
           data-testid="action-archive"
-          aria-label="Archiver cet article"
+          aria-label="Ajouter à À lire"
           title={isOnline ? undefined : 'Non disponible hors-ligne'}
         >
-          Archiver
+          À lire
         </button>
       </div>
     </>

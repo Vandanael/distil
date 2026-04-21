@@ -12,7 +12,7 @@ export async function keepArticle(articleId: string): Promise<void> {
 
   await supabase
     .from('articles')
-    .update({ status: 'accepted', kept_anyway: true })
+    .update({ status: 'pending', kept_anyway: true })
     .eq('id', articleId)
     .eq('user_id', user.id)
 
@@ -32,7 +32,7 @@ export async function markAsRead(articleId: string): Promise<void> {
     .update({ status: 'read', read_at: new Date().toISOString() })
     .eq('id', articleId)
     .eq('user_id', user.id)
-    .eq('status', 'accepted') // ne pas ecraser 'archived' ou autres
+    .neq('status', 'not_interested') // ne pas ecraser un rejet explicite
 
   revalidatePath('/feed')
 }

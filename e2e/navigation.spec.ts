@@ -48,6 +48,20 @@ test.describe('Navigation desktop (header)', () => {
   })
 })
 
+test.describe('Qualite du rendu du feed', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+
+  test.beforeEach(async ({ page }) => {
+    await loginAs(page, 'yvan-test@distil.local')
+    await expect(page).toHaveURL(/\/feed/)
+  })
+
+  test('aucune occurrence de "recupere" sans accent dans le DOM du feed', async ({ page }) => {
+    const bodyText = await page.locator('body').innerText()
+    expect(bodyText).not.toMatch(/recupere/i)
+  })
+})
+
 test.describe('Navigation mobile (BottomNav)', () => {
   test.use({ viewport: MOBILE })
 

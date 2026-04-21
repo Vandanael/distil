@@ -9,12 +9,16 @@ const COPY = {
   fr: {
     home: 'Accueil',
     about: 'À propos',
+    privacy: 'Confidentialité',
+    terms: 'Conditions',
     rights: 'Tous droits réservés.',
     navLabel: 'Navigation publique',
   },
   en: {
     home: 'Home',
     about: 'About',
+    privacy: 'Privacy',
+    terms: 'Terms',
     rights: 'All rights reserved.',
     navLabel: 'Public navigation',
   },
@@ -40,6 +44,16 @@ export function PublicFooter({ lang }: { lang?: Lang } = {}) {
               <li>
                 <Link href="/about" className="hover:text-accent transition-colors">
                   {t.about}
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-accent transition-colors">
+                  {t.privacy}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-accent transition-colors">
+                  {t.terms}
                 </Link>
               </li>
             </ul>

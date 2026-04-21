@@ -69,7 +69,7 @@ export default async function FeedPage() {
             'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, published_at, scored_at, word_count, og_image_url, status'
           )
           .eq('user_id', user.id)
-          .in('status', ['accepted', 'read'])
+          .in('status', ['pending', 'read'])
           .order('scored_at', { ascending: false })
           .limit(dailyCap),
         supabase

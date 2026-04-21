@@ -26,7 +26,7 @@ type Article = {
 }
 
 function DemoArticleCard({ article, index }: { article: Article; index: number }) {
-  const isRejected = article.status === 'rejected'
+  const isRejected = article.status === 'not_interested'
   // Reproduit exactement le layout d'ArticleCard du feed
   const isAboveFold = index < 3
 
@@ -139,8 +139,8 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
     articles = data ?? []
   }
 
-  const accepted = articles.filter((a) => a.status === 'accepted')
-  const rejected = articles.filter((a) => a.status === 'rejected')
+  const accepted = articles.filter((a) => a.status === 'pending')
+  const rejected = articles.filter((a) => a.status === 'not_interested')
   const all = [...accepted, ...rejected]
 
   return (

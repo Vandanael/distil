@@ -1,10 +1,21 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ArticleCard } from './ArticleCard'
 import { DismissProvider } from './DismissContext'
+import { toast } from 'sonner'
+import { markNotInterested, addToRead } from '@/app/(main)/article/[id]/actions'
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}))
 
 vi.mock('@/app/(main)/article/[id]/actions', () => ({
-  dismissArticle: vi.fn().mockResolvedValue(undefined),
+  markNotInterested: vi.fn().mockResolvedValue(undefined),
+  addToRead: vi.fn().mockResolvedValue(undefined),
 }))
 
 function renderCard(props: React.ComponentProps<typeof ArticleCard>) {
@@ -31,6 +42,17 @@ const BASE_PROPS = {
   ogImageUrl: null,
 }
 
+beforeEach(() => {
+  vi.mocked(toast.success).mockClear()
+  vi.mocked(toast.error).mockClear()
+  vi.mocked(markNotInterested).mockClear()
+  vi.mocked(addToRead).mockClear()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 describe('ArticleCard', () => {
   it('affiche le titre', () => {
     renderCard(BASE_PROPS)
@@ -44,7 +66,7 @@ describe('ArticleCard', () => {
 
   it('affiche le temps de lecture', () => {
     renderCard(BASE_PROPS)
-    expect(screen.getByText('4 min')).toBeTruthy()
+    expect(screen.getByText(/4 min/)).toBeTruthy()
   })
 
   it('affiche le tag Decouverte si serendipity', () => {
@@ -62,7 +84,6 @@ describe('ArticleCard', () => {
   it('pas de label textuel pour un match sans serendipity (juste le score)', () => {
     renderCard({ ...BASE_PROPS, score: 70 })
     const tag = screen.getByTestId('tag-abc-123')
-    // Tag toujours present pour l a11y (sr-only avec le score) mais pas de "Match" visible
     expect(tag.textContent).not.toContain('Match')
   })
 
@@ -97,11 +118,11 @@ describe('ArticleCard', () => {
     expect(screen.queryByTestId('paywall-badge-abc-123')).toBeNull()
   })
 
-  it('affiche le bouton dismiss toujours present et tappable', () => {
+  it('bouton Pas intéressé présent avec le bon aria-label', () => {
     renderCard(BASE_PROPS)
     const btn = screen.getByTestId('dismiss-abc-123')
     expect(btn).toBeTruthy()
-    expect(btn.getAttribute('aria-label')).toBe('Masquer cet article')
+    expect(btn.getAttribute('aria-label')).toBe('Pas intéressé pour cet article')
   })
 
   it('le tag est cliquable quand fourni', () => {
@@ -114,5 +135,88 @@ describe('ArticleCard', () => {
     expect(screen.queryByTestId('justification-inline-abc-123')).toBeNull()
     fireEvent.click(screen.getByTestId('toggle-details-abc-123'))
     expect(screen.getByTestId('justification-inline-abc-123')).toBeTruthy()
+  })
+
+  it('bouton Pas intéressé affiche le toast avec le bon message', () => {
+    renderCard(BASE_PROPS)
+    fireEvent.click(screen.getByTestId('dismiss-abc-123'))
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      'Pas intéressé',
+      expect.objectContaining({ duration: 4000 })
+    )
+  })
+
+  it('undo bouton Pas intéressé annule la persistence markNotInterested', () => {
+    vi.useFakeTimers()
+    renderCard(BASE_PROPS)
+
+    fireEvent.click(screen.getByTestId('dismiss-abc-123'))
+
+    const [, opts] = vi.mocked(toast.success).mock.calls[0] as [string, { action?: { onClick: () => void } }]
+    act(() => { opts?.action?.onClick() })
+
+    act(() => { vi.advanceTimersByTime(4000) })
+
+    expect(vi.mocked(markNotInterested)).not.toHaveBeenCalled()
+  })
+
+  it('swipe gauche affiche le toast Pas intéressé', () => {
+    vi.useFakeTimers()
+    renderCard(BASE_PROPS)
+    const card = screen.getByTestId('article-card-abc-123')
+
+    act(() => {
+      fireEvent.pointerDown(card, { clientX: 100, clientY: 200, button: 0, pointerId: 1 })
+      fireEvent.pointerMove(card, { clientX: 0, clientY: 200, pointerId: 1 })
+      fireEvent.pointerUp(card, { clientX: 0, clientY: 200, pointerId: 1 })
+    })
+
+    // SLIDE_OUT_DURATION = 200ms avant le callback
+    act(() => { vi.advanceTimersByTime(200) })
+
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      'Pas intéressé',
+      expect.objectContaining({ duration: 4000 })
+    )
+  })
+
+  it('swipe droit affiche le toast Ajouté à À lire', () => {
+    vi.useFakeTimers()
+    renderCard(BASE_PROPS)
+    const card = screen.getByTestId('article-card-abc-123')
+
+    act(() => {
+      fireEvent.pointerDown(card, { clientX: 0, clientY: 200, button: 0, pointerId: 1 })
+      fireEvent.pointerMove(card, { clientX: 100, clientY: 200, pointerId: 1 })
+      fireEvent.pointerUp(card, { clientX: 100, clientY: 200, pointerId: 1 })
+    })
+
+    act(() => { vi.advanceTimersByTime(200) })
+
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      'Ajouté à À lire',
+      expect.objectContaining({ duration: 4000 })
+    )
+  })
+
+  it('undo swipe droit annule la persistence addToRead', () => {
+    vi.useFakeTimers()
+    renderCard(BASE_PROPS)
+    const card = screen.getByTestId('article-card-abc-123')
+
+    act(() => {
+      fireEvent.pointerDown(card, { clientX: 0, clientY: 200, button: 0, pointerId: 1 })
+      fireEvent.pointerMove(card, { clientX: 100, clientY: 200, pointerId: 1 })
+      fireEvent.pointerUp(card, { clientX: 100, clientY: 200, pointerId: 1 })
+    })
+
+    act(() => { vi.advanceTimersByTime(200) })
+
+    const [, opts] = vi.mocked(toast.success).mock.calls[0] as [string, { action?: { onClick: () => void } }]
+    act(() => { opts?.action?.onClick() })
+
+    act(() => { vi.advanceTimersByTime(4000) })
+
+    expect(vi.mocked(addToRead)).not.toHaveBeenCalled()
   })
 })

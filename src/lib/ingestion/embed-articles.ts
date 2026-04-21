@@ -55,7 +55,7 @@ export async function embedPendingArticles(): Promise<EmbedResult> {
   const { data: pending, error } = await supabase
     .from('articles')
     .select('id, content_text')
-    .eq('status', 'accepted')
+    .eq('status', 'pending')
     .is('embedding', null)
     .not('content_text', 'is', null)
     .filter('content_text', 'neq', '')

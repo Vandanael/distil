@@ -5,19 +5,20 @@ import { revalidatePath } from 'next/cache'
 import { logError } from '@/lib/errors/log-error'
 import type { HighlightAnchor } from '@/lib/highlights/serializer'
 
-export async function archiveArticle(articleId: string): Promise<void> {
+export async function addToRead(articleId: string): Promise<void> {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return
 
+  const now = new Date().toISOString()
   const { error } = await supabase
     .from('articles')
-    .update({ status: 'archived', archived_at: new Date().toISOString() })
+    .update({ status: 'to_read', archived_at: now, last_shown_in_edition_at: now })
     .eq('id', articleId)
     .eq('user_id', user.id)
-  if (error) await logError({ route: 'archiveArticle', error, userId: user.id })
+  if (error) await logError({ route: 'addToRead', error, userId: user.id })
 
   revalidatePath('/feed')
   revalidatePath('/library')
@@ -73,7 +74,7 @@ export async function saveNote(
   revalidatePath('/library')
 }
 
-export async function dismissArticle(
+export async function markNotInterested(
   articleId: string,
   reason: 'off_topic' | 'already_read' | 'dismissed_by_user' = 'dismissed_by_user'
 ): Promise<void> {
@@ -85,20 +86,19 @@ export async function dismissArticle(
 
   const { error: dismissError } = await supabase
     .from('articles')
-    .update({ status: 'rejected', rejection_reason: reason })
+    .update({ status: 'not_interested', rejection_reason: reason })
     .eq('id', articleId)
     .eq('user_id', user.id)
   if (dismissError)
-    await logError({ route: 'dismissArticle', error: dismissError, userId: user.id })
+    await logError({ route: 'markNotInterested', error: dismissError, userId: user.id })
 
   revalidatePath('/feed')
 }
 
-// Retire un article des archives sans le detruire : passe en status 'rejected'
-// + reset archived_at. L'historique reste, l'article ne remonte plus dans
-// /library ni /feed. Garde-fou .eq('status', 'archived') : refuse d'ecraser
-// un statut different (article deja remis en feed ou autre).
-export async function removeFromLibrary(articleId: string): Promise<void> {
+// Retire un article de la liste "A lire" : remet en status 'pending' neutre
+// + reset archived_at. Garde-fou .eq('status', 'to_read') : refuse d'ecraser
+// un statut different.
+export async function removeFromToRead(articleId: string): Promise<void> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -107,11 +107,11 @@ export async function removeFromLibrary(articleId: string): Promise<void> {
 
   const { error } = await supabase
     .from('articles')
-    .update({ status: 'rejected', archived_at: null, rejection_reason: 'dismissed_by_user' })
+    .update({ status: 'pending', archived_at: null })
     .eq('id', articleId)
     .eq('user_id', user.id)
-    .eq('status', 'archived')
-  if (error) await logError({ route: 'removeFromLibrary', error, userId: user.id })
+    .eq('status', 'to_read')
+  if (error) await logError({ route: 'removeFromToRead', error, userId: user.id })
 
   revalidatePath('/library')
 }

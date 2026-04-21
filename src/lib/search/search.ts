@@ -25,7 +25,7 @@ export async function searchFullText(
     .from('articles')
     .select('id, title, excerpt, site_name, score')
     .eq('user_id', userId)
-    .in('status', ['accepted', 'read', 'archived'])
+    .in('status', ['pending', 'read', 'to_read'])
     .textSearch('search_vector', query, { type: 'websearch', config: 'french' })
     .limit(limit)
 

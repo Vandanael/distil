@@ -194,7 +194,7 @@ export function ReadingView({
               >
                 <p className="font-ui text-sm text-muted-foreground">Contenu non disponible</p>
                 <p className="font-body text-base text-muted-foreground leading-relaxed">
-                  Le contenu de cet article n&apos;a pas pu etre recupere - il est probablement
+                  Le contenu de cet article n&apos;a pas pu être récupéré - il est probablement
                   protege par un paywall ou inaccessible au parsing.
                 </p>
                 <a

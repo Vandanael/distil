@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
           .from('articles')
           .select('title, site_name')
           .eq('user_id', profile.id)
-          .eq('status', 'accepted')
+          .eq('status', 'pending')
           .gte('updated_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
           .limit(20),
         supabase
@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
                 justification: scored.justification,
                 is_serendipity: scored.isSerendipity,
                 rejection_reason: scored.rejectionReason,
-                status: scored.accepted ? 'accepted' : 'rejected',
+                status: scored.accepted ? 'pending' : 'not_interested',
                 origin: 'agent',
                 scored_at: new Date().toISOString(),
               }
@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
         if (insertedArticles && process.env.VOYAGE_API_KEY) {
           await Promise.allSettled(
             insertedArticles
-              .filter((a) => a.status === 'accepted' && a.content_text)
+              .filter((a) => a.status === 'pending' && a.content_text)
               .map(async (article) => {
                 const embedding = await generateEmbedding(
                   article.content_text as string,
