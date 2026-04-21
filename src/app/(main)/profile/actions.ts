@@ -1,6 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { generateProfileEmbedding } from '@/lib/embeddings/profile-embedding'
+import { logError } from '@/lib/errors/log-error'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -26,6 +28,37 @@ export async function updateProfile(input: ProfileUpdate) {
 
   const { language, ...rest } = input
 
+  // Si profile_text ou interests changent, il faut regenerer l'embedding :
+  // sinon le ranking continue a tourner sur l'ancien vecteur et le feed derive.
+  const needsEmbeddingRefresh = 'profile_text' in input || 'interests' in input
+  let embeddingJson: string | null = null
+  if (needsEmbeddingRefresh) {
+    const { data: current } = await supabase
+      .from('profiles')
+      .select('profile_text, sector, interests')
+      .eq('id', user.id)
+      .single()
+    try {
+      const vector = await generateProfileEmbedding(
+        {
+          profile_text: input.profile_text ?? current?.profile_text ?? null,
+          sector: current?.sector ?? null,
+          interests: input.interests ?? current?.interests ?? [],
+        },
+        user.id
+      )
+      if (vector) embeddingJson = JSON.stringify(vector)
+    } catch (err) {
+      await logError({
+        route: 'profile.updateProfile.embedding',
+        error: err,
+        userId: user.id,
+      })
+    }
+  }
+
+  const embeddingPatch = embeddingJson ? { embedding: embeddingJson } : {}
+
   // Merge language dans profile_structured sans ecraser les autres champs
   if (language !== undefined) {
     const { data: current } = await supabase
@@ -37,11 +70,14 @@ export async function updateProfile(input: ProfileUpdate) {
     const merged = { ...(current?.profile_structured ?? {}), language }
     const { error } = await supabase
       .from('profiles')
-      .update({ ...rest, profile_structured: merged })
+      .update({ ...rest, profile_structured: merged, ...embeddingPatch })
       .eq('id', user.id)
     if (error) throw new Error(error.message)
   } else {
-    const { error } = await supabase.from('profiles').update(rest).eq('id', user.id)
+    const { error } = await supabase
+      .from('profiles')
+      .update({ ...rest, ...embeddingPatch })
+      .eq('id', user.id)
     if (error) throw new Error(error.message)
   }
 

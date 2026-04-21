@@ -1,6 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { generateProfileEmbedding } from '@/lib/embeddings/profile-embedding'
+import { logError } from '@/lib/errors/log-error'
 import { redirect } from 'next/navigation'
 
 export type ProfileInput = {
@@ -25,6 +27,25 @@ export async function createProfile(input: ProfileInput) {
 
   const profileStructured = input.language ? { language: input.language } : null
 
+  // Regenere l'embedding en amont : sans lui, le ranking retourne un feed vide.
+  let embeddingJson: string | null = null
+  try {
+    const vector = await generateProfileEmbedding(
+      {
+        profile_text: input.profile_text ?? null,
+        interests: input.interests ?? [],
+      },
+      user.id
+    )
+    if (vector) embeddingJson = JSON.stringify(vector)
+  } catch (err) {
+    await logError({
+      route: 'onboarding.createProfile.embedding',
+      error: err,
+      userId: user.id,
+    })
+  }
+
   const { error } = await supabase.from('profiles').upsert({
     id: user.id,
     profile_text: input.profile_text ?? null,
@@ -35,6 +56,7 @@ export async function createProfile(input: ProfileInput) {
     onboarding_completed: true,
     onboarding_method: input.method,
     profile_structured: profileStructured,
+    ...(embeddingJson ? { embedding: embeddingJson } : {}),
   })
 
   if (error) {
