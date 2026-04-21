@@ -32,7 +32,7 @@ const RANKING_TIMEOUT_MS = 60_000
  *
  * Les erreurs sont non-bloquantes : l'utilisateur est toujours redirigé.
  */
-async function triggerFirstEditionRanking(userId: string): Promise<void> {
+export async function triggerFirstEditionRanking(userId: string): Promise<void> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
