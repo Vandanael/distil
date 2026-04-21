@@ -17,9 +17,9 @@ test.describe('Thomas - onboarding + parametres avances', () => {
       .getByTestId('profile-text')
       .fill('ML engineer, sources primaires uniquement, machine learning')
 
-    await page.getByTestId('source-input').fill('arxiv.org')
+    await page.getByTestId('sources-urllist-input').fill('arxiv.org')
     await page.keyboard.press('Enter')
-    await expect(page.getByTestId('sources-list')).toContainText('arxiv.org')
+    await expect(page.getByTestId('sources-urllist-list')).toContainText('arxiv.org')
 
     await page.getByTestId('submit-onboarding').click()
     await expect(page).toHaveURL(/\/feed/)

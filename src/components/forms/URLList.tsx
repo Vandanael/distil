@@ -84,7 +84,10 @@ export function URLList({
   return (
     <div className="space-y-2" data-testid={testId}>
       {value.length > 0 && (
-        <ul className="divide-y divide-border border border-input">
+        <ul
+          className="divide-y divide-border border border-input"
+          data-testid={testId ? `${testId}-list` : undefined}
+        >
           {value.map((url, i) => (
             <li
               key={`${url}-${i}`}
@@ -121,6 +124,7 @@ export function URLList({
           placeholder={placeholder ?? t.forms.urlAddPlaceholder}
           disabled={disabled || limitReached}
           aria-invalid={error ? true : undefined}
+          data-testid={testId ? `${testId}-input` : undefined}
           className={cn(error && 'border-destructive')}
         />
         <Button
