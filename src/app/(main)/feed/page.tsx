@@ -22,6 +22,7 @@ type FeedArticle = {
   word_count: number | null
   og_image_url: string | null
   status: string
+  below_normal_threshold: boolean
 }
 
 type SubScores = { q1: number | null; q2: number | null; q3: number | null }
@@ -66,7 +67,7 @@ export default async function FeedPage() {
         supabase
           .from('articles')
           .select(
-            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, published_at, scored_at, word_count, og_image_url, status'
+            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, published_at, scored_at, word_count, og_image_url, status, below_normal_threshold'
           )
           .eq('user_id', user.id)
           .in('status', ['pending', 'read'])
@@ -139,6 +140,7 @@ export default async function FeedPage() {
   }
 
   const topInterests = interests.slice(0, 3)
+  const hasLightHarvest = articles.some((a) => a.below_normal_threshold)
 
   // Fil unique : essentiels trie par score desc, puis serendipity trie par score desc
   const essentials = articles.filter((a) => !a.is_serendipity).sort(sortByScoreDesc)
@@ -146,7 +148,7 @@ export default async function FeedPage() {
 
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3 md:py-10 w-full">
-      <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} />
+      <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} hasLightHarvest={hasLightHarvest} />
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
       <DismissProvider>

@@ -9,9 +9,10 @@ import { useLocale } from '@/lib/i18n/context'
 type Props = {
   lastRefreshAt: string | null
   topInterests: string[]
+  hasLightHarvest?: boolean
 }
 
-export function FeedHeader({ lastRefreshAt, topInterests }: Props) {
+export function FeedHeader({ lastRefreshAt, topInterests, hasLightHarvest }: Props) {
   const { locale, t } = useLocale()
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -59,6 +60,9 @@ export function FeedHeader({ lastRefreshAt, topInterests }: Props) {
 
   return (
     <header className="mb-6 mt-2">
+      {hasLightHarvest && (
+        <p className="mb-3 text-sm text-muted-foreground font-ui">{t.feed.lightHarvest}</p>
+      )}
       <div className="flex items-baseline justify-between gap-4 flex-wrap">
         <h1 className="font-ui text-base md:text-lg font-semibold text-foreground">
           {t.feed.title}

@@ -25,6 +25,8 @@ export const translations = {
       bucketEssentialSub: 'A ne pas manquer',
       bucketSurprise: 'Decouverte',
       bucketSurpriseSub: 'Hors de vos habitudes',
+      lightHarvest:
+        'Moisson plus légère aujourd\'hui - le seuil a été adapté pour préserver votre rendez-vous matinal.',
     },
     article: {
       serendipity: 'Découverte',
@@ -108,6 +110,8 @@ export const translations = {
       bucketEssentialSub: 'Must reads',
       bucketSurprise: 'Discovery',
       bucketSurpriseSub: 'Outside your usual reads',
+      lightHarvest:
+        'Lighter harvest today - the threshold was adapted to preserve your morning briefing.',
     },
     article: {
       serendipity: 'Discovery',

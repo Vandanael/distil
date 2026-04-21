@@ -22,6 +22,7 @@ export type RankedItem = {
   justification: string
   bucket: 'essential' | 'surprise'
   rank: number
+  belowNormalThreshold?: boolean
 }
 
 export type RankingResult = {
@@ -35,6 +36,7 @@ export type RankingResult = {
   keywordHitsCount: number
   keywordHitsPromoted: number
   keywordHitsForceInjected: number
+  editionSize: number
   error: string | null
   durationMs: number
 }

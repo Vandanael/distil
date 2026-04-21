@@ -35,7 +35,7 @@ export const HIGH_RELEVANCE_Q1 = 7
 export const RESERVED_KEYWORD_SLOTS = 2
 export const ESSENTIAL_MAX = 5
 
-type LlmRankedItem = {
+export type LlmRankedItem = {
   item_id: string
   q1: number
   q2: number
@@ -134,6 +134,103 @@ export function applyCosineGuard(
     essential: keptEssential,
     surprise: [...keptSurprise, ...downgraded],
   }
+}
+
+/**
+ * Compose l'edition finale avec plancher 5 / plafond 8 et ratio 75/25.
+ * Si moins de 5 articles qualifiants (Q1 >= MIN_Q1_RELEVANCE), repêche par Q1
+ * desc parmi les items LLM sous le seuil et les flagge below_normal_threshold.
+ */
+export function composeEdition(
+  essential: LlmRankedItem[],
+  surprise: LlmRankedItem[],
+  _candidates: RankingCandidate[],
+  minCount = 5,
+  maxCount = 8,
+  targetRatio = 0.75
+): { essential: RankedItem[]; surprise: RankedItem[] } {
+  const qEssential = enforceMinRelevance(essential)
+  const qSurprise = enforceMinRelevance(surprise)
+  const qualifying = qEssential.length + qSurprise.length
+
+  const target = Math.max(minCount, Math.min(maxCount, qualifying))
+  const targetEssential = Math.ceil(target * targetRatio)
+  const targetSurprise = target - targetEssential
+
+  const takenQE = Math.min(targetEssential, qEssential.length)
+  // Les slots essential non remplis sont cedés à surprise avant repêche
+  const remainingAfterEssential = target - takenQE
+  const takenQS = Math.min(remainingAfterEssential, qSurprise.length)
+  const remaining = target - takenQE - takenQS
+
+  const essentialItems: RankedItem[] = qEssential.slice(0, takenQE).map((item, i) => ({
+    itemId: item.item_id,
+    q1: item.q1,
+    q2: item.q2,
+    q3: item.q3,
+    justification: item.justification,
+    bucket: 'essential' as const,
+    rank: i + 1,
+    belowNormalThreshold: false,
+  }))
+
+  const surpriseItems: RankedItem[] = qSurprise.slice(0, takenQS).map((item, i) => ({
+    itemId: item.item_id,
+    q1: item.q1,
+    q2: item.q2,
+    q3: item.q3,
+    justification: item.justification,
+    bucket: 'surprise' as const,
+    rank: i + 1,
+    belowNormalThreshold: false,
+  }))
+
+  if (remaining > 0) {
+    const usedIds = new Set([...essentialItems, ...surpriseItems].map((r) => r.itemId))
+    const repechPool = [...essential, ...surprise]
+      .filter((item) => item.q1 < MIN_Q1_RELEVANCE && !usedIds.has(item.item_id))
+      .sort((a, b) => b.q1 - a.q1)
+      .slice(0, remaining)
+
+    const essentialDeficit = targetEssential - takenQE
+    const repecheE = repechPool.slice(0, essentialDeficit)
+    const repecheS = repechPool.slice(essentialDeficit)
+
+    repecheE.forEach((item) => {
+      essentialItems.push({
+        itemId: item.item_id,
+        q1: item.q1,
+        q2: item.q2,
+        q3: item.q3,
+        justification: item.justification,
+        bucket: 'essential',
+        rank: essentialItems.length + 1,
+        belowNormalThreshold: true,
+      })
+    })
+
+    repecheS.forEach((item) => {
+      surpriseItems.push({
+        itemId: item.item_id,
+        q1: item.q1,
+        q2: item.q2,
+        q3: item.q3,
+        justification: item.justification,
+        bucket: 'surprise',
+        rank: surpriseItems.length + 1,
+        belowNormalThreshold: true,
+      })
+    })
+
+    essentialItems.forEach((item, i) => {
+      item.rank = i + 1
+    })
+    surpriseItems.forEach((item, i) => {
+      item.rank = i + 1
+    })
+  }
+
+  return { essential: essentialItems, surprise: surpriseItems }
 }
 
 // Fenetre d'injection des signaux dans le prompt (ADR-012). 14 jours = cycle
@@ -371,6 +468,7 @@ async function persistRanking(
         status: 'pending',
         origin: 'agent',
         scored_at: new Date().toISOString(),
+        below_normal_threshold: item.belowNormalThreshold ?? false,
       }
 
       try {
@@ -418,6 +516,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       keywordHitsCount: 0,
       keywordHitsPromoted: 0,
       keywordHitsForceInjected: 0,
+      editionSize: 0,
       error: "Deja classe aujourd'hui",
       durationMs: Date.now() - start,
     }
@@ -437,6 +536,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       keywordHitsCount: 0,
       keywordHitsPromoted: 0,
       keywordHitsForceInjected: 0,
+      editionSize: 0,
       error: "Pas d'embedding profil disponible",
       durationMs: Date.now() - start,
     }
@@ -459,6 +559,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       keywordHitsCount: 0,
       keywordHitsPromoted: 0,
       keywordHitsForceInjected: 0,
+      editionSize: 0,
       error: 'Aucun candidat disponible',
       durationMs: Date.now() - start,
     }
@@ -496,34 +597,18 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
       modelUsed = FALLBACK_MODEL
     }
 
-    // Garde-fou 1 : Q1 < 6 = hors-sujet, purge avant slicing.
-    // Garde-fou 2 : Q1 >= 7 avec distance cosine > 0.6 = LLM incoherent avec l'embedding,
+    // Garde-fou 1 : Q1 >= 7 avec distance cosine > 0.6 = incoherence LLM/embedding,
     // downgrade dans surprise ou drop si deja en surprise (scenario Dezeen/Politique).
+    // enforceMinRelevance est applique en interne par composeEdition.
     const guarded = applyCosineGuard(
-      enforceMinRelevance(llmResult.essential ?? []),
-      enforceMinRelevance(llmResult.surprise ?? []),
+      llmResult.essential ?? [],
+      llmResult.surprise ?? [],
       candidates
     )
 
-    essential = guarded.essential.slice(0, 5).map((item, i) => ({
-      itemId: item.item_id,
-      q1: item.q1,
-      q2: item.q2,
-      q3: item.q3,
-      justification: item.justification,
-      bucket: 'essential' as const,
-      rank: i + 1,
-    }))
-
-    surprise = guarded.surprise.slice(0, 3).map((item, i) => ({
-      itemId: item.item_id,
-      q1: item.q1,
-      q2: item.q2,
-      q3: item.q3,
-      justification: item.justification,
-      bucket: 'surprise' as const,
-      rank: i + 1,
-    }))
+    const composed = composeEdition(guarded.essential, guarded.surprise, candidates)
+    essential = composed.essential
+    surprise = composed.surprise
   } catch (err) {
     // Complete LLM failure : cosine fallback
     rankError = err instanceof Error ? err.message : String(err)
@@ -564,6 +649,7 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     keywordHitsCount: keywordHitIds.size,
     keywordHitsPromoted,
     keywordHitsForceInjected: forceInjected,
+    editionSize: essential.length + surprise.length,
     error: rankError,
     durationMs: Date.now() - start,
   }
@@ -612,6 +698,7 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
           candidates_count: r.candidatesCount,
           essential_count: r.essential.length,
           surprise_count: r.surprise.length,
+          edition_size: r.editionSize,
           duration_ms: r.durationMs,
           error: r.error,
           keyword_hits_count: r.keywordHitsCount,
