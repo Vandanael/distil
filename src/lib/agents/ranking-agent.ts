@@ -15,6 +15,14 @@ import type { RankedItem, RankingCandidate, RankingResult } from './ranking-type
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 
+type CarryOverArticle = {
+  id: string
+  item_id: string
+  score: number | null
+  justification: string | null
+  is_serendipity: boolean
+}
+
 const MODEL = 'gemini-2.5-flash'
 const FALLBACK_MODEL = 'gemini-2.0-flash'
 
@@ -134,6 +142,34 @@ export function applyCosineGuard(
     essential: keptEssential,
     surprise: [...keptSurprise, ...downgraded],
   }
+}
+
+/**
+ * Retire les N articles les moins scores (par q1) pour laisser la place
+ * aux carry-overs. Retourne essential et surprise reduits, re-rankes.
+ */
+export function integrateCarryOvers(
+  essential: RankedItem[],
+  surprise: RankedItem[],
+  numCarryOvers: number
+): { essential: RankedItem[]; surprise: RankedItem[] } {
+  if (numCarryOvers === 0) return { essential, surprise }
+  const allComposed = [...essential, ...surprise]
+  const numToReplace = Math.min(numCarryOvers, allComposed.length)
+  if (numToReplace === 0) return { essential, surprise }
+
+  const toDropIds = new Set(
+    [...allComposed].sort((a, b) => a.q1 - b.q1).slice(0, numToReplace).map((r) => r.itemId)
+  )
+
+  const newEssential = essential
+    .filter((r) => !toDropIds.has(r.itemId))
+    .map((item, i) => ({ ...item, rank: i + 1 }))
+  const newSurprise = surprise
+    .filter((r) => !toDropIds.has(r.itemId))
+    .map((item, i) => ({ ...item, rank: i + 1 }))
+
+  return { essential: newEssential, surprise: newSurprise }
 }
 
 /**
@@ -332,6 +368,24 @@ async function loadUserProfile(
   }
 }
 
+async function loadCarryOverCandidates(
+  supabase: ServiceClient,
+  userId: string,
+  todayStart: string
+): Promise<CarryOverArticle[]> {
+  const { data } = await supabase
+    .from('articles')
+    .select('id, item_id, score, justification, is_serendipity')
+    .eq('user_id', userId)
+    .eq('status', 'pending')
+    .eq('carry_over_count', 0)
+    .not('last_shown_in_edition_at', 'is', null)
+    .lt('last_shown_in_edition_at', todayStart)
+    .order('score', { ascending: false })
+    .limit(2)
+  return (data ?? []).filter((r): r is CarryOverArticle => r.item_id !== null)
+}
+
 async function callRankingLlm(
   profilePrompt: ReturnType<typeof buildRankingUserPrompt>,
   modelId: string,
@@ -452,6 +506,7 @@ async function persistRanking(
       const candidate = candidateMap.get(item.itemId)
       if (!candidate) return
 
+      const now = new Date().toISOString()
       const articleRow: ArticleInsert = {
         user_id: userId,
         item_id: item.itemId,
@@ -467,7 +522,8 @@ async function persistRanking(
         is_serendipity: item.bucket === 'surprise',
         status: 'pending',
         origin: 'agent',
-        scored_at: new Date().toISOString(),
+        scored_at: now,
+        last_shown_in_edition_at: now,
         below_normal_threshold: item.belowNormalThreshold ?? false,
       }
 
@@ -495,7 +551,11 @@ async function persistRanking(
 
 async function rankForUser(supabase: ServiceClient, userId: string): Promise<RankingResult> {
   const start = Date.now()
-  const today = new Date().toISOString().slice(0, 10)
+  const now = new Date()
+  const today = now.toISOString().slice(0, 10)
+  const todayStart = new Date(now)
+  todayStart.setUTCHours(0, 0, 0, 0)
+  const todayStartISO = todayStart.toISOString()
 
   // Check if already ranked today
   const { count } = await supabase
@@ -627,6 +687,27 @@ async function rankForUser(supabase: ServiceClient, userId: string): Promise<Ran
     const reserved = injectReservedKeywordSlots(essential, surprise, candidates)
     essential = reserved.essential
     forceInjected = reserved.forceInjected
+  }
+
+  // Carry-over : integrer les articles pending d'hier dans l'edition du jour.
+  // Les carry-overs remplacent les moins bons items composes (meme quota total).
+  const carryOvers = await loadCarryOverCandidates(supabase, userId, todayStartISO)
+  if (carryOvers.length > 0) {
+    const integrated = integrateCarryOvers(essential, surprise, carryOvers.length)
+    essential = integrated.essential
+    surprise = integrated.surprise
+
+    // UPDATE carry-overs : carry_over_count=1, last_shown_in_edition_at=today
+    const nowISO = now.toISOString()
+    await Promise.all(
+      carryOvers.map((co) =>
+        supabase
+          .from('articles')
+          .update({ carry_over_count: 1, last_shown_in_edition_at: nowISO })
+          .eq('user_id', userId)
+          .eq('item_id', co.item_id)
+      )
+    )
   }
 
   await persistRanking(supabase, userId, today, essential, surprise, candidates)

@@ -27,6 +27,10 @@ export const translations = {
       bucketSurpriseSub: 'Hors de vos habitudes',
       lightHarvest:
         'Moisson plus légère aujourd\'hui - le seuil a été adapté pour préserver votre rendez-vous matinal.',
+      absenceBanner:
+        'Pendant votre absence, Distil a continué à trier. Reprenez ici.',
+      editionCompletePrefix: 'Votre édition du',
+      editionCompleteSuffix: 'est complète. Rendez-vous demain matin.',
     },
     article: {
       serendipity: 'Découverte',
@@ -112,6 +116,9 @@ export const translations = {
       bucketSurpriseSub: 'Outside your usual reads',
       lightHarvest:
         'Lighter harvest today - the threshold was adapted to preserve your morning briefing.',
+      absenceBanner: 'While you were away, Distil kept sorting. Resume here.',
+      editionCompletePrefix: 'Your edition of',
+      editionCompleteSuffix: 'is complete. See you tomorrow morning.',
     },
     article: {
       serendipity: 'Discovery',

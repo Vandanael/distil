@@ -219,4 +219,16 @@ describe('ArticleCard', () => {
 
     expect(vi.mocked(addToRead)).not.toHaveBeenCalled()
   })
+
+  it('affiche le badge carry-over "Hier" si carryOverCount=1 et scoredAt hier', () => {
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    renderCard({ ...BASE_PROPS, carryOverCount: 1, scoredAt: yesterday })
+    expect(screen.getByTestId('carry-over-badge-abc-123')).toBeTruthy()
+    expect(screen.getByTestId('carry-over-badge-abc-123').textContent).toContain('Hier')
+  })
+
+  it('ne pas afficher le badge carry-over si carryOverCount=0', () => {
+    renderCard({ ...BASE_PROPS, carryOverCount: 0 })
+    expect(screen.queryByTestId('carry-over-badge-abc-123')).toBeNull()
+  })
 })

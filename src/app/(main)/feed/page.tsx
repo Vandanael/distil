@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { ArticleCard } from './components/ArticleCard'
 import { EmptyFeed } from './components/EmptyFeed'
 import { FeedShell } from './components/FeedShell'
@@ -23,6 +24,7 @@ type FeedArticle = {
   og_image_url: string | null
   status: string
   below_normal_threshold: boolean
+  carry_over_count: number
 }
 
 type SubScores = { q1: number | null; q2: number | null; q3: number | null }
@@ -43,6 +45,7 @@ export default async function FeedPage() {
   let lastRefreshAt: string | null = null
   let interests: string[] = []
   let keywordGroups: KeywordGroup[] = []
+  let daysSinceLastLogin: number | undefined = undefined
   const subScoresByItemId = new Map<string, SubScores>()
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -62,16 +65,20 @@ export default async function FeedPage() {
       interests = profileResult.data?.interests ?? []
 
       const now = new Date()
+      const todayStart = new Date(now)
+      todayStart.setHours(0, 0, 0, 0)
+      const todayStartISO = todayStart.toISOString()
 
       const [articlesResult, lastRunResult] = await Promise.all([
         supabase
           .from('articles')
           .select(
-            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, published_at, scored_at, word_count, og_image_url, status, below_normal_threshold'
+            'id, item_id, title, site_name, excerpt, reading_time_minutes, score, justification, is_serendipity, origin, published_at, scored_at, word_count, og_image_url, status, below_normal_threshold, carry_over_count'
           )
           .eq('user_id', user.id)
           .in('status', ['pending', 'read'])
-          .order('scored_at', { ascending: false })
+          .gte('last_shown_in_edition_at', todayStartISO)
+          .order('score', { ascending: false, nullsFirst: false })
           .limit(dailyCap),
         supabase
           .from('scoring_runs')
@@ -86,6 +93,23 @@ export default async function FeedPage() {
 
       articles = articlesResult.data ?? []
       lastRefreshAt = lastRunResult.data?.completed_at ?? null
+
+      // Bannière retour d'absence : lecture via service role (auth.users)
+      const serviceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+      if (serviceUrl && serviceKey) {
+        try {
+          const adminClient = createServiceClient(serviceUrl, serviceKey)
+          const { data: adminUser } = await adminClient.auth.admin.getUserById(user.id)
+          const lastSignIn = adminUser?.user?.last_sign_in_at
+          if (lastSignIn) {
+            const diffMs = Date.now() - new Date(lastSignIn).getTime()
+            daysSinceLastLogin = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+          }
+        } catch {
+          // Non bloquant
+        }
+      }
 
       // Section "Tous vos mots-cles" : items des 48h matchant un keyword de l'user
       // et qui ne sont pas dans le feed (NOT EXISTS articles, cote RPC).
@@ -148,11 +172,11 @@ export default async function FeedPage() {
 
   return (
     <div className="max-w-[720px] lg:max-w-[1160px] mx-auto px-4 py-3 md:py-10 w-full">
-      <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} hasLightHarvest={hasLightHarvest} />
+      <FeedHeader lastRefreshAt={lastRefreshAt} topInterests={topInterests} hasLightHarvest={hasLightHarvest} daysSinceLastLogin={daysSinceLastLogin} />
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
       <DismissProvider>
-        <FeedShell className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2">
+        <FeedShell className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2" articleStatuses={articles.map((a) => a.status)}>
           {articles.length === 0 ? (
             <div className="lg:col-span-2">
               <EmptyFeed />
@@ -178,6 +202,7 @@ export default async function FeedPage() {
                   ogImageUrl={a.og_image_url}
                   isRead={a.status === 'read'}
                   subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
+                  carryOverCount={a.carry_over_count}
                 />
               ))}
 
@@ -214,6 +239,7 @@ export default async function FeedPage() {
                   ogImageUrl={a.og_image_url}
                   isRead={a.status === 'read'}
                   subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
+                  carryOverCount={a.carry_over_count}
                 />
               ))}
             </>

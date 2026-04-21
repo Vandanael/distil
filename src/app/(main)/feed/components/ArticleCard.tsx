@@ -31,6 +31,7 @@ type Props = {
   isRead?: boolean
   staggerIndex?: number
   subScores?: { q1: number | null; q2: number | null; q3: number | null } | null
+  carryOverCount?: number
 }
 
 function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
@@ -46,6 +47,19 @@ function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string
   if (diffD === 1) return isFr ? 'hier' : 'yesterday'
   if (diffD < 7) return isFr ? `il y a ${diffD}j` : `${diffD}d ago`
   return date.toLocaleDateString(isFr ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' })
+}
+
+function formatCarryOverBadge(scoredAt: string | null, locale: 'fr' | 'en'): string {
+  if (!scoredAt) return locale === 'fr' ? 'Hier' : 'Yesterday'
+  const date = new Date(scoredAt)
+  if (isNaN(date.getTime())) return locale === 'fr' ? 'Hier' : 'Yesterday'
+  const diffMs = Date.now() - date.getTime()
+  const diffD = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  const isFr = locale === 'fr'
+  if (diffD <= 1) return isFr ? 'Hier' : 'Yesterday'
+  return isFr
+    ? `De ${date.toLocaleDateString('fr-FR', { weekday: 'long' })}`
+    : `From ${date.toLocaleDateString('en-GB', { weekday: 'long' })}`
 }
 
 function formatPublishedDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
@@ -84,6 +98,7 @@ export function ArticleCard({
   isRead = false,
   staggerIndex = 0,
   subScores = null,
+  carryOverCount = 0,
 }: Props) {
   const { locale, t } = useLocale()
   const { dismissedIds } = useDismissContext()
@@ -94,6 +109,7 @@ export function ArticleCard({
   const [isDismissing, startDismissTransition] = useTransition()
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
+  const carryOverLabel = carryOverCount >= 1 ? formatCarryOverBadge(scoredAt, locale) : null
   const retrievedRelative = formatRelativeDate(scoredAt, locale)
   const publishedLabel = formatPublishedDate(publishedAt, locale)
   const retrievedLabel = retrievedRelative
@@ -332,6 +348,14 @@ export function ArticleCard({
               title="Contenu non accessible - article probablement derriere un paywall"
             >
               · Paywall
+            </span>
+          )}
+          {carryOverLabel && (
+            <span
+              className="whitespace-nowrap font-ui text-muted-foreground/60"
+              data-testid={`carry-over-badge-${id}`}
+            >
+              · {carryOverLabel}
             </span>
           )}
         </div>

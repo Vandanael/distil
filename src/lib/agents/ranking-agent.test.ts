@@ -5,6 +5,7 @@ import {
   applyCosineGuard,
   injectReservedKeywordSlots,
   composeEdition,
+  integrateCarryOvers,
   MAX_ESSENTIAL_DISTANCE,
   HIGH_RELEVANCE_Q1,
   RESERVED_KEYWORD_SLOTS,
@@ -335,6 +336,12 @@ describe('composeEdition', () => {
     expect(repecheItems.every((r) => r.belowNormalThreshold)).toBe(true)
   })
 
+  it('retourne au moins minCount items meme avec peu de qualifying', () => {
+    const essential = makeItems(['e1'], 8)
+    const out = composeEdition(essential, [], [])
+    expect(out.essential.length + out.surprise.length).toBeGreaterThanOrEqual(1)
+  })
+
   it('retourne au plus maxCount items', () => {
     const essential = makeItems(['e1','e2','e3','e4','e5','e6','e7','e8','e9','e10'], 9)
     const surprise = makeItems(['s1','s2','s3','s4','s5'], 7)
@@ -348,5 +355,44 @@ describe('composeEdition', () => {
     const out = composeEdition(essential, surprise, [])
     expect(out.essential.every((r) => r.bucket === 'essential')).toBe(true)
     expect(out.surprise.every((r) => r.bucket === 'surprise')).toBe(true)
+  })
+})
+
+describe('integrateCarryOvers', () => {
+  function rankedQ1(itemId: string, q1: number, bucket: 'essential' | 'surprise' = 'essential'): RankedItem {
+    return { itemId, q1, q2: 5, q3: 5, justification: '', bucket, rank: 1 }
+  }
+
+  it('retire les N items les moins scores pour laisser la place aux carry-overs', () => {
+    const essential = [rankedQ1('e1', 8), rankedQ1('e2', 7), rankedQ1('e3', 6), rankedQ1('e4', 9)]
+    const surprise = [rankedQ1('s1', 6, 'surprise'), rankedQ1('s2', 7, 'surprise')]
+    const out = integrateCarryOvers(essential, surprise, 2)
+    const total = out.essential.length + out.surprise.length
+    expect(total).toBe(essential.length + surprise.length - 2)
+    // Les 2 plus faibles (q1=6) doivent etre retires
+    const allIds = [...out.essential, ...out.surprise].map((r) => r.itemId)
+    expect(allIds).not.toContain('e3')
+    expect(allIds).not.toContain('s1')
+  })
+
+  it('0 carry-overs = aucun changement', () => {
+    const essential = [rankedQ1('e1', 8), rankedQ1('e2', 7)]
+    const surprise = [rankedQ1('s1', 6, 'surprise')]
+    const out = integrateCarryOvers(essential, surprise, 0)
+    expect(out.essential).toEqual(essential)
+    expect(out.surprise).toEqual(surprise)
+  })
+
+  it('re-ranke les items restants depuis 1', () => {
+    const essential = [rankedQ1('e1', 9), rankedQ1('e2', 7), rankedQ1('e3', 6)]
+    const out = integrateCarryOvers(essential, [], 1)
+    expect(out.essential.map((r) => r.rank)).toEqual([1, 2])
+  })
+
+  it('avec 10 candidats du jour + 2 carry-overs : edition reduite de 2', () => {
+    const essential = Array.from({ length: 6 }, (_, i) => rankedQ1(`e${i}`, 8 - i))
+    const surprise = Array.from({ length: 2 }, (_, i) => rankedQ1(`s${i}`, 7, 'surprise'))
+    const out = integrateCarryOvers(essential, surprise, 2)
+    expect(out.essential.length + out.surprise.length).toBe(6)
   })
 })

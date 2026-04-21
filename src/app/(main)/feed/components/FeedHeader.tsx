@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -10,12 +10,31 @@ type Props = {
   lastRefreshAt: string | null
   topInterests: string[]
   hasLightHarvest?: boolean
+  daysSinceLastLogin?: number
 }
 
-export function FeedHeader({ lastRefreshAt, topInterests, hasLightHarvest }: Props) {
+export function FeedHeader({ lastRefreshAt, topInterests, hasLightHarvest, daysSinceLastLogin }: Props) {
   const { locale, t } = useLocale()
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [absenceBannerDismissed, setAbsenceBannerDismissed] = useState(true)
+
+  const absenceBannerKey = `distil_absence_banner_dismissed_${new Date().toISOString().slice(0, 10)}`
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setAbsenceBannerDismissed(!!window.localStorage.getItem(absenceBannerKey))
+    }
+  }, [absenceBannerKey])
+
+  function dismissAbsenceBanner() {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(absenceBannerKey, 'true')
+    }
+    setAbsenceBannerDismissed(true)
+  }
+
+  const showAbsenceBanner = (daysSinceLastLogin ?? 0) > 3 && !absenceBannerDismissed
 
   function formatRefreshAge(isoDate: string): { label: string; isStale: boolean } {
     const diffMs = Date.now() - new Date(isoDate).getTime()
@@ -60,6 +79,25 @@ export function FeedHeader({ lastRefreshAt, topInterests, hasLightHarvest }: Pro
 
   return (
     <header className="mb-6 mt-2">
+      {showAbsenceBanner && (
+        <div
+          data-testid="absence-banner"
+          className="flex items-start justify-between gap-3 mb-3 px-3 py-2 bg-muted rounded-sm"
+        >
+          <p className="font-ui text-sm text-muted-foreground">{t.feed.absenceBanner}</p>
+          <button
+            type="button"
+            onClick={dismissAbsenceBanner}
+            aria-label={locale === 'fr' ? 'Fermer' : 'Dismiss'}
+            className="shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
       {hasLightHarvest && (
         <p className="mb-3 text-sm text-muted-foreground font-ui">{t.feed.lightHarvest}</p>
       )}

@@ -11,11 +11,23 @@ import { useDismissContext } from './DismissContext'
 type Props = {
   className?: string
   children: React.ReactNode
+  articleStatuses?: string[]
 }
 
-export function FeedShell({ className, children }: Props) {
+export function FeedShell({ className, children, articleStatuses }: Props) {
   const router = useRouter()
   const { locale, t } = useLocale()
+
+  const isEditionComplete =
+    articleStatuses !== undefined &&
+    articleStatuses.length > 0 &&
+    articleStatuses.every((s) => s !== 'pending')
+
+  const today = new Date()
+  const dateStr =
+    locale === 'fr'
+      ? today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+      : today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
   const { dismissById, undoById } = useDismissContext()
   const timerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
@@ -94,6 +106,14 @@ export function FeedShell({ className, children }: Props) {
       >
         ↑↓ naviguer · Enter ouvrir · d/← pas intéressé · → à lire
       </p>
+      {isEditionComplete && (
+        <p
+          data-testid="edition-complete"
+          className="font-serif text-base text-muted-foreground text-center py-8 lg:col-span-2"
+        >
+          {t.feed.editionCompletePrefix} {dateStr} {t.feed.editionCompleteSuffix}
+        </p>
+      )}
     </div>
   )
 }
