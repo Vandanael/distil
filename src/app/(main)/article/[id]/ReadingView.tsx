@@ -1,9 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { markAsRead } from '@/app/(main)/actions'
+import { addToRead } from './actions'
 import { useLocale } from '@/lib/i18n/context'
+import { useScrollEndDetection } from '@/lib/hooks/useScrollEndDetection'
 import { HighlightPopover } from './components/HighlightPopover'
 import { FloatingActionBar } from './components/FloatingActionBar'
 import { ReadingProgress } from './components/ReadingProgress'
@@ -17,8 +20,10 @@ type Props = {
   siteName: string | null
   publishedAt: string | null
   contentHtml: string
+  truncated: boolean
   readingTimeMinutes: number | null
   url: string
+  returnTo: '/feed' | '/library'
 }
 
 function extractDomain(url: string): string {
@@ -36,19 +41,26 @@ export function ReadingView({
   siteName,
   publishedAt,
   contentHtml,
+  truncated,
   readingTimeMinutes,
   url,
+  returnTo,
 }: Props) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [pendingHighlight, setPendingHighlight] = useState<{ id: string; text: string } | null>(
     null
   )
+  const [isMarking, startMarking] = useTransition()
+  const [isAdding, startAdding] = useTransition()
+  const [added, setAdded] = useState(false)
   const isOnline = useOnlineStatus()
-  const { locale } = useLocale()
+  const { locale, t } = useLocale()
+  const router = useRouter()
 
-  useEffect(() => {
-    markAsRead(id)
-  }, [id])
+  // Scroll-end 85% : passe l'article en read sans bloquer l'UI, sans redirect.
+  useScrollEndDetection(contentRef, () => {
+    void markAsRead(id)
+  })
 
   // Forcer target="_blank" sur tous les liens du contenu article (DOMPurify strip l'attribut sur les anciens articles)
   useEffect(() => {
@@ -87,6 +99,23 @@ export function ReadingView({
       })
     : null
 
+  const sourceLabel = siteName ?? extractDomain(url)
+
+  function handleMarkRead() {
+    startMarking(async () => {
+      await markAsRead(id)
+      router.push(returnTo)
+    })
+  }
+
+  function handleAddToRead() {
+    if (added) return
+    startAdding(async () => {
+      await addToRead(id)
+      setAdded(true)
+    })
+  }
+
   return (
     <>
       <ReadingProgress />
@@ -106,12 +135,18 @@ export function ReadingView({
           <div className="hidden md:block pt-1">
             <div className="sticky top-20 space-y-3">
               <Link
-                href="/feed"
-                aria-label="Retour au feed"
+                href={returnTo}
+                aria-label="Retour"
                 className="block font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
                 data-testid="back-to-feed"
               >
-                Retour au Feed
+                {returnTo === '/library'
+                  ? locale === 'fr'
+                    ? 'Retour à À lire'
+                    : 'Back to To read'
+                  : locale === 'fr'
+                    ? 'Retour au Feed'
+                    : 'Back to Feed'}
               </Link>
               <SaveOfflineButton articleId={id} />
             </div>
@@ -121,11 +156,17 @@ export function ReadingView({
           <div className="space-y-10">
             {/* Back link mobile only */}
             <Link
-              href="/feed"
+              href={returnTo}
               className="md:hidden font-ui text-sm text-muted-foreground transition-colors hover:text-accent"
               data-testid="back-to-feed-mobile"
             >
-              Retour au Feed
+              {returnTo === '/library'
+                ? locale === 'fr'
+                  ? 'Retour à À lire'
+                  : 'Back to To read'
+                : locale === 'fr'
+                  ? 'Retour au Feed'
+                  : 'Back to Feed'}
             </Link>
 
             {/* En-tete article */}
@@ -139,7 +180,7 @@ export function ReadingView({
                   data-testid="source-link"
                   title={locale === 'fr' ? "Ouvrir l'original" : 'Open original'}
                 >
-                  {siteName ?? extractDomain(url)}
+                  {sourceLabel}
                   <svg
                     width="12"
                     height="12"
@@ -203,7 +244,7 @@ export function ReadingView({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 font-ui text-sm text-accent hover:underline"
                 >
-                  Lire sur {siteName ?? extractDomain(url)}
+                  Lire sur {sourceLabel}
                   <svg
                     width="12"
                     height="12"
@@ -221,6 +262,70 @@ export function ReadingView({
                 </a>
               </div>
             )}
+
+            {/* Encart "Extrait - lire sur source" : uniquement si le contenu a ete tronque */}
+            {truncated && contentHtml && (
+              <div
+                data-testid="extract-cta"
+                className="border-t border-border pt-8 space-y-4"
+              >
+                <p className="font-ui text-sm text-muted-foreground">
+                  {t.reading.extractLabel} <span className="text-foreground">{sourceLabel}</span>
+                </p>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="read-on-source"
+                  className="inline-flex items-center gap-2 font-ui text-[15px] font-medium bg-accent text-background px-5 py-3 hover:bg-foreground transition-colors"
+                >
+                  {locale === 'fr' ? 'Lire sur' : 'Read on'} {sourceLabel}
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </div>
+            )}
+
+            {/* Actions fin d'article : "Lu" primaire, "Ajouter a A lire" secondaire (si tronque) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleMarkRead}
+                disabled={isMarking}
+                data-testid="mark-read"
+                className="inline-flex items-center justify-center font-ui text-[15px] uppercase tracking-[0.08em] bg-foreground text-background px-6 py-3 hover:bg-accent focus-visible:bg-accent transition-colors disabled:opacity-60"
+              >
+                {t.reading.markRead}
+              </button>
+              {truncated && (
+                <button
+                  type="button"
+                  onClick={handleAddToRead}
+                  disabled={isAdding || added}
+                  data-testid="add-to-read-inline"
+                  className="inline-flex items-center justify-center font-ui text-[15px] text-accent px-6 py-3 border border-border hover:text-foreground hover:border-foreground transition-colors disabled:opacity-60"
+                >
+                  {added
+                    ? locale === 'fr'
+                      ? 'Ajouté'
+                      : 'Added'
+                    : t.reading.addToRead}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

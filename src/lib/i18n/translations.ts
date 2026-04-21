@@ -85,6 +85,11 @@ export const translations = {
       removeTitle: 'Retirer de À lire',
       addedPrefix: 'Ajouté',
     },
+    reading: {
+      extractLabel: "Extrait - lire l'article complet sur",
+      markRead: 'Lu',
+      addToRead: 'Ajouter à À lire',
+    },
     theme: {
       toDark: 'Passer en mode sombre',
       toLight: 'Passer en mode clair',
@@ -170,6 +175,11 @@ export const translations = {
       removeToast: 'Removed from To read',
       removeTitle: 'Remove from To read',
       addedPrefix: 'Added',
+    },
+    reading: {
+      extractLabel: 'Excerpt - read the full article on',
+      markRead: 'Done',
+      addToRead: 'Add to To read',
     },
     theme: {
       toDark: 'Switch to dark mode',

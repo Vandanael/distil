@@ -1,10 +1,24 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { truncateToExtract } from '@/lib/parsing/extract'
 import { ReadingView } from './ReadingView'
 
 type Props = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ from?: string }>
+}
+
+function readExtractConfig(): { ratio: number; minWords: number } {
+  const ratioRaw = Number(process.env.ARTICLE_EXTRACT_RATIO)
+  const minRaw = Number(process.env.ARTICLE_EXTRACT_MIN_WORDS)
+  const ratio = Number.isFinite(ratioRaw) && ratioRaw > 0 ? ratioRaw : 0.3
+  const minWords = Number.isFinite(minRaw) && minRaw >= 0 ? minRaw : 150
+  return { ratio, minWords }
+}
+
+function resolveReturnTo(from: string | undefined): '/feed' | '/library' {
+  return from === 'library' ? '/library' : '/feed'
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -32,8 +46,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function ArticlePage({ params }: Props) {
+export default async function ArticlePage({ params, searchParams }: Props) {
   const { id } = await params
+  const { from } = await searchParams
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return (
@@ -61,6 +76,9 @@ export default async function ArticlePage({ params }: Props) {
 
   if (!article) notFound()
 
+  const { ratio, minWords } = readExtractConfig()
+  const extract = truncateToExtract(article.content_html ?? '', ratio, minWords)
+
   return (
     <ReadingView
       id={article.id}
@@ -68,9 +86,11 @@ export default async function ArticlePage({ params }: Props) {
       author={article.author}
       siteName={article.site_name}
       publishedAt={article.published_at}
-      contentHtml={article.content_html ?? ''}
+      contentHtml={extract.html}
+      truncated={extract.truncated}
       readingTimeMinutes={article.reading_time_minutes}
       url={article.url}
+      returnTo={resolveReturnTo(from)}
     />
   )
 }

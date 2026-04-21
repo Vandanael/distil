@@ -287,7 +287,7 @@ export function ArticleCard({
       >
         {/* Lien plein-carte (pattern stretched link) : clic n'importe ou sauf boutons actions (z-10) */}
         <Link
-          href={`/article/${id}`}
+          href={`/article/${id}?from=feed`}
           className="absolute inset-0 z-0 rounded-sm focus:outline-none"
           aria-label={title ?? 'Sans titre'}
           data-testid={`article-card-link-${id}`}

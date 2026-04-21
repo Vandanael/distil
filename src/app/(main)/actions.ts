@@ -35,4 +35,5 @@ export async function markAsRead(articleId: string): Promise<void> {
     .neq('status', 'not_interested') // ne pas ecraser un rejet explicite
 
   revalidatePath('/feed')
+  revalidatePath('/library')
 }

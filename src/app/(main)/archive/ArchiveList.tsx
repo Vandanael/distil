@@ -125,7 +125,7 @@ export function ArchiveList({ articles }: Props) {
           data-testid={`archive-card-${a.id}`}
         >
           <Link
-            href={`/article/${a.id}`}
+            href={`/article/${a.id}?from=library`}
             className="block space-y-2 pr-12"
             data-testid={`archive-card-link-${a.id}`}
           >
