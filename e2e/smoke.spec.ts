@@ -8,7 +8,7 @@ test('la page login charge avec OAuth Google et formulaire magic link', async ({
   // Formulaire magic link present (PR-13 : ajout du flow email comme alternative a Google OAuth)
   await expect(page.getByPlaceholder('vous@exemple.com')).toBeVisible()
   await expect(page.getByRole('button', { name: /envoyer le lien/i })).toBeVisible()
-  const back = page.getByRole('link', { name: /accueil/i })
+  const back = page.locator('header').getByRole('link', { name: /accueil/i })
   await expect(back).toBeVisible()
   await expect(back).toHaveAttribute('href', '/')
 })
