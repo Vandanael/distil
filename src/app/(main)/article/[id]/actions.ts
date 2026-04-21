@@ -93,6 +93,7 @@ export async function markNotInterested(
     await logError({ route: 'markNotInterested', error: dismissError, userId: user.id })
 
   revalidatePath('/feed')
+  revalidatePath('/library')
 }
 
 // Retire un article de la liste "A lire" : remet en status 'pending' neutre
@@ -114,6 +115,7 @@ export async function removeFromToRead(articleId: string): Promise<void> {
   if (error) await logError({ route: 'removeFromToRead', error, userId: user.id })
 
   revalidatePath('/library')
+  revalidatePath('/feed')
 }
 
 export async function addTag(articleId: string, tagName: string): Promise<void> {
