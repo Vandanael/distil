@@ -550,6 +550,12 @@ async function persistRanking(
       await supabase.from('articles').insert(articleRow)
     })
   )
+
+  // Efface first_edition_empty si l'édition est non vide.
+  // Déclenché par le cron quotidien pour les users dont la première édition était vide.
+  if (allRanked.length > 0) {
+    await supabase.from('profiles').update({ first_edition_empty: false }).eq('id', userId)
+  }
 }
 
 export async function rankForUser(supabase: ServiceClient, userId: string): Promise<RankingResult> {
