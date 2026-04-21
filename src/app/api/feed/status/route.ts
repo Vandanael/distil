@@ -21,11 +21,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ count: 0 }, { status: 401 })
   }
 
+  const now = new Date()
+  const todayStart = new Date(now)
+  todayStart.setHours(0, 0, 0, 0)
+  const todayStartISO = todayStart.toISOString()
+
   const { count } = await supabase
     .from('articles')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'pending')
+    .in('status', ['pending', 'read'])
+    .gte('last_shown_in_edition_at', todayStartISO)
 
   return NextResponse.json({ count: count ?? 0 }, { headers: { 'Cache-Control': 'no-store' } })
 }
