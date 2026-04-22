@@ -60,12 +60,13 @@ export default async function FeedPage() {
     if (user) {
       const profileResult = await supabase
         .from('profiles')
-        .select('daily_cap, interests, first_edition_empty')
+        .select('daily_cap, interests, display_interests, first_edition_empty')
         .eq('id', user.id)
         .single()
 
       const dailyCap = profileResult.data?.daily_cap ?? 10
-      interests = profileResult.data?.interests ?? []
+      const rawInterests: string[] = profileResult.data?.display_interests ?? profileResult.data?.interests ?? []
+      interests = rawInterests
       firstEditionEmpty = profileResult.data?.first_edition_empty ?? false
 
       const now = new Date()
