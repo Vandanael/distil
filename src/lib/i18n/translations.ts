@@ -152,6 +152,26 @@ export const translations = {
       discoveryOn: 'Articles variés, environ 1/3 de découverte chaque jour',
       discoveryOff: 'Priorité totale à vos flux, découverte uniquement si nécessaire',
     },
+    about: {
+      methodTitle: 'La méthode.',
+      methodLede:
+        "Chaque nuit, Distil prépare votre édition du lendemain à partir des articles publiés par vos sources.",
+      methodStep1Title: '1. Collecte.',
+      methodStep1Text:
+        'Distil récupère les articles publiés dans les 48 dernières heures par vos sources, et par un second pool utilisé pour la part découverte.',
+      methodStep2Title: '2. Pré-filtre.',
+      methodStep2Text:
+        "Un premier passage écarte les contenus trop courts, déjà vus, ou trop éloignés de votre profil.",
+      methodStep3Title: "3. Lecture par l’IA.",
+      methodStep3Text:
+        "Chaque article restant est lu par un modèle de langage qui évalue sa pertinence et rédige une justification courte, consultable.",
+      methodStep4Title: '4. Composition.',
+      methodStep4Text:
+        "L’édition contient 5 à 8 articles. Trois quarts proches de votre profil, un quart en découverte. Si la moisson est maigre, le seuil baisse et une bannière vous le signale.",
+      methodStep5Title: '5. Report.',
+      methodStep5Text:
+        "Les articles non lus les mieux notés peuvent remonter le lendemain, une seule fois. Rien ne s’accumule en silence.",
+    },
     onboarding: {
       kicker: 'Bienvenue dans Distil',
       title: 'Votre veille en deux minutes',
@@ -326,6 +346,26 @@ export const translations = {
         'Distil actively searches for relevant articles beyond your RSS feeds.',
       discoveryOn: 'Varied articles, around 1/3 discovery each day',
       discoveryOff: 'Full priority to your feeds, discovery only if needed',
+    },
+    about: {
+      methodTitle: 'How it works.',
+      methodLede:
+        'Every night, Distil prepares your next edition from the articles published by your sources.',
+      methodStep1Title: '1. Collection.',
+      methodStep1Text:
+        'Distil pulls articles published in the last 48 hours from your sources, and from a second pool used for the discovery share.',
+      methodStep2Title: '2. Pre-filter.',
+      methodStep2Text:
+        'A first pass drops items that are too short, already seen, or too far from your profile.',
+      methodStep3Title: '3. AI reading.',
+      methodStep3Text:
+        'Each remaining article is read by a language model that scores its relevance and writes a short justification, available on request.',
+      methodStep4Title: '4. Composition.',
+      methodStep4Text:
+        'Each edition contains 5 to 8 articles. Three quarters close to your profile, one quarter discovery. If the pool is thin, the threshold lowers and a banner tells you.',
+      methodStep5Title: '5. Carry-over.',
+      methodStep5Text:
+        'Unread top-scoring articles can roll over to the next day, once. Nothing accumulates silently.',
     },
     onboarding: {
       kicker: 'Welcome to Distil',

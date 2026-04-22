@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { PublicFooter } from '@/components/PublicFooter'
 import { PublicHeader } from '@/components/PublicHeader'
 import { BrandGlyph } from '@/components/BrandGlyph'
+import { AboutMethodSection } from '@/components/AboutMethodSection'
 
 const ABOUT_DESCRIPTION =
   'Distil est une veille intelligente et un read-later personnel. Curation IA transparente, diversite editoriale by design.'
@@ -91,32 +92,8 @@ export default function AboutPage() {
           </ul>
         </section>
 
-        {/* Méthode : schéma des 4 actions */}
-        <section className="mb-14 md:mb-16 border-t border-border pt-8 md:pt-10">
-          <h2 className="font-display text-4xl md:text-5xl text-foreground leading-[0.95] tracking-[-0.01em] mb-4 md:mb-6 text-balance">
-            La méthode.
-          </h2>
-          <p className="font-body text-[16px] text-muted-foreground leading-[1.6] mb-8 text-pretty">
-            Chaque article peut recevoir quatre actions distinctes. Deux signalent votre intérêt à
-            l&apos;algorithme. Deux organisent votre lecture.
-          </p>
-          <figure className="overflow-x-auto">
-            <pre className="font-mono text-[13px] md:text-[14px] leading-[1.75] text-foreground bg-[color-mix(in_oklab,var(--color-foreground)_5%,transparent)] px-5 py-6 border border-border whitespace-pre">
-              {`[Feed du jour]
-    │
-    ├── Plus comme ça ───→  signal algo · reste dans le feed
-    ├── Pas intéressé ───→  signal algo · disparaît (3s pour annuler)
-    ├── À lire ──────────→  pile [À lire]
-    └── Ouvre l'article ─→  [Mode lecture]
-                                 │
-                                 ├── Lu ───────→  état final
-                                 └── À lire ──→  pile [À lire]`}
-            </pre>
-            <figcaption className="mt-3 font-mono text-sm uppercase tracking-[0.18em] text-muted-foreground">
-              Flux complet des actions utilisateur.
-            </figcaption>
-          </figure>
-        </section>
+        {/* Méthode */}
+        <AboutMethodSection />
 
         {/* Fondations */}
         <section
