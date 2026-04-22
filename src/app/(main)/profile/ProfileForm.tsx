@@ -15,6 +15,7 @@ import { DiscoveryToggle } from './DiscoveryToggle'
 type ProfileData = {
   profile_text: string | null
   interests: string[]
+  display_interests: string[]
   pinned_sources: string[]
   language?: 'fr' | 'en' | 'both'
   discovery_mode: 'active' | 'sources_first'
@@ -29,7 +30,7 @@ export function ProfileForm({ profile }: Props) {
   const { t } = useLocale()
   const [sources, setSources] = useState<string[]>(profile.pinned_sources)
   const [profileText, setProfileText] = useState(profile.profile_text ?? '')
-  const [keywords, setKeywords] = useState<string[]>(profile.interests)
+  const [keywords, setKeywords] = useState<string[]>(profile.display_interests.length > 0 ? profile.display_interests : profile.interests)
   const [language, setLanguage] = useState<'fr' | 'en' | 'both'>(profile.language ?? 'both')
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -54,12 +55,23 @@ export function ProfileForm({ profile }: Props) {
     setSaveError(null)
     setSourcesSavedHint(false)
     const sourcesChanged = sources.join(',') !== profile.pinned_sources.join(',')
-    const normalizedKeywords = Array.from(new Set(keywords.map(normalizeKeyword).filter(Boolean)))
+    // Deduplication : on garde la premiere forme brute saisie pour chaque keyword normalise.
+    const seen = new Set<string>()
+    const displayInterests: string[] = []
+    const normalizedInterests: string[] = []
+    for (const kw of keywords) {
+      const norm = normalizeKeyword(kw)
+      if (!norm || seen.has(norm)) continue
+      seen.add(norm)
+      displayInterests.push(kw.trim())
+      normalizedInterests.push(norm)
+    }
     startTransition(async () => {
       try {
         await updateProfile({
           profile_text: profileText || undefined,
-          interests: normalizedKeywords,
+          interests: normalizedInterests,
+          display_interests: displayInterests,
           pinned_sources: sources,
           language,
         })

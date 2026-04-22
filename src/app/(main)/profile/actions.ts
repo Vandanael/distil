@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation'
 export type ProfileUpdate = {
   profile_text?: string
   interests?: string[]
+  display_interests?: string[]
   pinned_sources?: string[]
   daily_cap?: number
   serendipity_quota?: number

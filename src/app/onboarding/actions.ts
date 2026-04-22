@@ -12,6 +12,7 @@ export type ProfileInput = {
   method: 'express' | 'wizard'
   profile_text?: string
   interests?: string[]
+  display_interests?: string[]
   pinned_sources?: string[]
   daily_cap?: number
   serendipity_quota?: number
@@ -128,6 +129,7 @@ export async function createProfile(input: ProfileInput) {
     id: user.id,
     profile_text: input.profile_text ?? null,
     interests: input.interests ?? [],
+    display_interests: input.display_interests ?? input.interests ?? [],
     pinned_sources: input.pinned_sources ?? [],
     daily_cap: input.daily_cap ?? 10,
     serendipity_quota: input.serendipity_quota ?? 0.15,

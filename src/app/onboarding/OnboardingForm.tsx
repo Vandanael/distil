@@ -56,30 +56,42 @@ export function OnboardingForm() {
 
   function toggleSuggestion(tag: string) {
     const normalized = normalizeKeyword(tag)
-    if (keywords.includes(normalized)) {
-      setKeywords(keywords.filter((k) => k !== normalized))
+    const existingIndex = keywords.findIndex((k) => normalizeKeyword(k) === normalized)
+    if (existingIndex >= 0) {
+      setKeywords(keywords.filter((_, i) => i !== existingIndex))
     } else {
-      setKeywords([...keywords, normalized])
+      setKeywords([...keywords, tag])
     }
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const normalized = Array.from(new Set(keywords.map(normalizeKeyword).filter(Boolean)))
+    // Deduplication : on garde la premiere forme brute saisie pour chaque keyword normalise.
+    const seen = new Set<string>()
+    const displayInterests: string[] = []
+    const normalizedInterests: string[] = []
+    for (const kw of keywords) {
+      const norm = normalizeKeyword(kw)
+      if (!norm || seen.has(norm)) continue
+      seen.add(norm)
+      displayInterests.push(kw.trim())
+      normalizedInterests.push(norm)
+    }
     // Compose profile_text depuis les tags si l'utilisateur n'a rien saisi,
-    // pour que le générateur d'embedding ait une base minimale.
+    // pour que le generateur d'embedding ait une base minimale.
     const composedText =
       profileText.trim().length > 0
         ? profileText.trim()
-        : normalized.length > 0
-          ? normalized.join(', ')
+        : normalizedInterests.length > 0
+          ? normalizedInterests.join(', ')
           : undefined
 
     startTransition(async () => {
       await createProfile({
         method: 'express',
         profile_text: composedText,
-        interests: normalized,
+        interests: normalizedInterests,
+        display_interests: displayInterests,
         pinned_sources: sources,
         language,
       })
@@ -168,7 +180,7 @@ export function OnboardingForm() {
               </span>
               <div className="flex flex-wrap gap-2" data-testid="suggestions">
                 {MAINSTREAM_INTERESTS.map((theme) => {
-                  const active = keywords.includes(normalizeKeyword(theme))
+                  const active = keywords.some((k) => normalizeKeyword(k) === normalizeKeyword(theme))
                   return (
                     <button
                       key={theme}
