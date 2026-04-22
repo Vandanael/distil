@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { generateProfileEmbedding } from '@/lib/embeddings/profile-embedding'
 import { logError } from '@/lib/errors/log-error'
 import { revalidatePath } from 'next/cache'
@@ -149,5 +149,22 @@ export async function updatePinnedSources(
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
+  redirect('/')
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Non authentifie')
+
+  const admin = await createServiceClient()
+  const { error } = await admin.auth.admin.deleteUser(user.id)
+  if (error) {
+    await logError({ route: 'profile.deleteAccount', error, userId: user.id })
+    throw new Error('Erreur lors de la suppression du compte.')
+  }
+
   redirect('/')
 }
