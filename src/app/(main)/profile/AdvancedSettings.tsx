@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { updateProfile } from './actions'
+import { deleteAccount, updateProfile } from './actions'
 
 async function runScoring(urls: string[]): Promise<{ accepted: number; rejected: number }> {
   const res = await fetch('/api/scoring/run', {
@@ -29,6 +29,8 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
   const [showScoringPanel, setShowScoringPanel] = useState(false)
   const [scoringUrls, setScoringUrls] = useState('')
   const [isScoringPending, startScoringTransition] = useTransition()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [isDeleting, startDeleteTransition] = useTransition()
 
   const selectClass =
     'h-10 w-full border border-input bg-background px-3 font-ui text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
@@ -163,6 +165,58 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
               {isScoringPending ? 'Analyse en cours...' : 'Analyser'}
             </Button>
           </div>
+        )}
+      </div>
+
+      <div className="border-t border-destructive/30 pt-6 space-y-3">
+        <p className="font-ui text-sm font-medium text-destructive">Zone dangereuse</p>
+        <p className="font-body text-sm text-muted-foreground">
+          Supprimer votre compte et toutes vos donnees. Cette action est irreversible.
+        </p>
+        {confirmDelete ? (
+          <div className="space-y-3 border border-destructive/30 p-4">
+            <p className="font-ui text-sm text-destructive">
+              Êtes-vous sûr ? Toutes vos données seront supprimées définitivement.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={isDeleting}
+                onClick={() => {
+                  startDeleteTransition(async () => {
+                    try {
+                      await deleteAccount()
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : 'Erreur lors de la suppression.')
+                      setConfirmDelete(false)
+                    }
+                  })
+                }}
+              >
+                {isDeleting ? 'Suppression...' : 'Confirmer la suppression'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isDeleting}
+                onClick={() => setConfirmDelete(false)}
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={() => setConfirmDelete(true)}
+          >
+            Supprimer mon compte
+          </Button>
         )}
       </div>
     </div>
