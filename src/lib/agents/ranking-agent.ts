@@ -374,6 +374,9 @@ async function loadUserProfile(
   discoveryMode: DiscoveryMode
   dailyCap: number
   coldStart: boolean
+  pinned: string[]
+  pinnedFeedIds: string[]
+  pinnedFeedNames: string[]
 }> {
   const [profileTextResult, profileResult] = await Promise.all([
     supabase
@@ -423,6 +426,28 @@ async function loadUserProfile(
   const coldStart =
     interestsList.length === 0 && pinned.length === 0 && !(p?.profile_text && p.profile_text.trim())
 
+  // Resolution pinned URLs -> feed IDs. Les pinned_sources sont des URLs de site
+  // (ex: https://www.nrf.fr), feeds.url sont des URLs de flux (ex: https://www.nrf.fr/feed/).
+  // On match en extrayant le host de chaque pinned URL et en cherchant les feeds
+  // dont l'URL contient ce host.
+  let pinnedFeedIds: string[] = []
+  let pinnedFeedNames: string[] = []
+  if (pinned.length > 0) {
+    const pinnedHosts = pinned.map((u) => {
+      try { return new URL(u).hostname.replace(/^www\./, '') } catch { return '' }
+    }).filter(Boolean)
+
+    if (pinnedHosts.length > 0) {
+      const { data: matchedFeeds } = await supabase
+        .from('feeds')
+        .select('id, site_name')
+        .or(pinnedHosts.map((h) => `url.ilike.%${h}%`).join(','))
+
+      pinnedFeedIds = (matchedFeeds ?? []).map((f) => f.id)
+      pinnedFeedNames = (matchedFeeds ?? []).map((f) => f.site_name).filter(Boolean) as string[]
+    }
+  }
+
   return {
     staticProfile: pt?.static_profile ?? null,
     longTermProfile: pt?.long_term_profile ?? null,
@@ -433,6 +458,9 @@ async function loadUserProfile(
     discoveryMode: (p?.discovery_mode as DiscoveryMode | null) ?? 'active',
     dailyCap: p?.daily_cap ?? 8,
     coldStart,
+    pinned,
+    pinnedFeedIds,
+    pinnedFeedNames,
   }
 }
 
@@ -699,7 +727,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
   }
 
   const [candidates, recentSignals, rssAvailable] = await Promise.all([
-    prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage, MIN_WORD_COUNT),
+    prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage, MIN_WORD_COUNT, profile.pinnedFeedIds),
     loadRecentSignals(supabase, userId),
     countRelevantRss(supabase, userId, profile.embedding),
   ])
@@ -743,7 +771,8 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       fallbackText: profile.fallbackText,
     },
     candidates,
-    recentSignals
+    recentSignals,
+    profile.pinnedFeedNames
   )
 
   let essential: RankedItem[] = []

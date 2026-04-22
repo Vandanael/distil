@@ -188,7 +188,8 @@ export function buildRankingUserPrompt(
     fallbackText: string | null
   },
   candidates: RankingCandidate[],
-  signals?: RecentSignals
+  signals?: RecentSignals,
+  pinnedFeedNames?: string[]
 ): string {
   const lines: string[] = ['PROFIL LECTEUR :']
 
@@ -203,6 +204,13 @@ export function buildRankingUserPrompt(
   }
   if (!profile.staticProfile && !profile.longTermProfile && profile.fallbackText) {
     lines.push(profile.fallbackText)
+  }
+
+  // Sources favorites : les feeds pins du lecteur. Le prefilter booste deja
+  // ces items dans le pool cosine ; ce bloc informe le LLM du signal.
+  if (pinnedFeedNames && pinnedFeedNames.length > 0) {
+    lines.push('')
+    lines.push(`SOURCES FAVORITES : ${pinnedFeedNames.join(', ')}`)
   }
 
   // Bloc signaux courts (ADR-012). Le profil reste la source principale,

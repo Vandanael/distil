@@ -12,6 +12,7 @@ const LOOKBACK_HOURS = 48
  * preferredLanguage biaise le pool cosine 90/10 vers la langue demandee ('fr' | 'en').
  * 'both' ou undefined desactive le biais (comportement historique).
  * minWordCount seuil minimum de mots pour le pool cosine (default: MIN_WORD_COUNT).
+ * pinnedFeedIds IDs des feeds pinned : boost de -0.1 sur la distance cosine.
  */
 export async function prefilterCandidates(
   supabase: ServiceClient,
@@ -19,7 +20,8 @@ export async function prefilterCandidates(
   profileEmbedding: number[],
   limit: number = DEFAULT_LIMIT,
   preferredLanguage?: 'fr' | 'en',
-  minWordCount: number = MIN_WORD_COUNT
+  minWordCount: number = MIN_WORD_COUNT,
+  pinnedFeedIds: string[] = []
 ): Promise<RankingCandidate[]> {
   const cutoff = new Date(Date.now() - LOOKBACK_HOURS * 60 * 60 * 1000).toISOString()
 
@@ -31,6 +33,7 @@ export async function prefilterCandidates(
     max_count: limit,
     preferred_language: preferredLanguage ?? null,
     min_word_count: minWordCount,
+    pinned_feed_ids: pinnedFeedIds.length > 0 ? pinnedFeedIds : [],
   })
 
   if (error || !data) {
