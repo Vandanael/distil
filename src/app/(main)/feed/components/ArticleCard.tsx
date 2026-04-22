@@ -121,9 +121,6 @@ export function ArticleCard({
     : null
   const isPaywall = wordCount === 0
   const tag: RelevanceTag | null = scoreToTag(score, isSerendipity)
-  // Seule "Decouverte" garde un label (categorie editoriale distincte). Pour les matchs,
-  // le score % et sa couleur encodent deja la force : le mot "Match" est redondant.
-  const tagLabel: string | null = tag === 'discovery' ? t.article.tagDiscovery : null
   const hasSubScores =
     subScores && (subScores.q1 !== null || subScores.q2 !== null || subScores.q3 !== null)
   // Les 3 premieres cartes sont potentiellement above-the-fold
@@ -362,9 +359,9 @@ export function ArticleCard({
           )}
           {sourceKind === 'agent' && (
             <span
-              className="whitespace-nowrap font-ui text-sm text-muted-foreground/70"
+              className="whitespace-nowrap font-ui text-sm text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity"
               data-testid={`discovery-badge-${id}`}
-              title={t.article.originAgentTitle}
+              title={t.article.originAgentTooltip}
             >
               · {t.article.originAgent}
             </span>
@@ -415,15 +412,9 @@ export function ArticleCard({
                   <span className="text-sm text-muted-foreground font-normal">%</span>
                 </span>
               )}
-              {tagLabel ? (
-                <span data-testid={`tag-${id}`} className="font-ui text-sm text-accent">
-                  {tagLabel}
-                </span>
-              ) : (
-                <span data-testid={`tag-${id}`} className="sr-only">
-                  {Math.round(score ?? 0)}%
-                </span>
-              )}
+              <span data-testid={`tag-${id}`} className="sr-only">
+                {Math.round(score ?? 0)}%
+              </span>
               {(justification || hasSubScores) && (
                 <button
                   type="button"
