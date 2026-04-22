@@ -43,4 +43,8 @@ export type RankingResult = {
   editionSize: number
   error: string | null
   durationMs: number
+  cosineP25: number | null
+  cosineP50: number | null
+  cosineP75: number | null
+  guardDowngrades: number
 }

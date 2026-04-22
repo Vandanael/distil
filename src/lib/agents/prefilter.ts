@@ -1,3 +1,4 @@
+import { MIN_WORD_COUNT } from '@/lib/ranking/weights'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { RankingCandidate } from './ranking-types'
 
@@ -10,13 +11,15 @@ const LOOKBACK_HOURS = 48
  *
  * preferredLanguage biaise le pool cosine 90/10 vers la langue demandee ('fr' | 'en').
  * 'both' ou undefined desactive le biais (comportement historique).
+ * minWordCount seuil minimum de mots pour le pool cosine (default: MIN_WORD_COUNT).
  */
 export async function prefilterCandidates(
   supabase: ServiceClient,
   userId: string,
   profileEmbedding: number[],
   limit: number = DEFAULT_LIMIT,
-  preferredLanguage?: 'fr' | 'en'
+  preferredLanguage?: 'fr' | 'en',
+  minWordCount: number = MIN_WORD_COUNT
 ): Promise<RankingCandidate[]> {
   const cutoff = new Date(Date.now() - LOOKBACK_HOURS * 60 * 60 * 1000).toISOString()
 
@@ -27,6 +30,7 @@ export async function prefilterCandidates(
     cutoff_time: cutoff,
     max_count: limit,
     preferred_language: preferredLanguage ?? null,
+    min_word_count: minWordCount,
   })
 
   if (error || !data) {

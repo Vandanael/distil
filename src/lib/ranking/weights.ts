@@ -20,6 +20,13 @@ export const RSS_POOL_TARGET_MULTIPLIER = 2
 // peser dans le denominateur du ratio.
 export const RSS_RELEVANCE_DISTANCE_MAX = 0.5
 
+// Seuil minimum de mots pour qu'un item entre dans le pool cosine du prefilter.
+// Anciennement 300 (eliminait 94.6% du pool RSS, mediane word_count = 41).
+// Abaisse a 100 : filtre les titres purs (< 50 mots) tout en capturant les
+// articles editoriaux courts (descriptions de feeds litteraires a 60-100 mots).
+// Parametrable via le RPC prefilter_ranking_candidates(min_word_count => N).
+export const MIN_WORD_COUNT = 100
+
 // Mode 'sources_first' : seuil Pipeline A (refresh) au-dessus duquel on skip
 // la decouverte agent du tout. N'intervient pas dans le calcul du ratio cote
 // ranker (qui utilise rssAvailable >= dailyCap directement).

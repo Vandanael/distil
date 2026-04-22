@@ -12,7 +12,7 @@ import { parseUrl } from '@/lib/parsing/readability'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { Database } from '@/lib/supabase/database.types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
-import { resolveRssRatio, RSS_RELEVANCE_DISTANCE_MAX, type DiscoveryMode } from '@/lib/ranking/weights'
+import { resolveRssRatio, RSS_RELEVANCE_DISTANCE_MAX, MIN_WORD_COUNT, type DiscoveryMode } from '@/lib/ranking/weights'
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 
@@ -119,7 +119,7 @@ export function applyCosineGuard(
   essential: LlmRankedItem[],
   surprise: LlmRankedItem[],
   candidates: RankingCandidate[]
-): { essential: LlmRankedItem[]; surprise: LlmRankedItem[] } {
+): { essential: LlmRankedItem[]; surprise: LlmRankedItem[]; guardDowngrades: number } {
   const distanceByItem = new Map(candidates.map((c) => [c.itemId, c.distance]))
   const isFarClaim = (item: LlmRankedItem) => {
     const distance = distanceByItem.get(item.item_id)
@@ -137,11 +137,13 @@ export function applyCosineGuard(
 
   // Items deja en surprise mais avec Q1 >= 7 et distance > seuil : drop (pas de
   // deuxieme chance, ils pretendent etre pertinents tout en etant loin du profil).
+  const droppedFromSurprise = surprise.filter((item) => isFarClaim(item))
   const keptSurprise = surprise.filter((item) => !isFarClaim(item))
 
   return {
     essential: keptEssential,
     surprise: [...keptSurprise, ...downgraded],
+    guardDowngrades: downgraded.length + droppedFromSurprise.length,
   }
 }
 
@@ -665,6 +667,10 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       editionSize: 0,
       error: "Deja classe aujourd'hui",
       durationMs: Date.now() - start,
+      cosineP25: null,
+      cosineP50: null,
+      cosineP75: null,
+      guardDowngrades: 0,
     }
   }
 
@@ -685,11 +691,15 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       editionSize: 0,
       error: "Pas d'embedding profil disponible",
       durationMs: Date.now() - start,
+      cosineP25: null,
+      cosineP50: null,
+      cosineP75: null,
+      guardDowngrades: 0,
     }
   }
 
   const [candidates, recentSignals, rssAvailable] = await Promise.all([
-    prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage),
+    prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage, MIN_WORD_COUNT),
     loadRecentSignals(supabase, userId),
     countRelevantRss(supabase, userId, profile.embedding),
   ])
@@ -718,6 +728,10 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       editionSize: 0,
       error: 'Aucun candidat disponible',
       durationMs: Date.now() - start,
+      cosineP25: null,
+      cosineP50: null,
+      cosineP75: null,
+      guardDowngrades: 0,
     }
   }
 
@@ -737,6 +751,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
   let fallback = false
   let modelUsed: string | null = null
   let rankError: string | null = null
+  let guardDowngrades = 0
 
   // Locale de la justification : 'en' si le lecteur a choisi l'anglais,
   // sinon francais (valeur par defaut, couvre 'fr' et 'both').
@@ -761,6 +776,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       llmResult.surprise ?? [],
       candidates
     )
+    guardDowngrades = guarded.guardDowngrades
 
     const composed = composeEdition(guarded.essential, guarded.surprise, candidates, { rssRatio })
     essential = composed.essential
@@ -815,6 +831,12 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
   const promotedIds = new Set([...essential, ...surprise].map((r) => r.itemId))
   const keywordHitsPromoted = [...keywordHitIds].filter((id) => promotedIds.has(id)).length
 
+  // Percentiles cosine sur les distances des candidats (telemetrie pour P0-2).
+  const sortedDistances = candidates.map((c) => c.distance).sort((a, b) => a - b)
+  const cosineP25 = sortedDistances.length > 0 ? sortedDistances[Math.floor(sortedDistances.length * 0.25)] ?? null : null
+  const cosineP50 = sortedDistances.length > 0 ? sortedDistances[Math.floor(sortedDistances.length * 0.5)] ?? null : null
+  const cosineP75 = sortedDistances.length > 0 ? sortedDistances[Math.floor(sortedDistances.length * 0.75)] ?? null : null
+
   return {
     userId,
     date: today,
@@ -829,6 +851,10 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
     editionSize: essential.length + surprise.length,
     error: rankError,
     durationMs: Date.now() - start,
+    cosineP25,
+    cosineP50,
+    cosineP75,
+    guardDowngrades: fallback ? 0 : guardDowngrades,
   }
 }
 
@@ -881,6 +907,10 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
           keyword_hits_count: r.keywordHitsCount,
           keyword_hits_promoted: r.keywordHitsPromoted,
           keyword_hits_force_injected: r.keywordHitsForceInjected,
+          cosine_p25: r.cosineP25,
+          cosine_p50: r.cosineP50,
+          cosine_p75: r.cosineP75,
+          guard_downgrades_count: r.guardDowngrades,
         }))
       )
       .then(({ error }) => {

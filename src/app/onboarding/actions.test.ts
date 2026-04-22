@@ -26,6 +26,10 @@ function makeResult(editionSize: number): RankingResult {
     editionSize,
     error: null,
     durationMs: 10,
+    cosineP25: null,
+    cosineP50: null,
+    cosineP75: null,
+    guardDowngrades: 0,
   }
 }
 
