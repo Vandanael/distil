@@ -28,6 +28,8 @@ export const translations = {
       lightHarvest:
         "Moisson plus légère aujourd'hui - le seuil a été adapté pour préserver votre rendez-vous matinal.",
       absenceBanner: 'Pendant votre absence, Distil a continué à trier. Reprenez ici.',
+      emptyEssentialTitle: 'Pas d\'essentiel cette fois',
+      emptyEssentialDetail: 'Aucun article ne correspond assez a votre profil pour figurer dans l\'essentiel. Vos decouvertes sont ci-dessous.',
       editionCompletePrefix: 'Votre édition du',
       editionCompleteSuffix: 'est complète. Rendez-vous demain matin.',
     },
@@ -202,6 +204,8 @@ export const translations = {
       lightHarvest:
         'Lighter harvest today - the threshold was adapted to preserve your morning briefing.',
       absenceBanner: 'While you were away, Distil kept sorting. Resume here.',
+      emptyEssentialTitle: 'No essentials this time',
+      emptyEssentialDetail: 'No article matched your profile closely enough for the essential section. Your discoveries are below.',
       editionCompletePrefix: 'Your edition of',
       editionCompleteSuffix: 'is complete. See you tomorrow morning.',
     },
