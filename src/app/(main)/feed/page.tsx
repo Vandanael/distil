@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { ArticleCard } from './components/ArticleCard'
+import { EmptyEssential } from './components/EmptyEssential'
 import { EmptyFeed } from './components/EmptyFeed'
 import { FirstEditionEmpty } from './components/FirstEditionEmpty'
 import { FeedShell } from './components/FeedShell'
@@ -212,6 +213,10 @@ export default async function FeedPage() {
             </div>
           ) : (
             <>
+              {essentials.length === 0 && surprises.length > 0 && (
+                <EmptyEssential />
+              )}
+
               {essentials.map((a, i) => (
                 <ArticleCard
                   key={a.id}
