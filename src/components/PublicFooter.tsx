@@ -59,7 +59,7 @@ export function PublicFooter({ lang }: { lang?: Lang } = {}) {
             </ul>
           </nav>
           <p className="font-ui text-[15px] text-subtle">
-            © {year} <span className="text-accent">Distil</span>. {t.rights}
+            © 2026-{year} <span className="text-accent">Distil</span>. {t.rights}
           </p>
         </div>
       </div>
