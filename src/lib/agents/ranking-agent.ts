@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@supabase/supabase-js'
+import { extractDomain } from '@/lib/url'
 import { prefilterCandidates } from './prefilter'
 import {
   getRankingSystemPrompt,
@@ -749,7 +750,7 @@ export async function persistRanking(
         url: candidate.url,
         title: candidate.title,
         author: candidate.author,
-        site_name: candidate.siteName,
+        site_name: candidate.siteName ?? extractDomain(candidate.url),
         published_at: candidate.publishedAt,
         content_text: candidate.contentPreview,
         word_count: candidate.wordCount,
@@ -772,6 +773,7 @@ export async function persistRanking(
         articleRow.og_image_url = parsed.ogImageUrl
         articleRow.word_count = parsed.wordCount
         if (parsed.author) articleRow.author = parsed.author
+        if (parsed.siteName) articleRow.site_name = parsed.siteName
       } catch {
         // Paywall, timeout, JS-only - on insere quand meme sans content_html
       }

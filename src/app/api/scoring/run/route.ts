@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { parseUrl } from '@/lib/parsing/readability'
+import { extractDomain } from '@/lib/url'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
 import { checkRefreshRateLimit } from '@/lib/rate-limit'
 import { enforceRateLimit } from '@/lib/api-rate-limit'
@@ -165,7 +166,7 @@ export async function POST(request: Request) {
               url: scored.url,
               title: parsed?.title ?? null,
               author: parsed?.author ?? null,
-              site_name: parsed?.siteName ?? null,
+              site_name: parsed?.siteName ?? extractDomain(scored.url),
               published_at: parsed?.publishedAt ?? null,
               content_html: parsed?.contentHtml ?? null,
               content_text: parsed?.contentText ?? null,

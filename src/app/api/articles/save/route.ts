@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { validateTokenFormat, hashToken } from '@/lib/tokens/api-tokens'
+import { extractDomain } from '@/lib/url'
 import { parseUrl } from '@/lib/parsing/readability'
 import { runScoringAgent } from '@/lib/agents/scoring-agent'
 import { generateEmbedding } from '@/lib/embeddings/voyage'
@@ -222,7 +223,7 @@ export async function POST(request: Request) {
       url: parsed.url,
       title: parsed.title,
       author: parsed.author,
-      site_name: parsed.siteName,
+      site_name: parsed.siteName ?? extractDomain(parsed.url),
       published_at: parsed.publishedAt,
       content_html: parsed.contentHtml,
       content_text: parsed.contentText,
