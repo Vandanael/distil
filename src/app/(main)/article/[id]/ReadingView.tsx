@@ -93,7 +93,7 @@ export function ReadingView({
       })
     : null
 
-  const sourceLabel = siteName ?? extractDomain(url)
+  const sourceLabel = siteName ?? extractDomain(url) || 'Source'
 
   return (
     <>
@@ -175,9 +175,9 @@ export function ReadingView({
                     <line x1="10" y1="14" x2="21" y2="3" />
                   </svg>
                 </a>
-                {tag && (
+                {tag === 'relevant' && (
                   <span className="font-ui text-xs uppercase tracking-wider text-muted-foreground ml-2">
-                    {tag === 'relevant' ? t.article.tagRelevant : t.article.tagDiscovery}
+                    {t.article.tagRelevant}
                   </span>
                 )}
                 {readingTimeMinutes && (
