@@ -9,6 +9,7 @@ import {
   type RecentSignals,
 } from './ranking-prompts'
 import { parseUrl } from '@/lib/parsing/readability'
+import { extractDomain } from '@/lib/url'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { Database } from '@/lib/supabase/database.types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
@@ -207,6 +208,69 @@ export function integrateCarryOvers(
     .map((item, i) => ({ ...item, rank: i + 1 }))
 
   return { essential: newEssential, surprise: newSurprise }
+}
+
+export type DiversityCapRejection = {
+  article_id: string
+  source: string
+  score: number
+  reason: 'source_cap_exceeded'
+}
+
+export type DiversityCapResult = {
+  kept: RankedItem[]
+  rejected: DiversityCapRejection[]
+  sourcesCapped: string[]
+  editionSizeBeforeCap: number
+  editionSizeAfterCap: number
+}
+
+export const DEFAULT_DIVERSITY_CAP = 2
+
+export function applyDiversityCap(
+  essential: RankedItem[],
+  surprise: RankedItem[],
+  candidates: RankingCandidate[],
+  capValue: number = DEFAULT_DIVERSITY_CAP,
+): DiversityCapResult {
+  const allItems = [...essential, ...surprise]
+  const editionSizeBeforeCap = allItems.length
+
+  const sourceById = new Map(
+    candidates.map((c) => [c.itemId, c.siteName ?? extractDomain(c.url)])
+  )
+
+  // Compter les items par source, garder l'ordre d'apparition (rank croissant = tie-break)
+  const sourceCounts = new Map<string, number>()
+  const kept: RankedItem[] = []
+  const rejected: DiversityCapRejection[] = []
+
+  for (const item of allItems) {
+    const source = sourceById.get(item.itemId) ?? 'unknown'
+    const count = sourceCounts.get(source) ?? 0
+
+    if (count < capValue) {
+      sourceCounts.set(source, count + 1)
+      kept.push(item)
+    } else {
+      rejected.push({
+        article_id: item.itemId,
+        source,
+        score: item.q1 * 10,
+        reason: 'source_cap_exceeded',
+      })
+    }
+  }
+
+  const sourcesCapped = [...new Set(rejected.map((r) => r.source))]
+
+  return {
+    kept,
+    rejected,
+    sourcesCapped,
+    editionSizeBeforeCap,
+    editionSizeAfterCap: kept.length,
+  }
 }
 
 /**
@@ -782,6 +846,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       cosineP50: null,
       cosineP75: null,
       guardDowngrades: 0,
+      diversityCapRejections: null,
     }
   }
 
@@ -806,6 +871,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       cosineP50: null,
       cosineP75: null,
       guardDowngrades: 0,
+      diversityCapRejections: null,
     }
   }
 
@@ -843,6 +909,7 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
       cosineP50: null,
       cosineP75: null,
       guardDowngrades: 0,
+      diversityCapRejections: null,
     }
   }
 
@@ -937,6 +1004,14 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
     )
   }
 
+  // ADR-015 : cap diversite sources. Applique apres carry-overs, avant persist.
+  const capResult = applyDiversityCap(essential, surprise, candidates)
+  if (capResult.rejected.length > 0) {
+    // Re-split les items gardes en essential/surprise selon leur bucket d'origine
+    essential = capResult.kept.filter((i) => i.bucket === 'essential').map((item, i) => ({ ...item, rank: i + 1 }))
+    surprise = capResult.kept.filter((i) => i.bucket === 'surprise').map((item, i) => ({ ...item, rank: i + 1 }))
+  }
+
   await persistRanking(supabase, userId, today, essential, surprise, candidates)
 
   // Telemetrie recall : combien de candidates etaient marques keyword_hit, et
@@ -970,6 +1045,15 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
     cosineP50,
     cosineP75,
     guardDowngrades: fallback ? 0 : guardDowngrades,
+    diversityCapRejections: capResult.rejected.length > 0
+      ? {
+          cap_value: DEFAULT_DIVERSITY_CAP,
+          rejected: capResult.rejected,
+          sources_capped: capResult.sourcesCapped,
+          edition_size_before_cap: capResult.editionSizeBeforeCap,
+          edition_size_after_cap: capResult.editionSizeAfterCap,
+        }
+      : null,
   }
 }
 
@@ -1026,6 +1110,7 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
           cosine_p50: r.cosineP50,
           cosine_p75: r.cosineP75,
           guard_downgrades_count: r.guardDowngrades,
+          diversity_cap_rejections: r.diversityCapRejections,
         }))
       )
       .then(({ error }) => {
@@ -1068,6 +1153,7 @@ export async function runRankingForUser(
       cosine_p50: result.cosineP50,
       cosine_p75: result.cosineP75,
       guard_downgrades_count: result.guardDowngrades,
+      diversity_cap_rejections: result.diversityCapRejections,
     })
     .then(({ error }) => {
       if (error) console.error('[ranking] ranking_runs insert failed', error.message)

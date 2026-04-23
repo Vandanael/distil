@@ -624,6 +624,7 @@ export type Database = {
           cosine_p50: number | null
           cosine_p75: number | null
           guard_downgrades_count: number | null
+          diversity_cap_rejections: Json | null
         }
         Insert: {
           id?: string
@@ -645,6 +646,7 @@ export type Database = {
           cosine_p50?: number | null
           cosine_p75?: number | null
           guard_downgrades_count?: number | null
+          diversity_cap_rejections?: Json | null
         }
         Update: {
           id?: string
@@ -666,6 +668,7 @@ export type Database = {
           cosine_p50?: number | null
           cosine_p75?: number | null
           guard_downgrades_count?: number | null
+          diversity_cap_rejections?: Json | null
         }
         Relationships: []
       }

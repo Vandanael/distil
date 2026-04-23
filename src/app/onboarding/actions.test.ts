@@ -30,6 +30,7 @@ function makeResult(editionSize: number): RankingResult {
     cosineP50: null,
     cosineP75: null,
     guardDowngrades: 0,
+    diversityCapRejections: null,
   }
 }
 
