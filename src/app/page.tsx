@@ -11,7 +11,7 @@ export const revalidate = 3600
 // Allowlist SEO : / et /about sont les 2 seules pages publiques indexables.
 // Tout le reste heritage du layout racine (noindex par defaut, defense en profondeur).
 const HOME_DESCRIPTION =
-  'Distil lit le web a votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversite editoriale, zero algorithme de popularite.'
+  'Distil lit le web à votre place chaque matin et ne garde que ce qui compte. Curation IA transparente, diversité éditoriale, zéro algorithme de popularité.'
 
 export const metadata = {
   title: 'Distil - votre veille quotidienne, sans le bruit',
@@ -33,7 +33,7 @@ export const metadata = {
 // score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
 // affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
 // cohabiter avec des articles scores et trahir la demo vide.
-// 5 articles, 5 themes distincts, 4 FR + 1 EN : produit francophone par defaut.
+// 5 articles, 5 themes distincts, 4 FR + 1 EN : produit francophone par défaut.
 const FALLBACK_ARTICLES: FeaturedArticle[] = [
   {
     title: 'Le Monde diplomatique',
@@ -173,7 +173,7 @@ export default async function RootPage() {
       const collected: FeaturedArticle[] = []
       picks.forEach((r, i) => {
         const candidates = r.data ?? []
-        // Prefere un article dont le site n'a pas encore ete choisi pour une autre persona.
+        // Prefere un article dont le site n'a pas encore été choisi pour une autre persona.
         const unique = candidates.find((a) => a.site_name && !usedSites.has(a.site_name))
         const pick = unique ?? candidates[0]
         if (!pick) return

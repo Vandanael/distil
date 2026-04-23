@@ -10,18 +10,18 @@ const QUESTIONS = [
   {
     kicker: 'Question 1',
     title: 'Votre langue',
-    body: 'Francophone, anglophone ou mixte. En mode francophone, 90% de votre feed sera en francais.',
-    hint: 'Vous pouvez changer ce reglage plus tard dans votre profil.',
+    body: 'Francophone, anglophone ou mixte. En mode francophone, 90% de votre feed sera en français.',
+    hint: 'Vous pouvez changer ce réglage plus tard dans votre profil.',
   },
   {
     kicker: 'Question 2',
-    title: 'Vos themes',
-    body: 'Choisissez parmi une liste de themes grand public (cinema, sciences, voyage...) ou decrivez-vous en texte libre.',
-    hint: 'Plus vous etes precis, plus le feed est pertinent.',
+    title: 'Vos thèmes',
+    body: 'Choisissez parmi une liste de thèmes grand public (cinéma, sciences, voyage...) ou décrivez-vous en texte libre.',
+    hint: 'Plus vous êtes précis, plus le feed est pertinent.',
   },
   {
     kicker: 'Question 3',
-    title: 'Vos sources preferees',
+    title: 'Vos sources préférées',
     body: 'Optionnel. Des domaines que vous voulez voir remonter : lemonde.fr, paulgraham.com, stratechery.com... Ou un fichier OPML si vous en avez un.',
     hint: 'Vous pouvez passer cette question et ajouter vos sources plus tard.',
   },
@@ -42,7 +42,7 @@ export default function OnboardingPreviewPage() {
             </h1>
             <p className="font-body text-base text-muted-foreground max-w-[52ch]">
               On vous pose seulement ce dont Distil a besoin pour calibrer votre feed. Rien
-              n&apos;est envoye tant que vous ne cliquez pas sur Demarrer.
+              n&apos;est envoyé tant que vous ne cliquez pas sur Démarrer.
             </p>
           </header>
 

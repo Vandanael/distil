@@ -10,10 +10,10 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { PublicFooter } from '@/components/PublicFooter'
 
 const ERROR_MESSAGES: Record<string, string> = {
-  no_code: 'Lien de connexion invalide. Veuillez reessayer.',
+  no_code: 'Lien de connexion invalide. Veuillez réessayer.',
   exchange_failed:
-    'Echec de la connexion. Veuillez reessayer. Si le probleme persiste, ouvrez une issue sur GitHub.',
-  supabase_not_configured: 'Service temporairement indisponible. Reessayez dans quelques instants.',
+    'Échec de la connexion. Veuillez réessayer. Si le problème persiste, ouvrez une issue sur GitHub.',
+  supabase_not_configured: 'Service temporairement indisponible. Réessayez dans quelques instants.',
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -53,7 +53,7 @@ function LoginPageInner() {
       },
     })
     if (authError || !data?.url) {
-      setError(authError?.message ?? 'Redirection Google impossible. Reessayez.')
+      setError(authError?.message ?? 'Redirection Google impossible. Réessayez.')
       setGoogleLoading(false)
       return
     }
@@ -143,7 +143,7 @@ function LoginPageInner() {
                 aria-live="polite"
                 className="font-ui text-[15px] text-foreground border-l-2 border-accent pl-3 py-2"
               >
-                Lien envoye. Ouvrez votre boite mail et cliquez sur le lien pour vous connecter.
+                Lien envoyé. Ouvrez votre boîte mail et cliquez sur le lien pour vous connecter.
               </p>
             ) : (
               <form onSubmit={handleMagicLink} className="space-y-3" noValidate>
@@ -175,7 +175,7 @@ function LoginPageInner() {
             )}
 
             <p id="login-help" className="font-ui text-sm text-muted-foreground leading-relaxed">
-              Connexion rapide et securisee. Distil ne partage aucune donnee au-dela de votre email
+              Connexion rapide et sécurisée. Distil ne partage aucune donnée au-delà de votre email
               et ne publie rien en votre nom.
             </p>
 

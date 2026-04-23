@@ -22,7 +22,7 @@ export function DiscoveryToggle({ mode: initial }: Props) {
       setMode(next)
       toast.success(next === 'active' ? t.profile.discoveryOn : t.profile.discoveryOff)
     } catch {
-      toast.error('Erreur lors de la mise a jour')
+      toast.error('Erreur lors de la mise à jour')
     } finally {
       setPending(false)
     }

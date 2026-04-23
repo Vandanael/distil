@@ -44,7 +44,7 @@ export default function GlobalError({
           Incident <em className="italic text-accent">technique.</em>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground leading-[1.6] mb-12 text-pretty max-w-[48ch]">
-          L&apos;incident a ete signale. Vous pouvez reessayer ou revenir a l&apos;accueil.
+          L&apos;incident a été signalé. Vous pouvez réessayer ou revenir à l&apos;accueil.
         </p>
 
         <div className="flex flex-wrap items-center gap-8">
@@ -53,7 +53,7 @@ export default function GlobalError({
             onClick={reset}
             className="inline-flex items-center font-ui text-[15px] border-b-2 border-foreground pb-1 text-foreground hover:text-accent hover:border-accent transition-colors"
           >
-            Reessayer
+            Réessayer
           </button>
           <Link
             href="/"

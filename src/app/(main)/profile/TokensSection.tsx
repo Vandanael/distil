@@ -94,15 +94,15 @@ export function TokensSection({ tokens: initialTokens }: Props) {
           disabled={isPending}
           data-testid="quick-create-bookmarklet"
         >
-          {isPending ? 'Creation...' : 'Creer mon bookmarklet'}
+          {isPending ? 'Création...' : 'Créer mon bookmarklet'}
         </Button>
       )}
 
-      {/* Token cree : affichage one-shot */}
+      {/* Token créé : affichage one-shot */}
       {createdToken && (
         <div className="space-y-3 border border-accent/40 p-4 bg-accent/5">
           <p className="font-ui text-sm font-semibold text-accent uppercase tracking-wider">
-            Bookmarklet pret
+            Bookmarklet prêt
           </p>
 
           <div className="space-y-2">
@@ -117,7 +117,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
                 onClick={(e) => e.preventDefault()}
                 draggable
               >
-                + Ajouter a Distil
+                + Ajouter à Distil
               </a>
               <Button
                 type="button"
@@ -126,7 +126,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
                 onClick={handleCopyBookmarklet}
                 data-testid="copy-bookmarklet"
               >
-                {copied ? 'Copie !' : 'Copier le code'}
+                {copied ? 'Copié !' : 'Copier le code'}
               </Button>
             </div>
           </div>
@@ -161,8 +161,8 @@ export function TokensSection({ tokens: initialTokens }: Props) {
               <div className="min-w-0">
                 <p className="font-ui text-sm text-foreground truncate">{token.name}</p>
                 <p className="font-ui text-sm text-muted-foreground">
-                  Cree le {formatDate(token.created_at)}
-                  {token.last_used_at && ` - Utilise le ${formatDate(token.last_used_at)}`}
+                  Créé le {formatDate(token.created_at)}
+                  {token.last_used_at && ` - Utilisé le ${formatDate(token.last_used_at)}`}
                 </p>
               </div>
               <Button
@@ -173,21 +173,21 @@ export function TokensSection({ tokens: initialTokens }: Props) {
                 data-testid={`delete-token-${token.id}`}
                 className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                Revoquer
+                Révoquer
               </Button>
             </li>
           ))}
         </ul>
       )}
 
-      {/* Formulaire creation custom */}
+      {/* Formulaire création custom */}
       {tokens.length > 0 && !showCustomForm && (
         <button
           type="button"
           onClick={() => setShowCustomForm(true)}
           className="font-ui text-sm text-muted-foreground hover:text-accent transition-colors"
         >
-          Creer un token personnalise
+          Créer un token personnalisé
         </button>
       )}
       {(showCustomForm || tokens.length === 0) && !createdToken && tokens.length > 0 && (
@@ -208,7 +208,7 @@ export function TokensSection({ tokens: initialTokens }: Props) {
             className="shrink-0 h-10"
             data-testid="create-token-btn"
           >
-            {isPending ? 'Creation...' : 'Creer'}
+            {isPending ? 'Création...' : 'Créer'}
           </Button>
         </form>
       )}
