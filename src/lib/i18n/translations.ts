@@ -34,6 +34,7 @@ export const translations = {
       editionCompletePrefix: 'Votre édition du',
       editionCompleteSuffix: 'est complète. Rendez-vous demain matin.',
       editionCompleteBody: "Les articles non traités reviennent demain s'ils sont très bien notés, sinon l'édition de demain prend le relais. Rien ne s'accumule en silence.",
+      softLimitMessage: "Vous avez pas mal trié aujourd'hui. L'édition de demain sera plus juste grâce à vos signaux.",
     },
     article: {
       serendipity: 'Découverte',
@@ -242,6 +243,7 @@ export const translations = {
       editionCompletePrefix: 'Your edition of',
       editionCompleteSuffix: 'is complete. See you tomorrow morning.',
       editionCompleteBody: 'Untreated articles return tomorrow if highly rated, otherwise tomorrow\'s edition takes over. Nothing accumulates silently.',
+      softLimitMessage: "You've been sorting quite a bit today. Tomorrow's edition will be better thanks to your signals.",
     },
     article: {
       serendipity: 'Discovery',

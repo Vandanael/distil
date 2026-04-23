@@ -7,6 +7,7 @@ import { useFeedKeyboard } from '@/lib/hooks/useFeedKeyboard'
 import { addToRead, markNotInterested } from '@/app/(main)/article/[id]/actions'
 import { useLocale } from '@/lib/i18n/context'
 import { useDismissContext } from './DismissContext'
+import { useFeedPool } from './FeedPoolContext'
 
 type Props = {
   className?: string
@@ -29,6 +30,7 @@ export function FeedShell({ className, children, articleStatuses }: Props) {
       ? today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
       : today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
   const { dismissById, undoById } = useDismissContext()
+  const pool = useFeedPool()
   const timerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const handleNotInterested = useCallback(
@@ -99,6 +101,11 @@ export function FeedShell({ className, children, articleStatuses }: Props) {
   return (
     <div className={className} data-testid="feed-articles">
       {children}
+      {pool?.showSoftLimit && (
+        <p className="font-body text-sm text-muted-foreground/70 text-center py-4 lg:col-span-2">
+          {t.feed.softLimitMessage}
+        </p>
+      )}
       {/* Hint clavier discret, desktop only */}
       <p
         aria-hidden="true"

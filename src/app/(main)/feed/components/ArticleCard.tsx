@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
 import { scoreColorClass } from '@/lib/utils'
 import { useDismissContext } from './DismissContext'
+import { useFeedPool } from './FeedPoolContext'
 
 const SIGNAL_COACH_FLAG = 'distil_signal_coach_seen'
 
@@ -35,6 +36,7 @@ type Props = {
   staggerIndex?: number
   subScores?: { q1: number | null; q2: number | null; q3: number | null } | null
   carryOverCount?: number
+  isReserve?: boolean
 }
 
 function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
@@ -104,16 +106,31 @@ export function ArticleCard({
   staggerIndex = 0,
   subScores = null,
   carryOverCount = 0,
+  isReserve = false,
 }: Props) {
   const { locale, t } = useLocale()
   const { dismissedIds } = useDismissContext()
+  const pool = useFeedPool()
   const [dismissed, setDismissed] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
+  const [showNewIndicator, setShowNewIndicator] = useState(false)
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
+  const prevRevealedRef = useRef(false)
+
+  const isRevealed = isReserve ? (pool?.revealedIds.has(id) ?? false) : true
+
+  useEffect(() => {
+    if (isReserve && !prevRevealedRef.current && isRevealed) {
+      prevRevealedRef.current = true
+      setShowNewIndicator(true)
+      const timer = setTimeout(() => setShowNewIndicator(false), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [isReserve, isRevealed])
   const carryOverLabel = carryOverCount >= 1 ? formatCarryOverBadge(scoredAt, locale) : null
   const retrievedRelative = formatRelativeDate(scoredAt, locale)
   const publishedLabel = formatPublishedDate(publishedAt, locale)
@@ -146,11 +163,13 @@ export function ArticleCard({
     enabled: !dismissed,
   })
 
+  if (isReserve && !isRevealed) return null
   if (dismissed || dismissedIds.has(id)) return null
 
   function handleNotInterested() {
     const reason = isRead ? 'already_read' : 'off_topic'
     setDismissed(true)
+    pool?.promoteFromReserve()
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
@@ -177,6 +196,7 @@ export function ArticleCard({
 
   function handleAddToRead() {
     setDismissed(true)
+    pool?.promoteFromReserve()
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
@@ -224,7 +244,10 @@ export function ArticleCard({
   }
 
   return (
-    <div className="relative -mx-3" data-article-card-wrapper>
+    <div
+      className={`relative -mx-3 border-l-2 transition-colors duration-[3000ms] ${showNewIndicator ? 'border-accent/30' : 'border-transparent'}`}
+      data-article-card-wrapper
+    >
       {swipeDirection === 'right' && (
         <div
           aria-hidden="true"
