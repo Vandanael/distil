@@ -62,7 +62,9 @@ function makeCandidate(
     url: `https://example.test/${id}`,
     title: `Article ${id}`,
     author: null,
-    siteName: kind === 'rss' ? 'Source RSS' : 'Decouverte',
+    // siteName unique par item : la diversity cap (max 2 articles/source)
+    // limiterait sinon essential à 2 items par kind dans ces scenarios.
+    siteName: kind === 'rss' ? `Source RSS ${id}` : `Decouverte ${id}`,
     publishedAt: null,
     contentPreview: 'lorem ipsum',
     wordCount: 500,
@@ -131,6 +133,11 @@ beforeEach(() => {
   mocks.LLM_OUTPUT.surprise = []
 })
 
+// L'index LLM est 1-based : candidates[i] → index i+1 dans le indexMap.
+// RSS items occupent 1..10, agent items occupent 11..20 quand candidates = [...rss, ...agent].
+const rssIdx = (i: number) => i + 1
+const agentIdx = (i: number) => 11 + i
+
 describe('rankForUser - ponderation adaptative (integration)', () => {
   it('mode active avec pool RSS modere (~dailyCap) produit un split ~50/50 dans essential', async () => {
     const rssItems = Array.from({ length: 10 }, (_, i) => makeCandidate(`r${i}`, 'rss'))
@@ -141,14 +148,14 @@ describe('rankForUser - ponderation adaptative (integration)', () => {
     mocks.LLM_OUTPUT.essential = [
       ...rssItems
         .slice(0, 5)
-        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
+        .map((_, i) => ({ item_id: rssIdx(i), q1: 9, q2: 5, q3: 5, justification: 'r' })),
       ...agentItems
         .slice(0, 5)
-        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
+        .map((_, i) => ({ item_id: agentIdx(i), q1: 9, q2: 5, q3: 5, justification: 'a' })),
     ]
     mocks.LLM_OUTPUT.surprise = [
-      { item_id: rssItems[5].itemId, q1: 7, q2: 8, q3: 7, justification: 'sr' },
-      { item_id: agentItems[5].itemId, q1: 7, q2: 8, q3: 7, justification: 'sa' },
+      { item_id: rssIdx(5), q1: 7, q2: 8, q3: 7, justification: 'sr' },
+      { item_id: agentIdx(5), q1: 7, q2: 8, q3: 7, justification: 'sa' },
     ]
 
     vi.mocked(prefilterCandidates).mockResolvedValue(candidates)
@@ -193,14 +200,14 @@ describe('rankForUser - ponderation adaptative (integration)', () => {
     mocks.LLM_OUTPUT.essential = [
       ...rssItems
         .slice(0, 8)
-        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
+        .map((_, i) => ({ item_id: rssIdx(i), q1: 9, q2: 5, q3: 5, justification: 'r' })),
       ...agentItems
         .slice(0, 2)
-        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
+        .map((_, i) => ({ item_id: agentIdx(i), q1: 9, q2: 5, q3: 5, justification: 'a' })),
     ]
     mocks.LLM_OUTPUT.surprise = [
-      { item_id: rssItems[8].itemId, q1: 7, q2: 8, q3: 7, justification: 'sr' },
-      { item_id: agentItems[2].itemId, q1: 7, q2: 8, q3: 7, justification: 'sa' },
+      { item_id: rssIdx(8), q1: 7, q2: 8, q3: 7, justification: 'sr' },
+      { item_id: agentIdx(2), q1: 7, q2: 8, q3: 7, justification: 'sa' },
     ]
 
     vi.mocked(prefilterCandidates).mockResolvedValue(candidates)
@@ -236,10 +243,10 @@ describe('rankForUser - ponderation adaptative (integration)', () => {
     mocks.LLM_OUTPUT.essential = [
       ...rssItems
         .slice(0, 5)
-        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
+        .map((_, i) => ({ item_id: rssIdx(i), q1: 9, q2: 5, q3: 5, justification: 'r' })),
       ...agentItems
         .slice(0, 5)
-        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
+        .map((_, i) => ({ item_id: agentIdx(i), q1: 9, q2: 5, q3: 5, justification: 'a' })),
     ]
 
     vi.mocked(prefilterCandidates).mockResolvedValue(candidates)
