@@ -1,8 +1,10 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { addToRead } from '../actions'
+import { markAsRead } from '@/app/(main)/actions'
 import { NoteEditor } from './NoteEditor'
 import { TagInput } from './TagInput'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
@@ -13,6 +15,7 @@ type Props = {
   articleTitle: string | null
   articleUrl: string
   pendingHighlight: { id: string; text: string } | null
+  returnTo: '/feed' | '/library'
 }
 
 export function FloatingActionBar({
@@ -20,14 +23,17 @@ export function FloatingActionBar({
   articleTitle,
   articleUrl,
   pendingHighlight,
+  returnTo,
 }: Props) {
   const [showNote, setShowNote] = useState(false)
   const [showTag, setShowTag] = useState(false)
   const [tags, setTags] = useState<string[]>([])
   const [archived, setArchived] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [isMarking, startMarking] = useTransition()
   const isOnline = useOnlineStatus()
   const visible = useAutoHideOnScroll()
+  const router = useRouter()
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
 
@@ -108,6 +114,7 @@ export function FloatingActionBar({
           'fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between border-t border-border bg-background px-4 py-1',
           'transition-transform duration-200 ease-out motion-reduce:transition-none',
           'focus-within:translate-y-0',
+          'lg:translate-y-0',
           visible ? 'translate-y-0' : 'translate-y-full',
         ].join(' ')}
         aria-hidden={!visible || undefined}
@@ -168,6 +175,21 @@ export function FloatingActionBar({
             title={isOnline ? undefined : 'Non disponible hors-ligne'}
           >
             Tag
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              startMarking(async () => {
+                await markAsRead(articleId)
+                router.push(returnTo)
+              })
+            }}
+            disabled={!isOnline || isMarking}
+            className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+            data-testid="action-mark-read"
+            aria-label="Marquer comme lu"
+          >
+            Lu
           </button>
         </div>
 

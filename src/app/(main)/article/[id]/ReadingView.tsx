@@ -1,16 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { markAsRead } from '@/app/(main)/actions'
-import { addToRead } from './actions'
 import { useLocale } from '@/lib/i18n/context'
 import { useScrollEndDetection } from '@/lib/hooks/useScrollEndDetection'
 import { HighlightPopover } from './components/HighlightPopover'
 import { FloatingActionBar } from './components/FloatingActionBar'
 import { ReadingProgress } from './components/ReadingProgress'
-import { SaveOfflineButton } from './components/SaveOfflineButton'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
 import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
 import { extractDomain } from '@/lib/url'
@@ -51,12 +48,8 @@ export function ReadingView({
   const [pendingHighlight, setPendingHighlight] = useState<{ id: string; text: string } | null>(
     null
   )
-  const [isMarking, startMarking] = useTransition()
-  const [isAdding, startAdding] = useTransition()
-  const [added, setAdded] = useState(false)
   const isOnline = useOnlineStatus()
   const { locale, t } = useLocale()
-  const router = useRouter()
 
   // Scroll-end 85% : passe l'article en read sans bloquer l'UI, sans redirect.
   useScrollEndDetection(contentRef, () => {
@@ -102,21 +95,6 @@ export function ReadingView({
 
   const sourceLabel = siteName ?? extractDomain(url)
 
-  function handleMarkRead() {
-    startMarking(async () => {
-      await markAsRead(id)
-      router.push(returnTo)
-    })
-  }
-
-  function handleAddToRead() {
-    if (added) return
-    startAdding(async () => {
-      await addToRead(id)
-      setAdded(true)
-    })
-  }
-
   return (
     <>
       <ReadingProgress />
@@ -149,7 +127,6 @@ export function ReadingView({
                     ? 'Retour au Feed'
                     : 'Back to Feed'}
               </Link>
-              <SaveOfflineButton articleId={id} />
             </div>
           </div>
 
@@ -301,30 +278,6 @@ export function ReadingView({
                 </a>
               </div>
             )}
-
-            {/* Actions fin d'article : "Lu" primaire, "Ajouter a A lire" secondaire (si tronque) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleMarkRead}
-                disabled={isMarking}
-                data-testid="mark-read"
-                className="inline-flex items-center justify-center font-ui text-[15px] uppercase tracking-[0.08em] bg-foreground text-background px-6 py-3 hover:bg-accent focus-visible:bg-accent transition-colors disabled:opacity-60"
-              >
-                {t.reading.markRead}
-              </button>
-              {truncated && (
-                <button
-                  type="button"
-                  onClick={handleAddToRead}
-                  disabled={isAdding || added}
-                  data-testid="add-to-read-inline"
-                  className="inline-flex items-center justify-center font-ui text-[15px] text-accent px-6 py-3 border border-border hover:text-foreground hover:border-foreground transition-colors disabled:opacity-60"
-                >
-                  {added ? (locale === 'fr' ? 'Ajouté' : 'Added') : t.reading.addToRead}
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -340,6 +293,7 @@ export function ReadingView({
         articleTitle={title}
         articleUrl={url}
         pendingHighlight={pendingHighlight}
+        returnTo={returnTo}
       />
     </>
   )
