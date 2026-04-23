@@ -25,6 +25,15 @@ export async function prefilterCandidates(
 ): Promise<RankingCandidate[]> {
   const cutoff = new Date(Date.now() - LOOKBACK_HOURS * 60 * 60 * 1000).toISOString()
 
+  // DEBUG-RPC : log temporaire pour diagnostiquer candidates_count = 0
+  console.log('[DEBUG-RPC]', JSON.stringify({
+    user_id: userId,
+    preferred_language: preferredLanguage ?? null,
+    min_word_count: minWordCount,
+    cutoff_time: cutoff,
+    pinned_feed_ids: pinnedFeedIds.length > 0 ? pinnedFeedIds : [],
+  }))
+
   // Use RPC for cosine-based pre-filtering
   const { data, error } = await supabase.rpc('prefilter_ranking_candidates', {
     user_embedding: JSON.stringify(profileEmbedding),
