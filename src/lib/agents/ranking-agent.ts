@@ -587,6 +587,9 @@ async function persistRanking(
   const allRanked = [...essential, ...surprise]
   const candidateMap = new Map(candidates.map((c) => [c.itemId, c]))
 
+  const { logError } = await import('@/lib/errors/log-error')
+  console.info(`Persisting ${allRanked.length} items for user ${userId}`)
+
   // Insert daily_ranking
   if (allRanked.length > 0) {
     const { error: rankingError } = await supabase.from('daily_ranking').upsert(
@@ -604,14 +607,13 @@ async function persistRanking(
       { onConflict: 'user_id,date,item_id' }
     )
     if (rankingError) {
-      const { logError } = await import('@/lib/errors/log-error')
       await logError({ route: 'persistRanking.daily_ranking', error: rankingError, userId })
     }
   }
 
   // Promote to articles table, then enrich with full content via Readability.
   // Parsing en parallele (fetch deja protege par timeout 10s dans fetcher.ts).
-  await Promise.allSettled(
+  const settled = await Promise.allSettled(
     allRanked.map(async (item) => {
       const candidate = candidateMap.get(item.itemId)
       if (!candidate) return
@@ -657,6 +659,18 @@ async function persistRanking(
       await supabase.from('articles').insert(articleRow)
     })
   )
+
+  for (const [i, result] of settled.entries()) {
+    if (result.status === 'rejected') {
+      const item = allRanked[i]
+      await logError({
+        route: 'persistRanking.articles',
+        error: result.reason,
+        userId,
+        context: { item_id: item?.itemId },
+      })
+    }
+  }
 
   // Efface first_edition_empty si l'édition est non vide.
   // Déclenché par le cron quotidien pour les users dont la première édition était vide.
