@@ -33,7 +33,7 @@ export const metadata = {
 // score n'est disponible (serviceKey absent, comptes demo vides). Ils sont
 // affiches sous un heading distinct "Exemples editoriaux" pour ne jamais
 // cohabiter avec des articles scores et trahir la demo vide.
-// 5 articles, 5 themes distincts, 4 FR + 1 EN : produit francophone par défaut.
+// 3 articles, 3 themes distincts : produit francophone par défaut.
 const FALLBACK_ARTICLES: FeaturedArticle[] = [
   {
     title: 'Le Monde diplomatique',
@@ -46,7 +46,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: 'France Culture - La Suite dans les idees',
+    title: 'France Culture - La Suite dans les idées',
     url: 'https://www.radiofrance.fr/franceculture',
     site_name: 'France Culture',
     excerpt: null,
@@ -56,7 +56,7 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     persona_slug: null,
   },
   {
-    title: "Reporterre - le quotidien de l'ecologie",
+    title: "Reporterre - le quotidien de l'écologie",
     url: 'https://reporterre.net/',
     site_name: 'Reporterre',
     excerpt: null,
@@ -65,30 +65,10 @@ const FALLBACK_ARTICLES: FeaturedArticle[] = [
     justification: null,
     persona_slug: null,
   },
-  {
-    title: 'Pour la Science',
-    url: 'https://www.pourlascience.fr/',
-    site_name: 'Pour la Science',
-    excerpt: null,
-    score: null,
-    is_serendipity: false,
-    justification: null,
-    persona_slug: null,
-  },
-  {
-    title: 'The Guardian - long reads',
-    url: 'https://www.theguardian.com/news/series/the-long-read',
-    site_name: 'The Guardian',
-    excerpt: null,
-    score: null,
-    is_serendipity: true,
-    justification: null,
-    persona_slug: null,
-  },
 ]
 
-// 1 article par persona vitrine, total = HOME_FEATURED_SLUGS.length.
-const EDITION_TARGET = 5
+// 1 article par persona vitrine, total = EDITION_TARGET.
+const EDITION_TARGET = 3
 
 type FeaturedArticle = {
   title: string | null
