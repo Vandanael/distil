@@ -1,3 +1,7 @@
+// Retire du UI en PR 4 (beta), a reintegrer post-beta si la feature est
+// confirmee comme promesse produit. Le fichier reste comme base pour la
+// reactivation. Aucun import de ce composant ne doit exister dans le code.
+
 'use client'
 
 import { useState } from 'react'
