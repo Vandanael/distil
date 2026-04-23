@@ -64,7 +64,9 @@ export function MainHeader() {
                     href={href}
                     aria-current={active ? 'page' : undefined}
                     className={`font-ui text-[15px] px-2 transition-colors ${
-                      active ? 'text-foreground font-medium' : 'text-subtle hover:text-accent'
+                      active
+                        ? 'text-foreground font-medium'
+                        : 'text-subtle hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2'
                     }`}
                   >
                     {labelKey ? t.nav[labelKey] : href}

@@ -97,7 +97,7 @@ export function PublicHeader({ contextLabel }: Props) {
           <div className="flex items-center gap-1 shrink-0 h-full">
             <Link
               href={onLogin ? '/' : '/login'}
-              className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent transition-colors"
+              className="inline-flex items-center h-full font-ui text-[15px] px-2 text-subtle hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors"
             >
               {onLogin ? t.home : t.login}
             </Link>

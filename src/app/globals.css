@@ -118,6 +118,10 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent;
   }
+  /* Offset typographique global sur tous les liens */
+  a {
+    text-underline-offset: 3px;
+  }
 }
 
 /* EmptyFeed : barre de progression indeterminee */
@@ -237,7 +241,7 @@
   @apply text-accent no-underline;
 }
 .article-prose a:hover {
-  @apply underline;
+  @apply underline decoration-accent decoration-2;
 }
 .article-prose strong {
   @apply text-foreground font-semibold;
