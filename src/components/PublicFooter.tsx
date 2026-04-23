@@ -39,22 +39,34 @@ export function PublicFooter({ lang }: { lang?: Lang } = {}) {
           <nav aria-label={t.navLabel}>
             <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 font-ui text-[15px] text-subtle">
               <li>
-                <Link href="/" className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors">
+                <Link
+                  href="/"
+                  className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors"
+                >
                   {t.home}
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors">
+                <Link
+                  href="/about"
+                  className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors"
+                >
                   {t.about}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors">
+                <Link
+                  href="/privacy"
+                  className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors"
+                >
                   {t.privacy}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors">
+                <Link
+                  href="/terms"
+                  className="hover:text-accent hover:underline hover:decoration-accent hover:decoration-2 focus-visible:underline focus-visible:decoration-accent focus-visible:decoration-2 transition-colors"
+                >
                   {t.terms}
                 </Link>
               </li>
