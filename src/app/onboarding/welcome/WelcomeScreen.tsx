@@ -52,7 +52,7 @@ export function WelcomeScreen() {
         Distil lit vos sources.
       </h1>
       <p className="font-body text-base md:text-lg text-center mt-6 max-w-md text-muted-foreground">
-        Moins d'une minute la première fois. Instantané ensuite.
+        Moins d&apos;une minute la première fois. Instantané ensuite.
       </p>
     </div>
   )

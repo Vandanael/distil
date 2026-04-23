@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { useLocale } from '@/lib/i18n/context'
 
@@ -18,27 +18,33 @@ export function FeedHeader({
   daysSinceLastLogin,
 }: Props) {
   const { locale, t } = useLocale()
-  const [absenceBannerDismissed, setAbsenceBannerDismissed] = useState(true)
 
   const absenceBannerKey = `distil_absence_banner_dismissed_${new Date().toISOString().slice(0, 10)}`
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setAbsenceBannerDismissed(!!window.localStorage.getItem(absenceBannerKey))
-    }
-  }, [absenceBannerKey])
+  const absenceBannerDismissed = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === 'undefined') return () => {}
+      const handler = (e: StorageEvent) => {
+        if (e.key === absenceBannerKey) onStoreChange()
+      }
+      window.addEventListener('storage', handler)
+      return () => window.removeEventListener('storage', handler)
+    },
+    () => typeof window !== 'undefined' && !!window.localStorage.getItem(absenceBannerKey),
+    () => false,
+  )
 
   function dismissAbsenceBanner() {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(absenceBannerKey, 'true')
+      window.dispatchEvent(new StorageEvent('storage', { key: absenceBannerKey }))
     }
-    setAbsenceBannerDismissed(true)
   }
 
   const showAbsenceBanner = (daysSinceLastLogin ?? 0) > 3 && !absenceBannerDismissed
 
+  const [nowMs] = useState(() => Date.now())
   function formatRefreshAge(isoDate: string): { label: string; isStale: boolean } {
-    const diffMs = Date.now() - new Date(isoDate).getTime()
+    const diffMs = nowMs - new Date(isoDate).getTime()
     const diffH = Math.floor(diffMs / (1000 * 60 * 60))
     const isFr = locale === 'fr'
     if (diffH < 1) return { label: isFr ? "a l'instant" : 'just now', isStale: false }

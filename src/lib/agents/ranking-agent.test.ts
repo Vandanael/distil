@@ -295,7 +295,7 @@ describe('injectReservedKeywordSlots', () => {
 function llmItem(
   id: string,
   q1: number,
-  bucket: 'essential' | 'surprise' = 'essential'
+  _bucket: 'essential' | 'surprise' = 'essential'
 ): LlmRankedItem {
   return { item_id: id, q1, q2: 5, q3: 5, justification: '' }
 }
