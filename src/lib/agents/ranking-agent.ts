@@ -25,7 +25,7 @@ type CarryOverArticle = {
 }
 
 const MODEL = 'gemini-2.5-flash'
-const FALLBACK_MODEL = 'gemini-2.0-flash'
+const FALLBACK_MODEL = 'gemini-flash-latest'
 
 // Seuil dur : un article Q1 < MIN_Q1_RELEVANCE est hors-sujet pour ce lecteur
 // et n'a le droit d'apparaitre dans aucun bucket. Garde-fou si le prompt rate.
@@ -792,7 +792,10 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
     try {
       llmResult = await callRankingLlm(userPrompt, MODEL, userId, justificationLocale)
       modelUsed = MODEL
-    } catch {
+    } catch (primaryErr) {
+      // Log explicite si le modele primaire est decommisionne (404) ou en erreur
+      const { logError } = await import('@/lib/errors/log-error')
+      await logError({ route: 'rankForUser.callRankingLlm', error: primaryErr, userId })
       llmResult = await callRankingLlm(userPrompt, FALLBACK_MODEL, userId, justificationLocale)
       modelUsed = FALLBACK_MODEL
     }
