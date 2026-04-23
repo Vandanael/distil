@@ -51,7 +51,7 @@ export default function PrivacyPage() {
               deletion, and portability. Contact{' '}
               <a
                 href="mailto:hello@distil.app"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 hello@distil.app
               </a>{' '}
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
                 href="https://www.cnil.fr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 www.cnil.fr
               </a>
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
             <p>
               <a
                 href="#politique-fr"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 Full privacy policy available in French below.
               </a>
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
               relative à vos données, contactez{' '}
               <a
                 href="mailto:hello@distil.app"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 hello@distil.app
               </a>
@@ -287,7 +287,7 @@ export default function PrivacyPage() {
               d&apos;effacement et de portabilité de vos données. Pour exercer ces droits, écrivez à{' '}
               <a
                 href="mailto:hello@distil.app"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 hello@distil.app
               </a>
@@ -300,7 +300,7 @@ export default function PrivacyPage() {
                 href="https://www.cnil.fr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 www.cnil.fr
               </a>

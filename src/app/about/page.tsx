@@ -127,7 +127,7 @@ export default function AboutPage() {
                       href="https://en.wikipedia.org/wiki/Filter_bubble"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       Eli Pariser (2011)
                     </a>
@@ -136,7 +136,7 @@ export default function AboutPage() {
                       href="https://reutersinstitute.politics.ox.ac.uk/digital-news-report"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       Digital News Report
                     </a>{' '}
@@ -153,7 +153,7 @@ export default function AboutPage() {
                       href="https://en.wikipedia.org/wiki/Attention_economy"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       1971
                     </a>{' '}
@@ -172,7 +172,7 @@ export default function AboutPage() {
                       href="https://www.maryannewolf.com/reader-come-home"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       <em>Reader, Come Home</em>
                     </a>{' '}
@@ -190,7 +190,7 @@ export default function AboutPage() {
                       href="https://www.emerald.com/insight/content/doi/10.1108/00220410310472518/full/html"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       Foster &amp; Ford (2003)
                     </a>{' '}
@@ -218,7 +218,7 @@ export default function AboutPage() {
                       href="https://towardsdatascience.com/making-news-recommendations-explainable-with-large-language-models-74f119c7e036/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       DER SPIEGEL (2025)
                     </a>
@@ -236,7 +236,7 @@ export default function AboutPage() {
                       href="https://aclanthology.org/2024.findings-naacl.39/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       NAACL 2024
                     </a>
@@ -254,7 +254,7 @@ export default function AboutPage() {
                       href="https://research.atspotify.com/2024/12/contextualized-recommendations-through-personalized-narratives-using-llms"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       Spotify Research (2024)
                     </a>
@@ -272,7 +272,7 @@ export default function AboutPage() {
                       href="https://arxiv.org/html/2502.09797v1"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       Survey 2025
                     </a>{' '}
@@ -281,7 +281,7 @@ export default function AboutPage() {
                       href="https://arxiv.org/html/2403.03424v1"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                      className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
                     >
                       WWW 2024
                     </a>
@@ -302,7 +302,7 @@ export default function AboutPage() {
             Pour toute question ou retour, écrivez à{' '}
             <a
               href="mailto:hello@distil.app"
-              className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+              className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
             >
               hello@distil.app
             </a>
@@ -311,7 +311,7 @@ export default function AboutPage() {
               href="https://github.com/Vandanael/distil/issues"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+              className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
             >
               issue GitHub
             </a>
@@ -333,7 +333,7 @@ export default function AboutPage() {
               Droit à l&apos;oubli : sur simple demande à{' '}
               <a
                 href="mailto:hello@distil.app"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 hello@distil.app
               </a>
@@ -342,14 +342,14 @@ export default function AboutPage() {
             <p>
               <a
                 href="/privacy"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 Politique de confidentialité
               </a>
               {' · '}
               <a
                 href="/terms"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 Conditions d&apos;utilisation
               </a>

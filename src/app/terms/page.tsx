@@ -55,7 +55,7 @@ export default function TermsPage() {
               account at any time from app settings or by contacting{' '}
               <a
                 href="mailto:hello@distil.app"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 hello@distil.app
               </a>
@@ -65,7 +65,7 @@ export default function TermsPage() {
             <p>
               <a
                 href="#conditions-fr"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 Full terms of use available in French below.
               </a>
@@ -195,7 +195,7 @@ export default function TermsPage() {
               les paramètres de l&apos;application ou en écrivant à{' '}
               <a
                 href="mailto:hello@distil.app"
-                className="text-foreground hover:text-accent transition-colors underline underline-offset-2"
+                className="text-foreground hover:text-accent transition-colors underline underline-offset-[3px] hover:decoration-2"
               >
                 hello@distil.app
               </a>
