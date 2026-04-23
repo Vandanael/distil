@@ -51,6 +51,7 @@ export default async function FeedPage() {
   let firstEditionEmpty = false
   const subScoresByItemId = new Map<string, SubScores>()
   const sourceKindByItemId = new Map<string, 'rss' | 'agent'>()
+  const bucketByItemId = new Map<string, 'essential' | 'surprise'>()
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const supabase = await createClient()
@@ -156,13 +157,16 @@ export default async function FeedPage() {
         const [rankingResult, itemsResult] = await Promise.all([
           supabase
             .from('daily_ranking')
-            .select('item_id, q1_relevance, q2_unexpected, q3_discovery')
+            .select('item_id, bucket, q1_relevance, q2_unexpected, q3_discovery')
             .eq('user_id', user.id)
             .in('item_id', itemIds),
           // Remonte feeds.kind pour distinguer les items RSS des items agent (badge Decouverte).
           supabase.from('items').select('id, feeds(kind)').in('id', itemIds),
         ])
         for (const row of rankingResult.data ?? []) {
+          if (row.bucket === 'essential' || row.bucket === 'surprise') {
+            bucketByItemId.set(row.item_id, row.bucket)
+          }
           subScoresByItemId.set(row.item_id, {
             q1: row.q1_relevance,
             q2: row.q2_unexpected,
@@ -230,6 +234,7 @@ export default async function FeedPage() {
                   justification={a.justification}
                   isSerendipity={a.is_serendipity}
                   origin={a.origin}
+                  bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
                   sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
                   publishedAt={a.published_at}
                   scoredAt={a.scored_at}
@@ -268,6 +273,7 @@ export default async function FeedPage() {
                   justification={a.justification}
                   isSerendipity={a.is_serendipity}
                   origin={a.origin}
+                  bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
                   sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
                   publishedAt={a.published_at}
                   scoredAt={a.scored_at}

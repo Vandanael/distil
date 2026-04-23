@@ -12,6 +12,7 @@ import { FloatingActionBar } from './components/FloatingActionBar'
 import { ReadingProgress } from './components/ReadingProgress'
 import { SaveOfflineButton } from './components/SaveOfflineButton'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
+import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
 
 type Props = {
   id: string
@@ -24,6 +25,9 @@ type Props = {
   readingTimeMinutes: number | null
   url: string
   returnTo: '/feed' | '/library'
+  bucket: 'essential' | 'surprise' | null
+  isSerendipity: boolean
+  origin: string
 }
 
 function extractDomain(url: string): string {
@@ -45,7 +49,11 @@ export function ReadingView({
   readingTimeMinutes,
   url,
   returnTo,
+  bucket,
+  isSerendipity,
+  origin,
 }: Props) {
+  const tag: RelevanceTag = scoreToTag(null, bucket, isSerendipity, origin)
   const contentRef = useRef<HTMLDivElement>(null)
   const [pendingHighlight, setPendingHighlight] = useState<{ id: string; text: string } | null>(
     null
@@ -197,6 +205,11 @@ export function ReadingView({
                     <line x1="10" y1="14" x2="21" y2="3" />
                   </svg>
                 </a>
+                {tag && (
+                  <span className="font-ui text-xs uppercase tracking-wider text-muted-foreground ml-2">
+                    {tag === 'relevant' ? t.article.tagRelevant : t.article.tagDiscovery}
+                  </span>
+                )}
                 {readingTimeMinutes && (
                   <>
                     <span>·</span>
