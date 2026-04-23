@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useFeedKeyboard } from '@/lib/hooks/useFeedKeyboard'
@@ -8,6 +8,9 @@ import { addToRead, markNotInterested } from '@/app/(main)/article/[id]/actions'
 import { useLocale } from '@/lib/i18n/context'
 import { useDismissContext } from './DismissContext'
 import { useFeedPool } from './FeedPoolContext'
+
+const SOFT_LIMIT_AUTO_HIDE_MS = 10000
+const SOFT_LIMIT_SCROLL_THRESHOLD_PX = 80
 
 type Props = {
   className?: string
@@ -98,10 +101,28 @@ export function FeedShell({ className, children, articleStatuses }: Props) {
     onNavigate: handleNavigate,
   })
 
+  // Auto-hide du message soft limit : 10s OU scroll > 80px, au premier des deux.
+  // hasTriggeredRef côté Provider empêche la ré-apparition dans la même édition.
+  const showSoftLimitNow = pool?.showSoftLimitNow ?? false
+  const dismissSoftLimit = pool?.dismissSoftLimit
+  useEffect(() => {
+    if (!showSoftLimitNow || !dismissSoftLimit) return
+    const initialY = window.scrollY
+    const timer = setTimeout(dismissSoftLimit, SOFT_LIMIT_AUTO_HIDE_MS)
+    const onScroll = () => {
+      if (Math.abs(window.scrollY - initialY) > SOFT_LIMIT_SCROLL_THRESHOLD_PX) dismissSoftLimit()
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [showSoftLimitNow, dismissSoftLimit])
+
   return (
     <div className={className} data-testid="feed-articles">
       {children}
-      {pool?.showSoftLimit && (
+      {pool?.showSoftLimitNow && (
         <p className="font-body text-sm text-muted-foreground/70 text-center py-4 lg:col-span-2">
           {t.feed.softLimitMessage}
         </p>

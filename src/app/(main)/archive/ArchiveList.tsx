@@ -117,9 +117,7 @@ export function ArchiveList({ articles }: Props) {
       {visibleArticles.length >= 10 && (
         <div className="flex items-center justify-between gap-3 px-3 py-2 bg-muted rounded-sm">
           <p className="font-ui text-sm text-muted-foreground">
-            {locale === 'fr'
-              ? `Votre pile s'épaissit. ${visibleArticles.length} articles en attente. Lire ne peut pas devenir une corvée.`
-              : `Your pile is thickening. ${visibleArticles.length} articles pending. Reading shouldn't become a chore.`}
+            {t.library.pileWarning.replace('{count}', String(visibleArticles.length))}
           </p>
         </div>
       )}

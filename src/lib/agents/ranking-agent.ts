@@ -576,6 +576,10 @@ async function countRelevantRss(
 const CARRY_OVER_SCORE_THRESHOLD = 0.9
 const MAX_CARRY_OVER = 4
 
+// Carry-over : remonte jusqu'à MAX_CARRY_OVER articles non traités de la veille
+// dont le score dépasse CARRY_OVER_SCORE_THRESHOLD (qualité avant volume).
+// S'il y a moins de 4 candidats au-dessus du seuil, on remonte ce qu'il y a
+// (0, 1, 2 ou 3) — pas de remplissage par des articles en dessous du seuil.
 async function loadCarryOverCandidates(
   supabase: ServiceClient,
   userId: string,

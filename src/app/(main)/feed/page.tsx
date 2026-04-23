@@ -51,6 +51,7 @@ export default async function FeedPage() {
   let daysSinceLastLogin: number | undefined = undefined
   let firstEditionEmpty = false
   let dailyCapResolved = 10
+  let softLimitAlreadyShown = false
   const subScoresByItemId = new Map<string, SubScores>()
   const sourceKindByItemId = new Map<string, 'rss' | 'agent'>()
   const bucketByItemId = new Map<string, 'essential' | 'surprise'>()
@@ -64,7 +65,7 @@ export default async function FeedPage() {
     if (user) {
       const profileResult = await supabase
         .from('profiles')
-        .select('daily_cap, interests, display_interests, first_edition_empty')
+        .select('daily_cap, interests, display_interests, first_edition_empty, last_soft_limit_shown_date')
         .eq('id', user.id)
         .single()
 
@@ -78,6 +79,8 @@ export default async function FeedPage() {
       const todayStart = new Date(now)
       todayStart.setHours(0, 0, 0, 0)
       const todayStartISO = todayStart.toISOString()
+      const todayDate = todayStartISO.slice(0, 10)
+      softLimitAlreadyShown = profileResult.data?.last_soft_limit_shown_date === todayDate
 
       const [articlesResult, lastRunResult] = await Promise.all([
         supabase
@@ -214,7 +217,7 @@ export default async function FeedPage() {
       />
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
-      <FeedPoolProvider reserveIds={reserveIds}>
+      <FeedPoolProvider reserveIds={reserveIds} softLimitAlreadyShown={softLimitAlreadyShown}>
       <DismissProvider>
         <FeedShell
           className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2"

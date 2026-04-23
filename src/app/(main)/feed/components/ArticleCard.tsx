@@ -15,6 +15,7 @@ import { useDismissContext } from './DismissContext'
 import { useFeedPool } from './FeedPoolContext'
 
 const SIGNAL_COACH_FLAG = 'distil_signal_coach_seen'
+const NEW_ARTICLE_HIGHLIGHT_DURATION_MS = 12000
 
 type Props = {
   id: string
@@ -127,7 +128,7 @@ export function ArticleCard({
     if (isReserve && !prevRevealedRef.current && isRevealed) {
       prevRevealedRef.current = true
       setShowNewIndicator(true)
-      const timer = setTimeout(() => setShowNewIndicator(false), 3000)
+      const timer = setTimeout(() => setShowNewIndicator(false), NEW_ARTICLE_HIGHLIGHT_DURATION_MS)
       return () => clearTimeout(timer)
     }
   }, [isReserve, isRevealed])
