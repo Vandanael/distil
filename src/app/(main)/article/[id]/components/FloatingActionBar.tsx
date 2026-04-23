@@ -181,19 +181,21 @@ export function FloatingActionBar({
           </button>
           <Tooltip>
             <TooltipTrigger
-              render={<button
-                type="button"
-                onClick={() => {
-                  startMarking(async () => {
-                    await markAsRead(articleId)
-                    router.push(returnTo)
-                  })
-                }}
-                disabled={!isOnline || isMarking}
-                className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-                data-testid="action-mark-read"
-                aria-label={t.reading.markReadAria}
-              />}
+              render={
+                <button
+                  type="button"
+                  onClick={() => {
+                    startMarking(async () => {
+                      await markAsRead(articleId)
+                      router.push(returnTo)
+                    })
+                  }}
+                  disabled={!isOnline || isMarking}
+                  className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+                  data-testid="action-mark-read"
+                  aria-label={t.reading.markReadAria}
+                />
+              }
             >
               {t.reading.markRead}
             </TooltipTrigger>
@@ -207,7 +209,10 @@ export function FloatingActionBar({
         {tags.length > 0 && (
           <div className="flex gap-1">
             {tags.map((tag) => (
-              <span key={tag} className="font-ui text-sm bg-muted text-muted-foreground px-2 py-0.5">
+              <span
+                key={tag}
+                className="font-ui text-sm bg-muted text-muted-foreground px-2 py-0.5"
+              >
                 {tag}
               </span>
             ))}

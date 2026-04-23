@@ -65,13 +65,16 @@ export default async function FeedPage() {
     if (user) {
       const profileResult = await supabase
         .from('profiles')
-        .select('daily_cap, interests, display_interests, first_edition_empty, last_soft_limit_shown_date')
+        .select(
+          'daily_cap, interests, display_interests, first_edition_empty, last_soft_limit_shown_date'
+        )
         .eq('id', user.id)
         .single()
 
       const dailyCap = profileResult.data?.daily_cap ?? 10
       dailyCapResolved = dailyCap
-      const rawInterests: string[] = profileResult.data?.display_interests ?? profileResult.data?.interests ?? []
+      const rawInterests: string[] =
+        profileResult.data?.display_interests ?? profileResult.data?.interests ?? []
       interests = rawInterests
       firstEditionEmpty = profileResult.data?.first_edition_empty ?? false
 
@@ -218,118 +221,116 @@ export default async function FeedPage() {
 
       {/* Articles : colonne unique jusqu'a lg, grille 2-col au-dela */}
       <FeedPoolProvider reserveIds={reserveIds} softLimitAlreadyShown={softLimitAlreadyShown}>
-      <DismissProvider>
-        <FeedShell
-          className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2"
-          articleStatuses={visibleArticles.map((a) => a.status)}
-        >
-          {firstEditionEmpty ? (
-            <div className="lg:col-span-2">
-              <FirstEditionEmpty />
-            </div>
-          ) : visibleArticles.length === 0 ? (
-            <div className="lg:col-span-2">
-              <EmptyFeed />
-            </div>
-          ) : (
-            <>
-              {essentials.length === 0 && surprises.length > 0 && (
-                <EmptyEssential />
-              )}
+        <DismissProvider>
+          <FeedShell
+            className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-2"
+            articleStatuses={visibleArticles.map((a) => a.status)}
+          >
+            {firstEditionEmpty ? (
+              <div className="lg:col-span-2">
+                <FirstEditionEmpty />
+              </div>
+            ) : visibleArticles.length === 0 ? (
+              <div className="lg:col-span-2">
+                <EmptyFeed />
+              </div>
+            ) : (
+              <>
+                {essentials.length === 0 && surprises.length > 0 && <EmptyEssential />}
 
-              {essentials.map((a, i) => (
-                <ArticleCard
-                  key={a.id}
-                  id={a.id}
-                  staggerIndex={i}
-                  title={a.title}
-                  siteName={a.site_name}
-                  excerpt={a.excerpt}
-                  readingTimeMinutes={a.reading_time_minutes}
-                  score={a.score}
-                  justification={a.justification}
-                  isSerendipity={a.is_serendipity}
-                  origin={a.origin}
-                  bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
-                  sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
-                  publishedAt={a.published_at}
-                  scoredAt={a.scored_at}
-                  wordCount={a.word_count}
-                  ogImageUrl={a.og_image_url}
-                  isRead={a.status === 'read'}
-                  subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
-                  carryOverCount={a.carry_over_count}
-                />
-              ))}
+                {essentials.map((a, i) => (
+                  <ArticleCard
+                    key={a.id}
+                    id={a.id}
+                    staggerIndex={i}
+                    title={a.title}
+                    siteName={a.site_name}
+                    excerpt={a.excerpt}
+                    readingTimeMinutes={a.reading_time_minutes}
+                    score={a.score}
+                    justification={a.justification}
+                    isSerendipity={a.is_serendipity}
+                    origin={a.origin}
+                    bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
+                    sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
+                    publishedAt={a.published_at}
+                    scoredAt={a.scored_at}
+                    wordCount={a.word_count}
+                    ogImageUrl={a.og_image_url}
+                    isRead={a.status === 'read'}
+                    subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
+                    carryOverCount={a.carry_over_count}
+                  />
+                ))}
 
-              {surprises.length > 0 && (
-                <div
-                  className="flex items-center gap-3 py-2 lg:col-span-2 lg:mt-4"
-                  data-testid="discovery-divider"
-                  aria-hidden="true"
-                >
-                  <span className="h-px flex-1 bg-border" />
-                  <span className="font-ui text-sm uppercase tracking-[0.16em] text-muted-foreground">
-                    Découverte
-                  </span>
-                  <span className="h-px flex-1 bg-border" />
-                </div>
-              )}
+                {surprises.length > 0 && (
+                  <div
+                    className="flex items-center gap-3 py-2 lg:col-span-2 lg:mt-4"
+                    data-testid="discovery-divider"
+                    aria-hidden="true"
+                  >
+                    <span className="h-px flex-1 bg-border" />
+                    <span className="font-ui text-sm uppercase tracking-[0.16em] text-muted-foreground">
+                      Découverte
+                    </span>
+                    <span className="h-px flex-1 bg-border" />
+                  </div>
+                )}
 
-              {surprises.map((a, i) => (
-                <ArticleCard
-                  key={a.id}
-                  id={a.id}
-                  staggerIndex={essentials.length + i}
-                  title={a.title}
-                  siteName={a.site_name}
-                  excerpt={a.excerpt}
-                  readingTimeMinutes={a.reading_time_minutes}
-                  score={a.score}
-                  justification={a.justification}
-                  isSerendipity={a.is_serendipity}
-                  origin={a.origin}
-                  bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
-                  sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
-                  publishedAt={a.published_at}
-                  scoredAt={a.scored_at}
-                  wordCount={a.word_count}
-                  ogImageUrl={a.og_image_url}
-                  isRead={a.status === 'read'}
-                  subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
-                  carryOverCount={a.carry_over_count}
-                />
-              ))}
+                {surprises.map((a, i) => (
+                  <ArticleCard
+                    key={a.id}
+                    id={a.id}
+                    staggerIndex={essentials.length + i}
+                    title={a.title}
+                    siteName={a.site_name}
+                    excerpt={a.excerpt}
+                    readingTimeMinutes={a.reading_time_minutes}
+                    score={a.score}
+                    justification={a.justification}
+                    isSerendipity={a.is_serendipity}
+                    origin={a.origin}
+                    bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
+                    sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
+                    publishedAt={a.published_at}
+                    scoredAt={a.scored_at}
+                    wordCount={a.word_count}
+                    ogImageUrl={a.og_image_url}
+                    isRead={a.status === 'read'}
+                    subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
+                    carryOverCount={a.carry_over_count}
+                  />
+                ))}
 
-              {reserveArticles.map((a, i) => (
-                <ArticleCard
-                  key={a.id}
-                  id={a.id}
-                  staggerIndex={essentials.length + surprises.length + i}
-                  title={a.title}
-                  siteName={a.site_name}
-                  excerpt={a.excerpt}
-                  readingTimeMinutes={a.reading_time_minutes}
-                  score={a.score}
-                  justification={a.justification}
-                  isSerendipity={a.is_serendipity}
-                  origin={a.origin}
-                  bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
-                  sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
-                  publishedAt={a.published_at}
-                  scoredAt={a.scored_at}
-                  wordCount={a.word_count}
-                  ogImageUrl={a.og_image_url}
-                  isRead={a.status === 'read'}
-                  subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
-                  carryOverCount={a.carry_over_count}
-                  isReserve={true}
-                />
-              ))}
-            </>
-          )}
-        </FeedShell>
-      </DismissProvider>
+                {reserveArticles.map((a, i) => (
+                  <ArticleCard
+                    key={a.id}
+                    id={a.id}
+                    staggerIndex={essentials.length + surprises.length + i}
+                    title={a.title}
+                    siteName={a.site_name}
+                    excerpt={a.excerpt}
+                    readingTimeMinutes={a.reading_time_minutes}
+                    score={a.score}
+                    justification={a.justification}
+                    isSerendipity={a.is_serendipity}
+                    origin={a.origin}
+                    bucket={a.item_id ? (bucketByItemId.get(a.item_id) ?? null) : null}
+                    sourceKind={a.item_id ? (sourceKindByItemId.get(a.item_id) ?? null) : null}
+                    publishedAt={a.published_at}
+                    scoredAt={a.scored_at}
+                    wordCount={a.word_count}
+                    ogImageUrl={a.og_image_url}
+                    isRead={a.status === 'read'}
+                    subScores={a.item_id ? (subScoresByItemId.get(a.item_id) ?? null) : null}
+                    carryOverCount={a.carry_over_count}
+                    isReserve={true}
+                  />
+                ))}
+              </>
+            )}
+          </FeedShell>
+        </DismissProvider>
       </FeedPoolProvider>
 
       <KeywordSection groups={keywordGroups} />

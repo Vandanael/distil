@@ -180,7 +180,9 @@ export function OnboardingForm() {
               </span>
               <div className="flex flex-wrap gap-2" data-testid="suggestions">
                 {MAINSTREAM_INTERESTS.map((theme) => {
-                  const active = keywords.some((k) => normalizeKeyword(k) === normalizeKeyword(theme))
+                  const active = keywords.some(
+                    (k) => normalizeKeyword(k) === normalizeKeyword(theme)
+                  )
                   return (
                     <button
                       key={theme}

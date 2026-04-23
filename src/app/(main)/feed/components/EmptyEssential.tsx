@@ -10,9 +10,7 @@ export function EmptyEssential() {
       <p className="font-ui text-sm font-medium text-muted-foreground">
         {t.feed.emptyEssentialTitle}
       </p>
-      <p className="font-body text-sm text-subtle mt-1">
-        {t.feed.emptyEssentialDetail}
-      </p>
+      <p className="font-body text-sm text-subtle mt-1">{t.feed.emptyEssentialDetail}</p>
     </div>
   )
 }

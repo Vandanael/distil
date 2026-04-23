@@ -29,12 +29,15 @@ export const translations = {
       lightHarvest:
         "Moisson plus légère aujourd'hui - le seuil a été adapté pour préserver votre rendez-vous matinal.",
       absenceBanner: 'Pendant votre absence, Distil a continué à trier. Reprenez ici.',
-      emptyEssentialTitle: 'Pas d\'essentiel cette fois',
-      emptyEssentialDetail: 'Aucun article ne correspond assez à votre profil pour figurer dans l\'essentiel. Vos découvertes sont ci-dessous.',
+      emptyEssentialTitle: "Pas d'essentiel cette fois",
+      emptyEssentialDetail:
+        "Aucun article ne correspond assez à votre profil pour figurer dans l'essentiel. Vos découvertes sont ci-dessous.",
       editionCompletePrefix: 'Votre édition du',
       editionCompleteSuffix: 'est complète. Rendez-vous demain matin.',
-      editionCompleteBody: "Les articles non traités reviennent demain s'ils sont très bien notés, sinon l'édition de demain prend le relais. Rien ne s'accumule en silence.",
-      softLimitMessage: "Vous avez pas mal trié aujourd'hui. L'édition de demain sera plus juste grâce à vos signaux.",
+      editionCompleteBody:
+        "Les articles non traités reviennent demain s'ils sont très bien notés, sinon l'édition de demain prend le relais. Rien ne s'accumule en silence.",
+      softLimitMessage:
+        "Vous avez pas mal trié aujourd'hui. L'édition de demain sera plus juste grâce à vos signaux.",
     },
     article: {
       serendipity: 'Découverte',
@@ -55,9 +58,9 @@ export const translations = {
       notInterested: 'Moins comme ça',
       notInterestedShort: 'Moins comme ça',
       notInterestedToast: 'Moins comme ça',
-      moreLikeThisTooltip: 'Distil privilégie ce type d\'articles à l\'avenir.',
-      lessLikeThisTooltip: 'Distil réduit ce type d\'articles à l\'avenir.',
-      addToReadTooltip: 'Déplace l\'article dans votre pile pour plus tard.',
+      moreLikeThisTooltip: "Distil privilégie ce type d'articles à l'avenir.",
+      lessLikeThisTooltip: "Distil réduit ce type d'articles à l'avenir.",
+      addToReadTooltip: "Déplace l'article dans votre pile pour plus tard.",
       carryOverTooltip: 'Revenu de votre édition du {day}. Jugé très pertinent.',
       addedToRead: 'Ajouté à À lire',
       addToRead: 'Ajouter à la liste de lecture',
@@ -93,17 +96,18 @@ export const translations = {
       empty: 'Aucun article dans votre pile À lire pour l\u2019instant.',
       emptyDetail: 'Ajoutez un article depuis la vue lecture pour le retrouver ici.',
       emptyBack: 'Retour au Feed',
-      pileWarning: 'Votre pile s\u2019épaissit. {count} articles en attente. Lire ne peut pas devenir une corvée.',
+      pileWarning:
+        'Votre pile s\u2019épaissit. {count} articles en attente. Lire ne peut pas devenir une corvée.',
       removeToast: 'Retiré de À lire',
       removeTitle: 'Retirer de À lire',
-      removeTooltip: 'Enlève l\'article de votre pile.',
+      removeTooltip: "Enlève l'article de votre pile.",
       addedPrefix: 'Ajouté',
     },
     reading: {
       extractLabel: "Extrait - lire l'article complet sur",
       markRead: 'Lu',
       markReadAria: 'Marquer comme lu',
-      markReadTooltip: 'Marque l\'article comme lu et l\'archive.',
+      markReadTooltip: "Marque l'article comme lu et l'archive.",
       addToRead: 'Ajouter à À lire',
     },
     theme: {
@@ -167,22 +171,22 @@ export const translations = {
     about: {
       methodTitle: 'La méthode.',
       methodLede:
-        "Chaque nuit, Distil prépare votre édition du lendemain à partir des articles publiés par vos sources.",
+        'Chaque nuit, Distil prépare votre édition du lendemain à partir des articles publiés par vos sources.',
       methodStep1Title: '1. Collecte.',
       methodStep1Text:
         'Distil récupère les articles publiés dans les 48 dernières heures par vos sources, et par un second pool utilisé pour la part découverte.',
       methodStep2Title: '2. Pré-filtre.',
       methodStep2Text:
-        "Un premier passage écarte les contenus trop courts, déjà vus, ou trop éloignés de votre profil.",
-      methodStep3Title: "3. Lecture par l’IA.",
+        'Un premier passage écarte les contenus trop courts, déjà vus, ou trop éloignés de votre profil.',
+      methodStep3Title: '3. Lecture par l’IA.',
       methodStep3Text:
-        "Chaque article restant est lu par un modèle de langage qui évalue sa pertinence et rédige une justification courte, consultable.",
+        'Chaque article restant est lu par un modèle de langage qui évalue sa pertinence et rédige une justification courte, consultable.',
       methodStep4Title: '4. Composition.',
       methodStep4Text:
-        "L’édition contient 5 à 8 articles. Trois quarts proches de votre profil, un quart en découverte. Si la moisson est maigre, le seuil baisse et une bannière vous le signale.",
+        'L’édition contient 5 à 8 articles. Trois quarts proches de votre profil, un quart en découverte. Si la moisson est maigre, le seuil baisse et une bannière vous le signale.',
       methodStep5Title: '5. Report.',
       methodStep5Text:
-        "Les articles non lus les mieux notés peuvent remonter le lendemain, une seule fois. Rien ne s’accumule en silence.",
+        'Les articles non lus les mieux notés peuvent remonter le lendemain, une seule fois. Rien ne s’accumule en silence.',
     },
     onboarding: {
       kicker: 'Bienvenue dans Distil',
@@ -239,11 +243,14 @@ export const translations = {
         'Lighter harvest today - the threshold was adapted to preserve your morning briefing.',
       absenceBanner: 'While you were away, Distil kept sorting. Resume here.',
       emptyEssentialTitle: 'No essentials this time',
-      emptyEssentialDetail: 'No article matched your profile closely enough for the essential section. Your discoveries are below.',
+      emptyEssentialDetail:
+        'No article matched your profile closely enough for the essential section. Your discoveries are below.',
       editionCompletePrefix: 'Your edition of',
       editionCompleteSuffix: 'is complete. See you tomorrow morning.',
-      editionCompleteBody: 'Untreated articles return tomorrow if highly rated, otherwise tomorrow\'s edition takes over. Nothing accumulates silently.',
-      softLimitMessage: "You've been sorting quite a bit today. Tomorrow's edition will be better thanks to your signals.",
+      editionCompleteBody:
+        "Untreated articles return tomorrow if highly rated, otherwise tomorrow's edition takes over. Nothing accumulates silently.",
+      softLimitMessage:
+        "You've been sorting quite a bit today. Tomorrow's edition will be better thanks to your signals.",
     },
     article: {
       serendipity: 'Discovery',
@@ -300,7 +307,8 @@ export const translations = {
       empty: 'No articles in your To read pile yet.',
       emptyDetail: 'Add an article from the reading view to find it here.',
       emptyBack: 'Back to Feed',
-      pileWarning: "Your pile is thickening. {count} articles pending. Reading shouldn't become a chore.",
+      pileWarning:
+        "Your pile is thickening. {count} articles pending. Reading shouldn't become a chore.",
       removeToast: 'Removed from To read',
       removeTitle: 'Remove from To read',
       removeTooltip: 'Remove the article from your pile.',
@@ -366,8 +374,7 @@ export const translations = {
       advanced: 'Advanced settings',
       theme: 'Theme',
       sectionDiscovery: 'Discovery beyond your sources',
-      sectionDiscoveryHint:
-        'Distil actively searches for relevant articles beyond your RSS feeds.',
+      sectionDiscoveryHint: 'Distil actively searches for relevant articles beyond your RSS feeds.',
       discoveryOn: 'Varied articles, around 1/3 discovery each day',
       discoveryOff: 'Full priority to your feeds, discovery only if needed',
     },

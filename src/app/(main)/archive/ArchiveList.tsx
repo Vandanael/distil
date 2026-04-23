@@ -158,21 +158,23 @@ export function ArchiveList({ articles }: Props) {
 
             <Tooltip>
               <TooltipTrigger
-                render={<button
-                  type="button"
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleRemove(a.id)
-                  }}
-                  aria-label={
-                    locale === 'fr'
-                      ? `Retirer ${a.title ?? 'cet article'} de À lire`
-                      : `Remove ${a.title ?? 'this article'} from To read`
-                  }
-                  data-testid={`archive-remove-${a.id}`}
-                  className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
-                />}
+                render={
+                  <button
+                    type="button"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleRemove(a.id)
+                    }}
+                    aria-label={
+                      locale === 'fr'
+                        ? `Retirer ${a.title ?? 'cet article'} de À lire`
+                        : `Remove ${a.title ?? 'this article'} from To read`
+                    }
+                    data-testid={`archive-remove-${a.id}`}
+                    className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
+                  />
+                }
               >
                 <svg
                   width="16"

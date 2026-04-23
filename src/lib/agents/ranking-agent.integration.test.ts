@@ -52,7 +52,11 @@ type Fixture = {
   rssAvailable: number
 }
 
-function makeCandidate(id: string, kind: 'rss' | 'agent', overrides: Partial<RankingCandidate> = {}): RankingCandidate {
+function makeCandidate(
+  id: string,
+  kind: 'rss' | 'agent',
+  overrides: Partial<RankingCandidate> = {}
+): RankingCandidate {
   return {
     itemId: id,
     url: `https://example.test/${id}`,
@@ -135,8 +139,12 @@ describe('rankForUser - ponderation adaptative (integration)', () => {
 
     // LLM : 10 essentiels (5 RSS + 5 agent) + 2 surprise (1 RSS + 1 agent)
     mocks.LLM_OUTPUT.essential = [
-      ...rssItems.slice(0, 5).map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
-      ...agentItems.slice(0, 5).map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
+      ...rssItems
+        .slice(0, 5)
+        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
+      ...agentItems
+        .slice(0, 5)
+        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
     ]
     mocks.LLM_OUTPUT.surprise = [
       { item_id: rssItems[5].itemId, q1: 7, q2: 8, q3: 7, justification: 'sr' },
@@ -183,8 +191,12 @@ describe('rankForUser - ponderation adaptative (integration)', () => {
     // Pool RSS abondant : le LLM met 8 RSS + 2 agent en essential. rssRatio=1.0 doit
     // remplir les 6 slots essentiels entierement avec du RSS.
     mocks.LLM_OUTPUT.essential = [
-      ...rssItems.slice(0, 8).map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
-      ...agentItems.slice(0, 2).map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
+      ...rssItems
+        .slice(0, 8)
+        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
+      ...agentItems
+        .slice(0, 2)
+        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
     ]
     mocks.LLM_OUTPUT.surprise = [
       { item_id: rssItems[8].itemId, q1: 7, q2: 8, q3: 7, justification: 'sr' },
@@ -222,8 +234,12 @@ describe('rankForUser - ponderation adaptative (integration)', () => {
     const candidates = [...rssItems, ...agentItems]
 
     mocks.LLM_OUTPUT.essential = [
-      ...rssItems.slice(0, 5).map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
-      ...agentItems.slice(0, 5).map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
+      ...rssItems
+        .slice(0, 5)
+        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'r' })),
+      ...agentItems
+        .slice(0, 5)
+        .map((c) => ({ item_id: c.itemId, q1: 9, q2: 5, q3: 5, justification: 'a' })),
     ]
 
     vi.mocked(prefilterCandidates).mockResolvedValue(candidates)

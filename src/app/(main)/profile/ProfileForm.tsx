@@ -30,7 +30,9 @@ export function ProfileForm({ profile }: Props) {
   const { t } = useLocale()
   const [sources, setSources] = useState<string[]>(profile.pinned_sources)
   const [profileText, setProfileText] = useState(profile.profile_text ?? '')
-  const [keywords, setKeywords] = useState<string[]>(profile.display_interests.length > 0 ? profile.display_interests : profile.interests)
+  const [keywords, setKeywords] = useState<string[]>(
+    profile.display_interests.length > 0 ? profile.display_interests : profile.interests
+  )
   const [language, setLanguage] = useState<'fr' | 'en' | 'both'>(profile.language ?? 'both')
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)

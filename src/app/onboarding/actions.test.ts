@@ -113,9 +113,7 @@ describe('triggerFirstEditionRanking', () => {
   })
 
   it('branche 2 : fallback réussi → first_edition_empty false, embedNewItems appelé, delete exécuté', async () => {
-    vi.mocked(rankForUser)
-      .mockResolvedValueOnce(makeResult(3))
-      .mockResolvedValueOnce(makeResult(7))
+    vi.mocked(rankForUser).mockResolvedValueOnce(makeResult(3)).mockResolvedValueOnce(makeResult(7))
 
     await triggerFirstEditionRanking('user-1')
 
@@ -126,9 +124,7 @@ describe('triggerFirstEditionRanking', () => {
   })
 
   it('branche 3 : fallback échoué → first_edition_empty true, daily_ranking vidé', async () => {
-    vi.mocked(rankForUser)
-      .mockResolvedValueOnce(makeResult(2))
-      .mockResolvedValueOnce(makeResult(1))
+    vi.mocked(rankForUser).mockResolvedValueOnce(makeResult(2)).mockResolvedValueOnce(makeResult(1))
 
     await triggerFirstEditionRanking('user-1')
 

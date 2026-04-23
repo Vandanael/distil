@@ -30,7 +30,7 @@ export function FeedHeader({
       return () => window.removeEventListener('storage', handler)
     },
     () => typeof window !== 'undefined' && !!window.localStorage.getItem(absenceBannerKey),
-    () => false,
+    () => false
   )
 
   function dismissAbsenceBanner() {

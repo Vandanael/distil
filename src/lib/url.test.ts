@@ -18,7 +18,7 @@ describe('extractDomain', () => {
     expect(extractDomain('http://localhost:3000/test')).toBe('localhost')
   })
 
-  it('retourne l\'input si URL invalide', () => {
+  it("retourne l'input si URL invalide", () => {
     expect(extractDomain('not-a-url')).toBe('not-a-url')
     expect(extractDomain('')).toBe('')
   })

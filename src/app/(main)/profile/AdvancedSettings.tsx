@@ -189,7 +189,9 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
                     try {
                       await deleteAccount()
                     } catch (err) {
-                      toast.error(err instanceof Error ? err.message : 'Erreur lors de la suppression.')
+                      toast.error(
+                        err instanceof Error ? err.message : 'Erreur lors de la suppression.'
+                      )
                       setConfirmDelete(false)
                     }
                   })

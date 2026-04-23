@@ -12,8 +12,5 @@ export async function markSoftLimitShown(): Promise<void> {
   if (!user) return
 
   const today = new Date().toISOString().slice(0, 10)
-  await supabase
-    .from('profiles')
-    .update({ last_soft_limit_shown_date: today })
-    .eq('id', user.id)
+  await supabase.from('profiles').update({ last_soft_limit_shown_date: today }).eq('id', user.id)
 }

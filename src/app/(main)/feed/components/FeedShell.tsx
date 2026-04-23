@@ -136,10 +136,7 @@ export function FeedShell({ className, children, articleStatuses }: Props) {
       </p>
       {isEditionComplete && (
         <div className="text-center py-8 lg:col-span-2">
-          <p
-            data-testid="edition-complete"
-            className="font-serif text-base text-muted-foreground"
-          >
+          <p data-testid="edition-complete" className="font-serif text-base text-muted-foreground">
             {t.feed.editionCompletePrefix} {dateStr} {t.feed.editionCompleteSuffix}
           </p>
           <p className="font-body text-sm text-muted-foreground/70 mt-2">

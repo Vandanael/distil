@@ -95,9 +95,7 @@ export default async function RootLayout({
         </a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <LocaleProvider initialLocale={initialLocale}>
-            <TooltipProvider delay={500}>
-              {children}
-            </TooltipProvider>
+            <TooltipProvider delay={500}>{children}</TooltipProvider>
             <Toaster position="bottom-center" />
           </LocaleProvider>
         </ThemeProvider>

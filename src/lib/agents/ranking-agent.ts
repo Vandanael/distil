@@ -13,7 +13,12 @@ import { extractDomain } from '@/lib/url'
 import type { ServiceClient } from '@/lib/supabase/types'
 import type { Database } from '@/lib/supabase/database.types'
 import type { RankedItem, RankingCandidate, RankingResult } from './ranking-types'
-import { resolveRssRatio, RSS_RELEVANCE_DISTANCE_MAX, MIN_WORD_COUNT, type DiscoveryMode } from '@/lib/ranking/weights'
+import {
+  resolveRssRatio,
+  RSS_RELEVANCE_DISTANCE_MAX,
+  MIN_WORD_COUNT,
+  type DiscoveryMode,
+} from '@/lib/ranking/weights'
 
 type ArticleInsert = Database['public']['Tables']['articles']['Insert']
 
@@ -84,7 +89,13 @@ export function resolveIndexedItems(
       invalidIndices.push(raw.item_id)
       continue
     }
-    items.push({ item_id: uuid, q1: raw.q1, q2: raw.q2, q3: raw.q3, justification: raw.justification })
+    items.push({
+      item_id: uuid,
+      q1: raw.q1,
+      q2: raw.q2,
+      q3: raw.q3,
+      justification: raw.justification,
+    })
   }
   return { items, invalidIndices }
 }
@@ -231,14 +242,12 @@ export function applyDiversityCap(
   essential: RankedItem[],
   surprise: RankedItem[],
   candidates: RankingCandidate[],
-  capValue: number = DEFAULT_DIVERSITY_CAP,
+  capValue: number = DEFAULT_DIVERSITY_CAP
 ): DiversityCapResult {
   const allItems = [...essential, ...surprise]
   const editionSizeBeforeCap = allItems.length
 
-  const sourceById = new Map(
-    candidates.map((c) => [c.itemId, c.siteName ?? extractDomain(c.url)])
-  )
+  const sourceById = new Map(candidates.map((c) => [c.itemId, c.siteName ?? extractDomain(c.url)]))
 
   // Compter les items par source, garder l'ordre d'apparition (rank croissant = tie-break)
   const sourceCounts = new Map<string, number>()
@@ -528,9 +537,15 @@ async function loadUserProfile(
   let pinnedFeedIds: string[] = []
   let pinnedFeedNames: string[] = []
   if (pinned.length > 0) {
-    const pinnedHosts = pinned.map((u) => {
-      try { return new URL(u).hostname.replace(/^www\./, '') } catch { return '' }
-    }).filter(Boolean)
+    const pinnedHosts = pinned
+      .map((u) => {
+        try {
+          return new URL(u).hostname.replace(/^www\./, '')
+        } catch {
+          return ''
+        }
+      })
+      .filter(Boolean)
 
     if (pinnedHosts.length > 0) {
       const { data: matchedFeeds } = await supabase
@@ -885,7 +900,15 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
   }
 
   const [candidates, recentSignals, rssAvailable] = await Promise.all([
-    prefilterCandidates(supabase, userId, profile.embedding, undefined, profile.preferredLanguage, MIN_WORD_COUNT, profile.pinnedFeedIds),
+    prefilterCandidates(
+      supabase,
+      userId,
+      profile.embedding,
+      undefined,
+      profile.preferredLanguage,
+      MIN_WORD_COUNT,
+      profile.pinnedFeedIds
+    ),
     loadRecentSignals(supabase, userId),
     countRelevantRss(supabase, userId, profile.embedding),
   ])
@@ -1017,8 +1040,12 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
   const capResult = applyDiversityCap(essential, surprise, candidates)
   if (capResult.rejected.length > 0) {
     // Re-split les items gardes en essential/surprise selon leur bucket d'origine
-    essential = capResult.kept.filter((i) => i.bucket === 'essential').map((item, i) => ({ ...item, rank: i + 1 }))
-    surprise = capResult.kept.filter((i) => i.bucket === 'surprise').map((item, i) => ({ ...item, rank: i + 1 }))
+    essential = capResult.kept
+      .filter((i) => i.bucket === 'essential')
+      .map((item, i) => ({ ...item, rank: i + 1 }))
+    surprise = capResult.kept
+      .filter((i) => i.bucket === 'surprise')
+      .map((item, i) => ({ ...item, rank: i + 1 }))
   }
 
   await persistRanking(supabase, userId, today, essential, surprise, candidates)
@@ -1032,9 +1059,18 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
 
   // Percentiles cosine sur les distances des candidats (telemetrie pour P0-2).
   const sortedDistances = candidates.map((c) => c.distance).sort((a, b) => a - b)
-  const cosineP25 = sortedDistances.length > 0 ? sortedDistances[Math.floor(sortedDistances.length * 0.25)] ?? null : null
-  const cosineP50 = sortedDistances.length > 0 ? sortedDistances[Math.floor(sortedDistances.length * 0.5)] ?? null : null
-  const cosineP75 = sortedDistances.length > 0 ? sortedDistances[Math.floor(sortedDistances.length * 0.75)] ?? null : null
+  const cosineP25 =
+    sortedDistances.length > 0
+      ? (sortedDistances[Math.floor(sortedDistances.length * 0.25)] ?? null)
+      : null
+  const cosineP50 =
+    sortedDistances.length > 0
+      ? (sortedDistances[Math.floor(sortedDistances.length * 0.5)] ?? null)
+      : null
+  const cosineP75 =
+    sortedDistances.length > 0
+      ? (sortedDistances[Math.floor(sortedDistances.length * 0.75)] ?? null)
+      : null
 
   return {
     userId,
@@ -1054,15 +1090,16 @@ export async function rankForUser(supabase: ServiceClient, userId: string): Prom
     cosineP50,
     cosineP75,
     guardDowngrades: fallback ? 0 : guardDowngrades,
-    diversityCapRejections: capResult.rejected.length > 0
-      ? {
-          cap_value: DEFAULT_DIVERSITY_CAP,
-          rejected: capResult.rejected,
-          sources_capped: capResult.sourcesCapped,
-          edition_size_before_cap: capResult.editionSizeBeforeCap,
-          edition_size_after_cap: capResult.editionSizeAfterCap,
-        }
-      : null,
+    diversityCapRejections:
+      capResult.rejected.length > 0
+        ? {
+            cap_value: DEFAULT_DIVERSITY_CAP,
+            rejected: capResult.rejected,
+            sources_capped: capResult.sourcesCapped,
+            edition_size_before_cap: capResult.editionSizeBeforeCap,
+            edition_size_after_cap: capResult.editionSizeAfterCap,
+          }
+        : null,
   }
 }
 
