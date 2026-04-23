@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   enforceMinRelevance,
   MIN_Q1_RELEVANCE,
@@ -7,12 +7,18 @@ import {
   composeEdition,
   integrateCarryOvers,
   resolveIndexedItems,
+  persistRanking,
   MAX_ESSENTIAL_DISTANCE,
   HIGH_RELEVANCE_Q1,
   RESERVED_KEYWORD_SLOTS,
 } from './ranking-agent'
 import type { LlmRankedItem, LlmRawItem } from './ranking-agent'
 import type { RankedItem, RankingCandidate } from './ranking-types'
+
+vi.mock('@/lib/errors/log-error', () => ({ logError: vi.fn() }))
+vi.mock('@/lib/parsing/readability', () => ({
+  parseUrl: vi.fn().mockRejectedValue(new Error('skip enrichment in tests')),
+}))
 
 function candidate(
   itemId: string,
@@ -612,5 +618,61 @@ describe('integrateCarryOvers', () => {
     const surprise = Array.from({ length: 2 }, (_, i) => rankedQ1(`s${i}`, 7, 'surprise'))
     const out = integrateCarryOvers(essential, surprise, 2)
     expect(out.essential.length + out.surprise.length).toBe(6)
+  })
+})
+
+describe('persistRanking - articles upsert', () => {
+  it('appelle upsert avec onConflict user_id,url (pas insert)', async () => {
+    const articlesUpsert = vi.fn().mockResolvedValue({ error: null })
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const supabase: any = {
+      from(table: string) {
+        if (table === 'daily_ranking') {
+          return { upsert: vi.fn().mockResolvedValue({ error: null }) }
+        }
+        if (table === 'articles') {
+          return { upsert: articlesUpsert }
+        }
+        if (table === 'profiles') {
+          return { update: () => ({ eq: vi.fn().mockResolvedValue({ error: null }) }) }
+        }
+        throw new Error(`unexpected table: ${table}`)
+      },
+    }
+
+    const item: RankedItem = {
+      itemId: 'item-1',
+      q1: 8,
+      q2: 5,
+      q3: 5,
+      justification: 'test',
+      bucket: 'essential',
+      rank: 1,
+    }
+    const cand: RankingCandidate = {
+      itemId: 'item-1',
+      url: 'https://example.test/article-1',
+      title: 'Article 1',
+      author: null,
+      siteName: null,
+      publishedAt: null,
+      contentPreview: 'preview',
+      wordCount: 300,
+      distance: 0.3,
+      unpopScore: 0,
+      isKeywordHit: false,
+      matchedKeywords: [],
+      keywordRank: 0,
+      sourceKind: 'rss',
+    }
+
+    await persistRanking(supabase, 'user-uuid', '2026-04-23', [item], [], [cand])
+
+    expect(articlesUpsert).toHaveBeenCalledOnce()
+    expect(articlesUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({ url: 'https://example.test/article-1', user_id: 'user-uuid' }),
+      { onConflict: 'user_id,url' }
+    )
   })
 })

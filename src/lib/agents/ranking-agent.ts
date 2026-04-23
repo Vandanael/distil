@@ -628,7 +628,7 @@ function cosineFallback(
   return { essential, surprise }
 }
 
-async function persistRanking(
+export async function persistRanking(
   supabase: ServiceClient,
   userId: string,
   date: string,
@@ -712,30 +712,18 @@ async function persistRanking(
         // Paywall, timeout, JS-only - on insere quand meme sans content_html
       }
 
-      // L'index UNIQUE sur articles(user_id, item_id) est partiel (WHERE item_id IS NOT NULL) :
-      // Supabase upsert onConflict ne peut pas matcher un index partial → fail silencieux.
-      // On fait delete-then-insert explicite par (user_id, item_id) qui est safe et idempotent.
-      const { error: deleteError } = await supabase
+      // Upsert sur (user_id, url) : l'index unique idx_articles_user_url est non-partial,
+      // contrairement à l'index sur item_id. Le delete précédent ne couvrait pas le cas
+      // où la même URL existait avec un item_id différent → code 23505 (unique_violation).
+      const { error: upsertError } = await supabase
         .from('articles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('item_id', item.itemId)
-      if (deleteError) {
-        await logError({
-          route: 'persistRanking.articles.delete',
-          error: deleteError,
-          userId,
-          context: { item_id: item.itemId, code: deleteError.code, details: deleteError.details },
-        })
-      }
-
-      const { error: insertError } = await supabase.from('articles').insert(articleRow)
-      if (insertError) {
+        .upsert(articleRow, { onConflict: 'user_id,url' })
+      if (upsertError) {
         await logError({
           route: 'persistRanking.articles.insert',
-          error: insertError,
+          error: upsertError,
           userId,
-          context: { item_id: item.itemId, code: insertError.code, details: insertError.details },
+          context: { item_id: item.itemId, code: upsertError.code, details: upsertError.details },
         })
       }
     })
