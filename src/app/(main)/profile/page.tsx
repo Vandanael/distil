@@ -33,13 +33,23 @@ export default async function ProfilePage() {
 
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select(
       'profile_text, interests, display_interests, pinned_sources, daily_cap, serendipity_quota, profile_structured, digest_email, discovery_mode'
     )
     .eq('id', user.id)
     .single()
+
+  if (profileError) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 w-full">
+        <p className="font-ui text-sm text-destructive">
+          Profil temporairement indisponible, reessayez dans un instant.
+        </p>
+      </div>
+    )
+  }
 
   if (!profile) redirect('/onboarding')
 

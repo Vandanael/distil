@@ -5,6 +5,7 @@ export const translations = {
       library: 'À lire',
       search: 'Recherche',
       profile: 'Profil',
+      signOut: 'Se déconnecter',
     },
     feed: {
       title: 'Votre veille du jour',
@@ -204,6 +205,7 @@ export const translations = {
       library: 'To read',
       search: 'Search',
       profile: 'Profile',
+      signOut: 'Sign out',
     },
     feed: {
       title: 'Your daily briefing',
