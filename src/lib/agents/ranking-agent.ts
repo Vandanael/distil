@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@supabase/supabase-js'
-import { extractDomain } from '@/lib/url'
 import { prefilterCandidates } from './prefilter'
 import {
   getRankingSystemPrompt,
