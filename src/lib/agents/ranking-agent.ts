@@ -57,6 +57,37 @@ type LlmResponse = {
   surprise: LlmRankedItem[]
 }
 
+export type LlmRawItem = {
+  item_id: number | string
+  q1: number
+  q2: number
+  q3: number
+  justification: string
+}
+
+type LlmRawResponse = {
+  essential: LlmRawItem[]
+  surprise: LlmRawItem[]
+}
+
+export function resolveIndexedItems(
+  rawItems: LlmRawItem[],
+  indexMap: Map<number, string>
+): { items: LlmRankedItem[]; invalidIndices: (number | string)[] } {
+  const items: LlmRankedItem[] = []
+  const invalidIndices: (number | string)[] = []
+  for (const raw of rawItems) {
+    const idx = Number(raw.item_id)
+    const uuid = !Number.isNaN(idx) ? indexMap.get(idx) : undefined
+    if (!uuid) {
+      invalidIndices.push(raw.item_id)
+      continue
+    }
+    items.push({ item_id: uuid, q1: raw.q1, q2: raw.q2, q3: raw.q3, justification: raw.justification })
+  }
+  return { items, invalidIndices }
+}
+
 export function enforceMinRelevance(items: LlmRankedItem[]): LlmRankedItem[] {
   return items.filter((item) => (item.q1 ?? 0) >= MIN_Q1_RELEVANCE)
 }
@@ -522,14 +553,35 @@ async function callRankingLlm(
     },
   })
 
-  const result = await model.generateContent(profilePrompt)
+  const result = await model.generateContent(profilePrompt.prompt)
   const text = result.response.text()
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('Aucun JSON dans la reponse')
 
+  const raw = JSON.parse(match[0]) as LlmRawResponse
+  const { logError } = await import('@/lib/errors/log-error')
+
+  const { items: essential, invalidIndices: essentialInvalid } = resolveIndexedItems(
+    raw.essential ?? [],
+    profilePrompt.indexMap
+  )
+  const { items: surprise, invalidIndices: surpriseInvalid } = resolveIndexedItems(
+    raw.surprise ?? [],
+    profilePrompt.indexMap
+  )
+
+  for (const idx of [...essentialInvalid, ...surpriseInvalid]) {
+    void logError({
+      route: 'callRankingLlm.invalid_index',
+      error: new Error(`Index inconnu: ${idx}`),
+      userId,
+      context: { item_id: idx },
+    })
+  }
+
   await recordProviderCall('gemini')
   await recordUserProviderCall('gemini', userId)
-  return JSON.parse(match[0]) as LlmResponse
+  return { essential, surprise }
 }
 
 function cosineFallback(

@@ -33,22 +33,22 @@ describe('buildRankingUserPrompt - prefixe [MATCH]', () => {
   it("n'ajoute pas de prefixe [MATCH] si isKeywordHit=false", () => {
     const c = baseCandidate({ isKeywordHit: false, matchedKeywords: [] })
     const out = buildRankingUserPrompt(emptyProfile, [c])
-    expect(out).not.toContain('[MATCH')
-    expect(out).toContain(`[${c.itemId}]`)
+    expect(out.prompt).not.toContain('[MATCH')
+    expect(out.prompt).toContain('[1]')
   })
 
   it('prefixe [MATCH:kw1,kw2] si isKeywordHit=true avec matchedKeywords non vide', () => {
     const c = baseCandidate({ isKeywordHit: true, matchedKeywords: ['ai agents', 'llm'] })
     const out = buildRankingUserPrompt(emptyProfile, [c])
-    expect(out).toContain('[MATCH:ai agents,llm]')
-    expect(out).toContain(`[${c.itemId}]`)
+    expect(out.prompt).toContain('[MATCH:ai agents,llm]')
+    expect(out.prompt).toContain('[1]')
   })
 
   it("n'ajoute pas le prefixe si matchedKeywords est vide, meme avec isKeywordHit=true", () => {
     // Cas defensif : si le flag est true mais le tableau vide, on ne fabrique pas un [MATCH:] vide.
     const c = baseCandidate({ isKeywordHit: true, matchedKeywords: [] })
     const out = buildRankingUserPrompt(emptyProfile, [c])
-    expect(out).not.toContain('[MATCH')
+    expect(out.prompt).not.toContain('[MATCH')
   })
 })
 
@@ -63,13 +63,13 @@ describe('buildRankingUserPrompt - suffixe ref', () => {
   it('ajoute ", ref" pour une source de reference', () => {
     const c = baseCandidate({ siteName: 'lemonde.fr' })
     const out = buildRankingUserPrompt(emptyProfile, [c])
-    expect(out).toMatch(/\d+ mots, ref \|/)
+    expect(out.prompt).toMatch(/\d+ mots, ref \|/)
   })
 
   it('pas de suffixe ref pour une source non listee', () => {
     const c = baseCandidate({ siteName: 'blog-random.test' })
     const out = buildRankingUserPrompt(emptyProfile, [c])
-    expect(out).not.toContain(', ref')
+    expect(out.prompt).not.toContain(', ref')
   })
 })
 
@@ -86,9 +86,9 @@ describe('buildRankingUserPrompt - signaux recents', () => {
       positive: [{ title: 'Article aime', siteName: 'stratechery.com' }],
       rejected: [],
     })
-    expect(out).toContain('SIGNAUX RECENTS')
-    expect(out).toContain('Appreciations explicites')
-    expect(out).toContain('Article aime | stratechery.com')
+    expect(out.prompt).toContain('SIGNAUX RECENTS')
+    expect(out.prompt).toContain('Appreciations explicites')
+    expect(out.prompt).toContain('Article aime | stratechery.com')
   })
 
   it('injecte les rejets avec titre et site', () => {
@@ -96,8 +96,8 @@ describe('buildRankingUserPrompt - signaux recents', () => {
       positive: [],
       rejected: [{ title: 'Article rejete', siteName: 'random.blog' }],
     })
-    expect(out).toContain('Articles rejetes')
-    expect(out).toContain('Article rejete | random.blog')
+    expect(out.prompt).toContain('Articles rejetes')
+    expect(out.prompt).toContain('Article rejete | random.blog')
   })
 
   it("n'ajoute pas de bloc signaux si listes vides", () => {
@@ -105,12 +105,12 @@ describe('buildRankingUserPrompt - signaux recents', () => {
       positive: [],
       rejected: [],
     })
-    expect(out).not.toContain('SIGNAUX RECENTS')
+    expect(out.prompt).not.toContain('SIGNAUX RECENTS')
   })
 
   it("n'ajoute pas de bloc signaux si argument omis", () => {
     const out = buildRankingUserPrompt(emptyProfile, [baseCandidate()])
-    expect(out).not.toContain('SIGNAUX RECENTS')
+    expect(out.prompt).not.toContain('SIGNAUX RECENTS')
   })
 
   it('tronque a 20 signaux par bucket', () => {
@@ -122,8 +122,26 @@ describe('buildRankingUserPrompt - signaux recents', () => {
       positive: many,
       rejected: [],
     })
-    expect(out).toContain('Titre 0 | ex.com')
-    expect(out).toContain('Titre 19 | ex.com')
-    expect(out).not.toContain('Titre 20 | ex.com')
+    expect(out.prompt).toContain('Titre 0 | ex.com')
+    expect(out.prompt).toContain('Titre 19 | ex.com')
+    expect(out.prompt).not.toContain('Titre 20 | ex.com')
+  })
+})
+
+describe('buildRankingUserPrompt - indexMap', () => {
+  it('construit un indexMap index→uuid correct (1-base)', () => {
+    const c1 = baseCandidate({ itemId: 'uuid-alpha' })
+    const c2 = baseCandidate({ itemId: 'uuid-beta' })
+    const { indexMap } = buildRankingUserPrompt(emptyProfile, [c1, c2])
+    expect(indexMap.get(1)).toBe('uuid-alpha')
+    expect(indexMap.get(2)).toBe('uuid-beta')
+    expect(indexMap.size).toBe(2)
+  })
+
+  it('utilise les indices numeriques dans le prompt, pas les UUIDs', () => {
+    const c = baseCandidate({ itemId: 'some-uuid-here' })
+    const { prompt } = buildRankingUserPrompt(emptyProfile, [c])
+    expect(prompt).toContain('[1]')
+    expect(prompt).not.toContain('some-uuid-here')
   })
 })

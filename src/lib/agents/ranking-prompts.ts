@@ -11,6 +11,11 @@ export type RecentSignals = {
   rejected: RecentSignal[]
 }
 
+export type RankingPromptResult = {
+  prompt: string
+  indexMap: Map<number, string>
+}
+
 // Cap du nombre de signaux injectes par prompt. Au-dela, le bruit dilue le
 // signal et la fenetre de contexte enfle inutilement (cf. ADR-012).
 export const MAX_SIGNALS_PER_BUCKET = 20
@@ -81,14 +86,16 @@ Mauvais (a eviter) :
 - "Source de qualite comme le NYT." (fait la comparaison)
 - "Dans votre domaine de predilection." (presume, vague)
 
+item_id est l'entier correspondant a la position du candidat dans la liste CANDIDATS DU JOUR (1, 2, 3...).
+
 Reponds UNIQUEMENT avec un objet JSON valide, aucun texte autour.
 Format :
 {
   "essential": [
-    {"item_id": "...", "q1": 9, "q2": 3, "q3": 7, "justification": "1 phrase en francais"}
+    {"item_id": 1, "q1": 9, "q2": 3, "q3": 7, "justification": "1 phrase en francais"}
   ],
   "surprise": [
-    {"item_id": "...", "q1": 6, "q2": 7, "q3": 8, "justification": "1 phrase en francais"}
+    {"item_id": 2, "q1": 6, "q2": 7, "q3": 8, "justification": "1 phrase en francais"}
   ]
 }`
 
@@ -156,14 +163,16 @@ Bad (avoid):
 - "Quality source like the NYT." (makes the comparison)
 - "In your field of predilection." (presumes, vague)
 
+item_id is the integer corresponding to the candidate's position in the CANDIDATS list (1, 2, 3...).
+
 Reply ONLY with a valid JSON object, no surrounding text.
 Format:
 {
   "essential": [
-    {"item_id": "...", "q1": 9, "q2": 3, "q3": 7, "justification": "1 sentence in English"}
+    {"item_id": 1, "q1": 9, "q2": 3, "q3": 7, "justification": "1 sentence in English"}
   ],
   "surprise": [
-    {"item_id": "...", "q1": 6, "q2": 7, "q3": 8, "justification": "1 sentence in English"}
+    {"item_id": 2, "q1": 6, "q2": 7, "q3": 8, "justification": "1 sentence in English"}
   ]
 }`
 
@@ -190,7 +199,7 @@ export function buildRankingUserPrompt(
   candidates: RankingCandidate[],
   signals?: RecentSignals,
   pinnedFeedNames?: string[]
-): string {
+): RankingPromptResult {
   const lines: string[] = ['PROFIL LECTEUR :']
 
   if (profile.staticProfile) {
@@ -233,7 +242,10 @@ export function buildRankingUserPrompt(
   lines.push('')
   lines.push(`CANDIDATS DU JOUR (${candidates.length} items) :`)
 
-  for (const c of candidates) {
+  const indexMap = new Map<number, string>()
+  candidates.forEach((c, i) => {
+    const idx = i + 1
+    indexMap.set(idx, c.itemId)
     const popularity = c.unpopScore > 0.7 ? 'rare' : c.unpopScore > 0.3 ? 'moyen' : 'commun'
     const matchPrefix =
       c.isKeywordHit && c.matchedKeywords.length > 0
@@ -241,9 +253,9 @@ export function buildRankingUserPrompt(
         : ''
     const refSuffix = isReferenceDomain(c.siteName) ? ', ref' : ''
     lines.push(
-      `${matchPrefix}[${c.itemId}] | ${c.title ?? 'Sans titre'} | ${c.siteName ?? c.author ?? 'inconnu'} | ${c.contentPreview.replace(/\n/g, ' ').slice(0, 300)} | ${c.wordCount} mots${refSuffix} | ${popularity}`
+      `${matchPrefix}[${idx}] | ${c.title ?? 'Sans titre'} | ${c.siteName ?? c.author ?? 'inconnu'} | ${c.contentPreview.replace(/\n/g, ' ').slice(0, 300)} | ${c.wordCount} mots${refSuffix} | ${popularity}`
     )
-  }
+  })
 
-  return lines.join('\n')
+  return { prompt: lines.join('\n'), indexMap }
 }

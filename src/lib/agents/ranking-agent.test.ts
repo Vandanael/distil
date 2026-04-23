@@ -6,11 +6,12 @@ import {
   injectReservedKeywordSlots,
   composeEdition,
   integrateCarryOvers,
+  resolveIndexedItems,
   MAX_ESSENTIAL_DISTANCE,
   HIGH_RELEVANCE_Q1,
   RESERVED_KEYWORD_SLOTS,
 } from './ranking-agent'
-import type { LlmRankedItem } from './ranking-agent'
+import type { LlmRankedItem, LlmRawItem } from './ranking-agent'
 import type { RankedItem, RankingCandidate } from './ranking-types'
 
 function candidate(
@@ -540,6 +541,34 @@ describe('composeEdition - split RSS/agent par rssRatio', () => {
     const out = composeEdition(essential, surprise, candidates, { rssRatio: 0.5 })
     expect(out.surprise.some((r) => r.sourceKind === 'rss')).toBe(true)
     expect(out.surprise.some((r) => r.sourceKind === 'agent')).toBe(true)
+  })
+})
+
+describe('resolveIndexedItems', () => {
+  it('mappe les indices vers les UUIDs via indexMap', () => {
+    const indexMap = new Map<number, string>([[1, 'uuid-a'], [2, 'uuid-b']])
+    const raw: LlmRawItem[] = [
+      { item_id: 1, q1: 8, q2: 5, q3: 7, justification: 'bon article' },
+      { item_id: 2, q1: 7, q2: 6, q3: 6, justification: 'interessant' },
+    ]
+    const { items, invalidIndices } = resolveIndexedItems(raw, indexMap)
+    expect(items).toHaveLength(2)
+    expect(items[0].item_id).toBe('uuid-a')
+    expect(items[1].item_id).toBe('uuid-b')
+    expect(invalidIndices).toHaveLength(0)
+  })
+
+  it('collecte les indices inconnus et les ignore sans lever', () => {
+    const indexMap = new Map<number, string>([[1, 'uuid-a']])
+    const raw: LlmRawItem[] = [
+      { item_id: 1, q1: 8, q2: 5, q3: 7, justification: 'ok' },
+      { item_id: 99, q1: 7, q2: 6, q3: 6, justification: 'fantome' },
+      { item_id: 'not-a-number', q1: 6, q2: 5, q3: 5, justification: 'uuid-mutile' },
+    ]
+    const { items, invalidIndices } = resolveIndexedItems(raw, indexMap)
+    expect(items).toHaveLength(1)
+    expect(items[0].item_id).toBe('uuid-a')
+    expect(invalidIndices).toEqual([99, 'not-a-number'])
   })
 })
 
