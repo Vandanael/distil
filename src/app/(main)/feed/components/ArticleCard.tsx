@@ -359,15 +359,6 @@ export function ArticleCard({
               · {carryOverLabel}
             </span>
           )}
-          {sourceKind === 'agent' && (
-            <span
-              className="whitespace-nowrap font-ui text-sm text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity"
-              data-testid={`discovery-badge-${id}`}
-              title={t.article.originAgentTooltip}
-            >
-              · {t.article.originAgent}
-            </span>
-          )}
         </div>
 
         {/* Ligne 3-4 : titre + thumbnail */}
