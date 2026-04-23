@@ -47,4 +47,11 @@ export type RankingResult = {
   cosineP50: number | null
   cosineP75: number | null
   guardDowngrades: number
+  diversityCapRejections: {
+    cap_value: number
+    rejected: Array<{ article_id: string; source: string; score: number; reason: string }>
+    sources_capped: string[]
+    edition_size_before_cap: number
+    edition_size_after_cap: number
+  } | null
 }
