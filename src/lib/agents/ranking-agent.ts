@@ -668,7 +668,15 @@ async function persistRanking(
   const settled = await Promise.allSettled(
     allRanked.map(async (item) => {
       const candidate = candidateMap.get(item.itemId)
-      if (!candidate) return
+      if (!candidate) {
+        await logError({
+          route: 'persistRanking.articles.missing_candidate',
+          error: new Error(`Candidate introuvable pour item_id: ${item.itemId}`),
+          userId,
+          context: { item_id: item.itemId },
+        })
+        return
+      }
 
       const now = new Date().toISOString()
       const articleRow: ArticleInsert = {
@@ -707,8 +715,29 @@ async function persistRanking(
       // L'index UNIQUE sur articles(user_id, item_id) est partiel (WHERE item_id IS NOT NULL) :
       // Supabase upsert onConflict ne peut pas matcher un index partial → fail silencieux.
       // On fait delete-then-insert explicite par (user_id, item_id) qui est safe et idempotent.
-      await supabase.from('articles').delete().eq('user_id', userId).eq('item_id', item.itemId)
-      await supabase.from('articles').insert(articleRow)
+      const { error: deleteError } = await supabase
+        .from('articles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('item_id', item.itemId)
+      if (deleteError) {
+        await logError({
+          route: 'persistRanking.articles.delete',
+          error: deleteError,
+          userId,
+          context: { item_id: item.itemId, code: deleteError.code, details: deleteError.details },
+        })
+      }
+
+      const { error: insertError } = await supabase.from('articles').insert(articleRow)
+      if (insertError) {
+        await logError({
+          route: 'persistRanking.articles.insert',
+          error: insertError,
+          userId,
+          context: { item_id: item.itemId, code: insertError.code, details: insertError.details },
+        })
+      }
     })
   )
 
