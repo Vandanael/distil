@@ -613,12 +613,17 @@ export type Database = {
           candidates_count: number
           essential_count: number
           surprise_count: number
+          edition_size: number
           duration_ms: number
           error: string | null
           created_at: string
           keyword_hits_count: number
           keyword_hits_promoted: number
           keyword_hits_force_injected: number
+          cosine_p25: number | null
+          cosine_p50: number | null
+          cosine_p75: number | null
+          guard_downgrades_count: number | null
         }
         Insert: {
           id?: string
@@ -629,12 +634,17 @@ export type Database = {
           candidates_count?: number
           essential_count?: number
           surprise_count?: number
+          edition_size?: number
           duration_ms?: number
           error?: string | null
           created_at?: string
           keyword_hits_count?: number
           keyword_hits_promoted?: number
           keyword_hits_force_injected?: number
+          cosine_p25?: number | null
+          cosine_p50?: number | null
+          cosine_p75?: number | null
+          guard_downgrades_count?: number | null
         }
         Update: {
           id?: string
@@ -645,12 +655,17 @@ export type Database = {
           candidates_count?: number
           essential_count?: number
           surprise_count?: number
+          edition_size?: number
           duration_ms?: number
           error?: string | null
           created_at?: string
           keyword_hits_count?: number
           keyword_hits_promoted?: number
           keyword_hits_force_injected?: number
+          cosine_p25?: number | null
+          cosine_p50?: number | null
+          cosine_p75?: number | null
+          guard_downgrades_count?: number | null
         }
         Relationships: []
       }
@@ -689,6 +704,8 @@ export type Database = {
           max_count?: number
           keyword_cap?: number
           preferred_language?: string | null
+          min_word_count?: number
+          pinned_feed_ids?: string[]
         }
         Returns: Array<{
           item_id: string
@@ -745,6 +762,16 @@ export type Database = {
           p_provider: string
           p_increment: number
           p_limit: number
+        }
+        Returns: number
+      }
+      increment_api_budget_user: {
+        Args: {
+          p_date: string
+          p_provider: string
+          p_increment: number
+          p_limit: number
+          p_user_id: string
         }
         Returns: number
       }

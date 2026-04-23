@@ -86,3 +86,20 @@ docs/
 - Les tests E2E Playwright couvrent les happy paths des personae. Ne pas ecrire de nouveaux E2E pendant les phases de polish UX (on les reecrit une fois stabilise).
 - Supabase RLS active par defaut. `DEV_BYPASS_AUTH=true` autorise uniquement en local (`NODE_ENV=development`).
 - Les variables d'environnement sensibles restent dans `.env.local`, jamais committees. Template dans `.env.example`.
+
+---
+
+## Endpoints admin
+
+### POST /api/admin/rerank
+
+Declenche un ranking manuel pour un user specifique (debug/tests). Supprime le daily_ranking du jour pour forcer le re-ranking.
+
+```bash
+curl -X POST https://DISTIL_URL/api/admin/rerank \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
+  -d '{"user_id": "UUID-DU-USER"}'
+```
+
+Reponse : `{ user_id, essential, surprise, duration_ms, error, ranking_run: { candidates_count, cosine_p25, cosine_p50, cosine_p75, guard_downgrades_count, keyword_hits_count } }`

@@ -949,3 +949,43 @@ export async function runDailyRanking(): Promise<RankingResult[]> {
 
   return results
 }
+
+/**
+ * Ranking pour un seul user (admin rerank, debug).
+ * Le caller fournit le client Supabase service_role et s'occupe du bypass
+ * du check "deja classe aujourd'hui" (suppression daily_ranking).
+ * Insere la telemetry dans ranking_runs.
+ */
+export async function runRankingForUser(
+  supabase: ServiceClient,
+  userId: string
+): Promise<RankingResult> {
+  const result = await rankForUser(supabase, userId)
+
+  await supabase
+    .from('ranking_runs')
+    .insert({
+      user_id: result.userId,
+      date: result.date,
+      model_used: result.modelUsed,
+      fallback: result.fallback,
+      candidates_count: result.candidatesCount,
+      essential_count: result.essential.length,
+      surprise_count: result.surprise.length,
+      edition_size: result.editionSize,
+      duration_ms: result.durationMs,
+      error: result.error,
+      keyword_hits_count: result.keywordHitsCount,
+      keyword_hits_promoted: result.keywordHitsPromoted,
+      keyword_hits_force_injected: result.keywordHitsForceInjected,
+      cosine_p25: result.cosineP25,
+      cosine_p50: result.cosineP50,
+      cosine_p75: result.cosineP75,
+      guard_downgrades_count: result.guardDowngrades,
+    })
+    .then(({ error }) => {
+      if (error) console.error('[ranking] ranking_runs insert failed', error.message)
+    })
+
+  return result
+}
