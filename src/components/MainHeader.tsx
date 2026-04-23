@@ -28,7 +28,7 @@ export function MainHeader() {
   return (
     <header
       className={[
-        'sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border',
+        'sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b-2 border-accent',
         isArticle ? 'hidden md:block' : '',
       ]
         .join(' ')
@@ -38,7 +38,7 @@ export function MainHeader() {
         <div className="flex items-center justify-between gap-4 min-h-10">
           <div className="flex items-center gap-3 md:gap-5 min-w-0">
             <Link href="/feed" className="hover:opacity-80 transition-opacity">
-              <span className="inline-block translate-y-[2px] font-display text-2xl md:text-3xl leading-none italic text-accent">
+              <span className="inline-block translate-y-[2px] font-display text-3xl md:text-4xl leading-none italic text-accent">
                 Distil
               </span>
             </Link>
