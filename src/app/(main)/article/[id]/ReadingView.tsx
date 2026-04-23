@@ -104,7 +104,7 @@ export function ReadingView({
           aria-live="polite"
           className="fixed top-0 left-0 right-0 z-50 bg-muted border-b border-border py-1.5 text-center font-ui text-sm text-muted-foreground"
         >
-          Vous etes hors-ligne - certaines actions sont desactivees
+          Vous êtes hors-ligne - certaines actions sont désactivées
         </div>
       )}
       {/* Layout desktop : pleine largeur feed, contenu decale avec marge editoriale */}
@@ -219,7 +219,7 @@ export function ReadingView({
                 <p className="font-ui text-sm text-muted-foreground">Contenu non disponible</p>
                 <p className="font-body text-base text-muted-foreground leading-relaxed">
                   Le contenu de cet article n&apos;a pas pu être récupéré - il est probablement
-                  protege par un paywall ou inaccessible au parsing.
+                  protégé par un paywall ou inaccessible au parsing.
                 </p>
                 <a
                   href={url}
@@ -246,7 +246,7 @@ export function ReadingView({
               </div>
             )}
 
-            {/* Encart "Extrait - lire sur source" : uniquement si le contenu a ete tronque */}
+            {/* Encart "Extrait - lire sur source" : uniquement si le contenu a été tronqué */}
             {truncated && contentHtml && (
               <div data-testid="extract-cta" className="border-t border-border pt-8 space-y-4">
                 <p className="font-ui text-sm text-muted-foreground">

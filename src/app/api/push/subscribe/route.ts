@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     .eq('id', user.id)
 
   if (updateError) {
-    return NextResponse.json({ error: 'Echec mise a jour profil' }, { status: 500 })
+    return NextResponse.json({ error: 'Échec mise à jour profil' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })
@@ -97,7 +97,7 @@ export async function DELETE() {
     .eq('id', user.id)
 
   if (updateError) {
-    return NextResponse.json({ error: 'Echec mise a jour profil' }, { status: 500 })
+    return NextResponse.json({ error: 'Échec mise à jour profil' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })

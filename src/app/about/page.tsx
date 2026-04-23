@@ -5,7 +5,7 @@ import { BrandGlyph } from '@/components/BrandGlyph'
 import { AboutMethodSection } from '@/components/AboutMethodSection'
 
 const ABOUT_DESCRIPTION =
-  'Distil est une veille intelligente et un read-later personnel. Curation IA transparente, diversite editoriale by design.'
+  'Distil est une veille intelligente et un read-later personnel. Curation IA transparente, diversité éditoriale by design.'
 
 export const metadata = {
   title: 'A propos',

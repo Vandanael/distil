@@ -8,11 +8,14 @@ import { addToRead, markNotInterested } from '@/app/(main)/article/[id]/actions'
 import { useSwipeActions } from '@/lib/hooks/useSwipeActions'
 import { useLocale } from '@/lib/i18n/context'
 import { isReferenceDomain } from '@/lib/agents/sources'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
 import { scoreColorClass } from '@/lib/utils'
 import { useDismissContext } from './DismissContext'
+import { useFeedPool } from './FeedPoolContext'
 
 const SIGNAL_COACH_FLAG = 'distil_signal_coach_seen'
+const NEW_ARTICLE_HIGHLIGHT_DURATION_MS = 12000
 
 type Props = {
   id: string
@@ -34,6 +37,7 @@ type Props = {
   staggerIndex?: number
   subScores?: { q1: number | null; q2: number | null; q3: number | null } | null
   carryOverCount?: number
+  isReserve?: boolean
 }
 
 function formatRelativeDate(dateStr: string | null, locale: 'fr' | 'en'): string | null {
@@ -103,16 +107,31 @@ export function ArticleCard({
   staggerIndex = 0,
   subScores = null,
   carryOverCount = 0,
+  isReserve = false,
 }: Props) {
   const { locale, t } = useLocale()
   const { dismissedIds } = useDismissContext()
+  const pool = useFeedPool()
   const [dismissed, setDismissed] = useState(false)
   const [positiveSignalSent, setPositiveSignalSent] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
   const [isDismissing, startDismissTransition] = useTransition()
+  const [showNewIndicator, setShowNewIndicator] = useState(false)
   const undoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cancelledRef = useRef(false)
+  const prevRevealedRef = useRef(false)
+
+  const isRevealed = isReserve ? (pool?.revealedIds.has(id) ?? false) : true
+
+  useEffect(() => {
+    if (isReserve && !prevRevealedRef.current && isRevealed) {
+      prevRevealedRef.current = true
+      setShowNewIndicator(true)
+      const timer = setTimeout(() => setShowNewIndicator(false), NEW_ARTICLE_HIGHLIGHT_DURATION_MS)
+      return () => clearTimeout(timer)
+    }
+  }, [isReserve, isRevealed])
   const carryOverLabel = carryOverCount >= 1 ? formatCarryOverBadge(scoredAt, locale) : null
   const retrievedRelative = formatRelativeDate(scoredAt, locale)
   const publishedLabel = formatPublishedDate(publishedAt, locale)
@@ -145,11 +164,13 @@ export function ArticleCard({
     enabled: !dismissed,
   })
 
+  if (isReserve && !isRevealed) return null
   if (dismissed || dismissedIds.has(id)) return null
 
   function handleNotInterested() {
     const reason = isRead ? 'already_read' : 'off_topic'
     setDismissed(true)
+    pool?.promoteFromReserve()
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
@@ -176,6 +197,7 @@ export function ArticleCard({
 
   function handleAddToRead() {
     setDismissed(true)
+    pool?.promoteFromReserve()
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
@@ -223,7 +245,10 @@ export function ArticleCard({
   }
 
   return (
-    <div className="relative -mx-3" data-article-card-wrapper>
+    <div
+      className={`relative -mx-3 border-l-2 transition-colors duration-[3000ms] ${showNewIndicator ? 'border-accent/30' : 'border-transparent'}`}
+      data-article-card-wrapper
+    >
       {swipeDirection === 'right' && (
         <div
           aria-hidden="true"
@@ -352,21 +377,30 @@ export function ArticleCard({
             </span>
           )}
           {carryOverLabel && (
-            <span
-              className="whitespace-nowrap font-ui text-muted-foreground/60"
-              data-testid={`carry-over-badge-${id}`}
-            >
-              · {carryOverLabel}
-            </span>
-          )}
-          {sourceKind === 'agent' && (
-            <span
-              className="whitespace-nowrap font-ui text-sm text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity"
-              data-testid={`discovery-badge-${id}`}
-              title={t.article.originAgentTooltip}
-            >
-              · {t.article.originAgent}
-            </span>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span
+                    className="whitespace-nowrap font-ui text-muted-foreground/60 pointer-events-auto"
+                    data-testid={`carry-over-badge-${id}`}
+                  />
+                }
+              >
+                · {carryOverLabel}
+              </TooltipTrigger>
+              <TooltipContent side="top" className="hidden md:block">
+                <p className="font-ui text-sm">
+                  {t.article.carryOverTooltip.replace(
+                    '{day}',
+                    carryOverLabel === 'Hier' || carryOverLabel === 'Yesterday'
+                      ? locale === 'fr'
+                        ? 'hier'
+                        : 'yesterday'
+                      : carryOverLabel
+                  )}
+                </p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 
@@ -499,16 +533,82 @@ export function ArticleCard({
         {/* Ligne actions : hors Link via z-10 pour que les clics prennent */}
         <div className="relative z-10 flex items-center gap-3 mt-3">
           <div className="ml-auto flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handlePositiveSignal}
-              disabled={positiveSignalSent}
-              aria-label={t.article.moreLikeThis}
-              data-testid={`signal-${id}`}
-              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
-              title={t.article.moreLikeThis}
-            >
-              {positiveSignalSent ? (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    onClick={handlePositiveSignal}
+                    disabled={positiveSignalSent}
+                    aria-label={t.article.moreLikeThis}
+                    data-testid={`signal-${id}`}
+                    className="inline-flex flex-col items-center justify-center gap-0.5 h-11 w-11 md:flex-row md:gap-2 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted disabled:text-accent disabled:opacity-50"
+                  />
+                }
+              >
+                {positiveSignalSent ? (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 10v12" />
+                    <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+                  </svg>
+                )}
+                {!positiveSignalSent && (
+                  <>
+                    <span className="md:hidden text-[11px] text-muted-foreground/60 leading-none">
+                      {locale === 'fr' ? 'Plus' : 'More'}
+                    </span>
+                    <span className="hidden md:inline whitespace-nowrap text-sm">
+                      {t.article.moreLikeThis}
+                    </span>
+                  </>
+                )}
+              </TooltipTrigger>
+              <TooltipContent side="top" className="hidden md:block">
+                <p className="font-ui text-sm">{t.article.moreLikeThisTooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleNotInterested()
+                    }}
+                    disabled={isDismissing}
+                    aria-label={t.article.notInterested}
+                    data-testid={`dismiss-${id}`}
+                    className="inline-flex flex-col items-center justify-center gap-0.5 h-11 w-11 md:flex-row md:gap-2 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-destructive hover:bg-muted disabled:opacity-20"
+                  />
+                }
+              >
                 <svg
                   width="16"
                   height="16"
@@ -520,91 +620,62 @@ export function ArticleCard({
                   strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path d="M20 6 9 17l-5-5" />
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m15 9-6 6" />
+                  <path d="m9 9 6 6" />
                 </svg>
-              ) : (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M7 10v12" />
-                  <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
-                </svg>
-              )}
-              {!positiveSignalSent && (
-                <span className="hidden md:inline whitespace-nowrap text-sm">
-                  {t.article.moreLikeThis}
+                <span className="md:hidden text-[11px] text-muted-foreground/60 leading-none">
+                  {locale === 'fr' ? 'Moins' : 'Less'}
                 </span>
-              )}
-            </button>
+                <span className="hidden md:inline whitespace-nowrap text-sm">
+                  {t.article.notInterestedShort}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="hidden md:block">
+                <p className="font-ui text-sm">{t.article.lessLikeThisTooltip}</p>
+              </TooltipContent>
+            </Tooltip>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleNotInterested()
-              }}
-              disabled={isDismissing}
-              aria-label={t.article.notInterested}
-              data-testid={`dismiss-${id}`}
-              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-destructive hover:bg-muted disabled:opacity-20"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleAddToRead()
+                    }}
+                    aria-label={t.article.addToRead}
+                    data-testid={`add-to-read-${id}`}
+                    className="inline-flex flex-col items-center justify-center gap-0.5 h-11 w-11 md:flex-row md:gap-2 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted"
+                  />
+                }
               >
-                <circle cx="12" cy="12" r="10" />
-                <path d="m15 9-6 6" />
-                <path d="m9 9 6 6" />
-              </svg>
-              <span className="hidden md:inline whitespace-nowrap text-sm">
-                {t.article.notInterestedShort}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleAddToRead()
-              }}
-              aria-label={t.article.addToRead}
-              data-testid={`add-to-read-${id}`}
-              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-              </svg>
-              <span className="hidden md:inline whitespace-nowrap text-sm">
-                {t.article.addToReadShort}
-              </span>
-            </button>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+                <span className="md:hidden text-[11px] text-muted-foreground/60 leading-none">
+                  {locale === 'fr' ? 'Lire' : 'Read'}
+                </span>
+                <span className="hidden md:inline whitespace-nowrap text-sm">
+                  {t.article.addToReadShort}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="hidden md:block">
+                <p className="font-ui text-sm">{t.article.addToReadTooltip}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

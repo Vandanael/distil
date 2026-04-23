@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useLocale } from '@/lib/i18n/context'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { removeFromToRead } from '@/app/(main)/article/[id]/actions'
 
 type Article = {
@@ -28,10 +29,12 @@ function formatAddedDate(iso: string | null, locale: 'fr' | 'en'): string {
   const isFr = locale === 'fr'
   if (diffD === 0) return isFr ? "Ajouté aujourd'hui" : 'Added today'
   if (diffD === 1) return isFr ? 'Ajouté hier' : 'Added yesterday'
-  if (diffD < 7) return isFr ? `Ajouté il y a ${diffD}j` : `Added ${diffD}d ago`
-  return isFr
-    ? `Ajouté le ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`
-    : `Added ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+  if (diffD < 7) return isFr ? `Ajouté il y a ${diffD} jours` : `Added ${diffD}d ago`
+  const weeks = Math.floor(diffD / 7)
+  if (weeks === 1) return isFr ? 'Ajouté il y a 1 sem.' : 'Added 1w ago'
+  if (diffD < 30) return isFr ? `Ajouté il y a ${weeks} sem.` : `Added ${weeks}w ago`
+  const months = Math.floor(diffD / 30)
+  return isFr ? `Ajouté il y a ${months} mois` : `Added ${months}mo ago`
 }
 
 type Props = { articles: Article[] }
@@ -111,8 +114,12 @@ export function ArchiveList({ articles }: Props) {
 
   return (
     <div className="space-y-6">
-      {visibleArticles.length > 10 && (
-        <p className="font-ui text-sm text-muted-foreground/70 italic">{t.library.pileWarning}</p>
+      {visibleArticles.length >= 10 && (
+        <div className="flex items-center justify-between gap-3 px-3 py-2 bg-muted rounded-sm">
+          <p className="font-ui text-sm text-muted-foreground">
+            {t.library.pileWarning.replace('{count}', String(visibleArticles.length))}
+          </p>
+        </div>
       )}
       <div
         className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0"
@@ -149,40 +156,48 @@ export function ArchiveList({ articles }: Props) {
               </div>
             </Link>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleRemove(a.id)
-              }}
-              aria-label={
-                locale === 'fr'
-                  ? `Retirer ${a.title ?? 'cet article'} de À lire`
-                  : `Remove ${a.title ?? 'this article'} from To read`
-              }
-              title={t.library.removeTitle}
-              data-testid={`archive-remove-${a.id}`}
-              className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleRemove(a.id)
+                    }}
+                    aria-label={
+                      locale === 'fr'
+                        ? `Retirer ${a.title ?? 'cet article'} de À lire`
+                        : `Remove ${a.title ?? 'this article'} from To read`
+                    }
+                    data-testid={`archive-remove-${a.id}`}
+                    className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
+                  />
+                }
               >
-                <path d="M3 6h18" />
-                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                <path d="M10 11v6" />
-                <path d="M14 11v6" />
-              </svg>
-            </button>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                </svg>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="hidden md:block">
+                <p className="font-ui text-sm">{t.library.removeTooltip}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         ))}
       </div>

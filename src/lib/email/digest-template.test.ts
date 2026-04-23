@@ -53,7 +53,7 @@ describe('buildDigestHtml', () => {
 
   it('contient le lien de desabonnement', () => {
     const html = buildDigestHtml(DATA)
-    expect(html).toContain('Se desabonner')
+    expect(html).toContain('Se désabonner')
     expect(html).toContain('unsubscribe?token=abc')
   })
 
@@ -93,7 +93,7 @@ describe('buildDigestText', () => {
 
   it('contient le lien de desabonnement', () => {
     const text = buildDigestText(DATA)
-    expect(text).toContain('Se desabonner')
+    expect(text).toContain('Se désabonner')
   })
 
   it('contient les scores', () => {

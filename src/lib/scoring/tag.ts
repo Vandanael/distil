@@ -11,7 +11,7 @@ export function scoreToTag(
   score: number | null | undefined,
   bucket: 'essential' | 'surprise' | null | undefined,
   isSerendipity: boolean,
-  origin: string,
+  origin: string
 ): RelevanceTag {
   if (origin === 'bookmarklet') return null
   if (bucket === 'surprise') return 'discovery'

@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { cookies } from 'next/headers'
 import { LocaleProvider } from '@/lib/i18n/context'
 import type { Locale } from '@/lib/i18n/translations'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
 const instrumentSerif = Instrument_Serif({
@@ -94,7 +95,7 @@ export default async function RootLayout({
         </a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <LocaleProvider initialLocale={initialLocale}>
-            {children}
+            <TooltipProvider delay={500}>{children}</TooltipProvider>
             <Toaster position="bottom-center" />
           </LocaleProvider>
         </ThemeProvider>

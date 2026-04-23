@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { NAV_ITEMS } from '@/lib/nav'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { LanguageToggle } from '@/components/LanguageToggle'
 import { SignOutButton } from '@/components/SignOutButton'
 import { useLocale } from '@/lib/i18n/context'
 
@@ -79,7 +78,6 @@ export function MainHeader() {
             >
               |
             </span>
-            <LanguageToggle />
             <ThemeToggle />
             <SignOutButton label={t.nav.signOut} />
           </div>

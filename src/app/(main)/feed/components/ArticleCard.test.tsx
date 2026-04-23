@@ -133,11 +133,11 @@ describe('ArticleCard', () => {
     expect(screen.queryByTestId('paywall-badge-abc-123')).toBeNull()
   })
 
-  it('bouton Pas intéressé présent avec le bon aria-label', () => {
+  it('bouton Moins comme ça présent avec le bon aria-label', () => {
     renderCard(BASE_PROPS)
     const btn = screen.getByTestId('dismiss-abc-123')
     expect(btn).toBeTruthy()
-    expect(btn.getAttribute('aria-label')).toBe('Pas intéressé pour cet article')
+    expect(btn.getAttribute('aria-label')).toBe('Moins comme ça')
   })
 
   it('le tag est cliquable quand fourni', () => {
@@ -152,16 +152,16 @@ describe('ArticleCard', () => {
     expect(screen.getByTestId('justification-inline-abc-123')).toBeTruthy()
   })
 
-  it('bouton Pas intéressé affiche le toast avec le bon message', () => {
+  it('bouton Moins comme ça affiche le toast avec le bon message', () => {
     renderCard(BASE_PROPS)
     fireEvent.click(screen.getByTestId('dismiss-abc-123'))
     expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
-      'Pas intéressé',
+      'Moins comme ça',
       expect.objectContaining({ duration: 4000 })
     )
   })
 
-  it('undo bouton Pas intéressé annule la persistence markNotInterested', () => {
+  it('undo bouton Moins comme ça annule la persistence markNotInterested', () => {
     vi.useFakeTimers()
     renderCard(BASE_PROPS)
 
@@ -182,7 +182,7 @@ describe('ArticleCard', () => {
     expect(vi.mocked(markNotInterested)).not.toHaveBeenCalled()
   })
 
-  it('swipe gauche affiche le toast Pas intéressé', () => {
+  it('swipe gauche affiche le toast Moins comme ça', () => {
     vi.useFakeTimers()
     renderCard(BASE_PROPS)
     const card = screen.getByTestId('article-card-abc-123')
@@ -199,7 +199,7 @@ describe('ArticleCard', () => {
     })
 
     expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
-      'Pas intéressé',
+      'Moins comme ça',
       expect.objectContaining({ duration: 4000 })
     )
   })

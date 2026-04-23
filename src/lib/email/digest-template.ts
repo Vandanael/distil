@@ -92,8 +92,8 @@ export function buildDigestHtml(data: DigestData): string {
     <!-- Footer -->
     <div style="border-top:1px solid #e2e0d8;padding-top:16px;margin-top:16px;">
       <p style="font-size:11px;color:#587060;line-height:1.5;margin:0;">
-        Cet email est envoye car vous avez active le digest dans vos <a href="${data.appUrl}/profile" style="color:#7A2E3A;">preferences</a>.
-        <a href="${data.unsubscribeUrl}" style="color:#587060;">Se desabonner</a>
+        Cet email est envoyé car vous avez activé le digest dans vos <a href="${data.appUrl}/profile" style="color:#7A2E3A;">préférences</a>.
+        <a href="${data.unsubscribeUrl}" style="color:#587060;">Se désabonner</a>
       </p>
     </div>
   </div>
@@ -110,5 +110,5 @@ export function buildDigestText(data: DigestData): string {
     return `${i + 1}. ${title}\n   ${meta}\n   ${data.appUrl}/article/${a.id}`
   })
 
-  return `Distil - ${data.date}\nVotre veille du jour\n\n${lines.join('\n\n')}\n\n---\nOuvrir Distil: ${data.appUrl}/feed\nSe desabonner: ${data.unsubscribeUrl}`
+  return `Distil - ${data.date}\nVotre veille du jour\n\n${lines.join('\n\n')}\n\n---\nOuvrir Distil: ${data.appUrl}/feed\nSe désabonner: ${data.unsubscribeUrl}`
 }

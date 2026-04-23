@@ -52,7 +52,7 @@ export function PushSubscribe() {
         body: JSON.stringify(sub.toJSON()),
       })
       setState('subscribed')
-      toast.success('Notifications activees')
+      toast.success('Notifications activées')
     } catch {
       toast.error("Impossible d'activer les notifications")
     }
@@ -65,9 +65,9 @@ export function PushSubscribe() {
       await sub?.unsubscribe()
       await fetch('/api/push/subscribe', { method: 'DELETE' })
       setState('unsubscribed')
-      toast.success('Notifications desactivees')
+      toast.success('Notifications désactivées')
     } catch {
-      toast.error('Erreur lors de la desactivation')
+      toast.error('Erreur lors de la désactivation')
     }
   }
 
@@ -78,7 +78,7 @@ export function PushSubscribe() {
       <div className="space-y-0.5">
         <p className="font-ui text-sm font-medium text-foreground">Notification matinale</p>
         <p className="font-body text-sm text-muted-foreground">
-          Recevez une notification quand votre veille du jour est prete.
+          Recevez une notification quand votre veille du jour est prête.
         </p>
       </div>
       <button
@@ -93,7 +93,7 @@ export function PushSubscribe() {
             : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground',
         ].join(' ')}
       >
-        {state === 'loading' ? '...' : state === 'subscribed' ? 'Activees' : 'Activer'}
+        {state === 'loading' ? '...' : state === 'subscribed' ? 'Activées' : 'Activer'}
       </button>
     </div>
   )

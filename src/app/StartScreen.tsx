@@ -70,9 +70,9 @@ const COPY = {
     foundationsNote:
       "Méthode enracinée dans la recherche sur les bulles de filtres, l'économie de l'attention et la sérendipité.",
     foundationsCta: 'Voir les fondations',
-    examplesTitle: 'Voir un exemple',
+    examplesTitle: 'Thèmes couverts',
     examplesSubtitle:
-      "Cinq thèmes, cinq éditions d'aujourd'hui. Choisissez celui qui vous parle, ignorez le reste.",
+      "Distil couvre aussi bien la géopolitique que la gastronomie. Vos centres d'intérêt décident de ce que vous voyez.",
     feedTitle: 'La veille du jour',
     feedTitleFallback: 'Exemples',
     feedEmpty: 'Distil analyse le web en ce moment. Revenez dans quelques minutes.',
@@ -113,9 +113,9 @@ const COPY = {
     foundationsNote:
       'Method grounded in research on filter bubbles, the attention economy, and serendipity.',
     foundationsCta: 'See the foundations',
-    examplesTitle: 'See an example',
+    examplesTitle: 'Themes covered',
     examplesSubtitle:
-      'Five topics, five editions for today. Pick the one that speaks to you, ignore the rest.',
+      'Distil covers everything from geopolitics to gastronomy. Your interests decide what you see.',
     feedTitle: "Today's briefing",
     feedTitleFallback: 'Samples',
     feedEmpty: 'Distil is scanning the web right now. Check back in a few minutes.',

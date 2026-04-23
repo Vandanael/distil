@@ -487,10 +487,7 @@ describe('composeEdition - split RSS/agent par rssRatio', () => {
 
   it('overflow agent vers RSS quand pool agent insuffisant', () => {
     // rssRatio 0.25 => 2 RSS + 4 agent theoriques, mais 1 seul agent disponible
-    const essential = [
-      ...makeItems(['r1', 'r2', 'r3', 'r4', 'r5'], 8),
-      ...makeItems(['a1'], 8),
-    ]
+    const essential = [...makeItems(['r1', 'r2', 'r3', 'r4', 'r5'], 8), ...makeItems(['a1'], 8)]
     const surprise = makeItems(['s1', 's2', 's3'], 7)
     const candidates = [
       rssCand('r1'),
@@ -511,10 +508,7 @@ describe('composeEdition - split RSS/agent par rssRatio', () => {
 
   it('overflow RSS vers agent quand pool RSS insuffisant', () => {
     // rssRatio 0.75 => 5 RSS + 1 agent theoriques, mais 1 seul RSS disponible
-    const essential = [
-      ...makeItems(['r1'], 8),
-      ...makeItems(['a1', 'a2', 'a3', 'a4', 'a5'], 8),
-    ]
+    const essential = [...makeItems(['r1'], 8), ...makeItems(['a1', 'a2', 'a3', 'a4', 'a5'], 8)]
     const surprise = makeItems(['s1', 's2', 's3'], 7)
     const candidates = [
       rssCand('r1'),
@@ -552,7 +546,10 @@ describe('composeEdition - split RSS/agent par rssRatio', () => {
 
 describe('resolveIndexedItems', () => {
   it('mappe les indices vers les UUIDs via indexMap', () => {
-    const indexMap = new Map<number, string>([[1, 'uuid-a'], [2, 'uuid-b']])
+    const indexMap = new Map<number, string>([
+      [1, 'uuid-a'],
+      [2, 'uuid-b'],
+    ])
     const raw: LlmRawItem[] = [
       { item_id: 1, q1: 8, q2: 5, q3: 7, justification: 'bon article' },
       { item_id: 2, q1: 7, q2: 6, q3: 6, justification: 'interessant' },

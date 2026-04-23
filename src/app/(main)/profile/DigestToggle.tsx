@@ -15,9 +15,9 @@ export function DigestToggle({ enabled: initial }: Props) {
     try {
       await toggleDigestEmail(!enabled)
       setEnabled(!enabled)
-      toast.success(enabled ? 'Digest desactive' : 'Digest active - chaque matin a 7h')
+      toast.success(enabled ? 'Digest désactivé' : 'Digest activé - chaque matin à 7h')
     } catch {
-      toast.error('Erreur lors de la mise a jour')
+      toast.error('Erreur lors de la mise à jour')
     } finally {
       setPending(false)
     }

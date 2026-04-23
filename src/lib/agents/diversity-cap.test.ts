@@ -42,9 +42,7 @@ describe('applyDiversityCap', () => {
       makeRankedItem({ itemId: 'a2', rank: 2 }),
       makeRankedItem({ itemId: 'b1', rank: 3 }),
     ]
-    const surprise = [
-      makeRankedItem({ itemId: 'c1', rank: 1, bucket: 'surprise' }),
-    ]
+    const surprise = [makeRankedItem({ itemId: 'c1', rank: 1, bucket: 'surprise' })]
     const candidates = [
       makeCandidate({ itemId: 'a1', siteName: 'source-a.com' }),
       makeCandidate({ itemId: 'a2', siteName: 'source-a.com' }),
@@ -60,15 +58,13 @@ describe('applyDiversityCap', () => {
     expect(result.editionSizeAfterCap).toBe(4)
   })
 
-  it('rejette le 3e article d\'une meme source (cap=2)', () => {
+  it("rejette le 3e article d'une meme source (cap=2)", () => {
     const essential = [
       makeRankedItem({ itemId: 'a1', rank: 1, q1: 9 }),
       makeRankedItem({ itemId: 'a2', rank: 2, q1: 8 }),
       makeRankedItem({ itemId: 'a3', rank: 3, q1: 7 }),
     ]
-    const surprise = [
-      makeRankedItem({ itemId: 'b1', rank: 1, q1: 6, bucket: 'surprise' }),
-    ]
+    const surprise = [makeRankedItem({ itemId: 'b1', rank: 1, q1: 6, bucket: 'surprise' })]
     const candidates = [
       makeCandidate({ itemId: 'a1', siteName: 'source-a.com' }),
       makeCandidate({ itemId: 'a2', siteName: 'source-a.com' }),
@@ -105,7 +101,7 @@ describe('applyDiversityCap', () => {
     expect(result.rejected[0].source).toBe('example.com')
   })
 
-  it('edition de 8 items avec 4 d\'une meme source : cap a 2 = edition reduite a 5', () => {
+  it("edition de 8 items avec 4 d'une meme source : cap a 2 = edition reduite a 5", () => {
     const essential = [
       makeRankedItem({ itemId: 'i1', rank: 1, q1: 9 }),
       makeRankedItem({ itemId: 'i2', rank: 2, q1: 8 }),

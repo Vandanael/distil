@@ -7,8 +7,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: () =>
     Promise.resolve({
       auth: {
-        getUser: () =>
-          Promise.resolve({ data: { user: { id: 'u1' } } }),
+        getUser: () => Promise.resolve({ data: { user: { id: 'u1' } } }),
       },
       from: () => ({
         select: () => ({
@@ -39,8 +38,6 @@ describe('ProfilePage - erreur technique', () => {
   it('affiche un bandeau erreur si Supabase retourne 42703 au lieu de redirect', async () => {
     const { default: ProfilePage } = await import('./page')
     render(await ProfilePage())
-    expect(
-      screen.getByText(/Profil temporairement indisponible/)
-    ).toBeTruthy()
+    expect(screen.getByText(/Profil temporairement indisponible/)).toBeTruthy()
   })
 })

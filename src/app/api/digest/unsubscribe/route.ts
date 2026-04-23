@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
   const { error } = await supabase.from('profiles').update({ digest_email: false }).eq('id', userId)
 
   if (error) {
-    return new NextResponse(page('Erreur', 'Impossible de mettre a jour vos preferences.'), {
+    return new NextResponse(page('Erreur', 'Impossible de mettre à jour vos préférences.'), {
       status: 500,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     })
@@ -51,8 +51,8 @@ export async function GET(req: NextRequest) {
 
   return new NextResponse(
     page(
-      'Desabonne',
-      'Vous ne recevrez plus le digest Distil. Vous pouvez le reactiver dans vos preferences.'
+      'Désabonné',
+      'Vous ne recevrez plus le digest Distil. Vous pouvez le réactiver dans vos préférences.'
     ),
     { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   )

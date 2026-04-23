@@ -9,6 +9,8 @@ import { NoteEditor } from './NoteEditor'
 import { TagInput } from './TagInput'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
 import { useAutoHideOnScroll } from '@/lib/hooks/useAutoHideOnScroll'
+import { useLocale } from '@/lib/i18n/context'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 type Props = {
   articleId: string
@@ -25,6 +27,7 @@ export function FloatingActionBar({
   pendingHighlight,
   returnTo,
 }: Props) {
+  const { t } = useLocale()
   const [showNote, setShowNote] = useState(false)
   const [showTag, setShowTag] = useState(false)
   const [tags, setTags] = useState<string[]>([])
@@ -47,7 +50,7 @@ export function FloatingActionBar({
       }
     } else {
       await navigator.clipboard.writeText(articleUrl)
-      toast.success('Lien copie')
+      toast.success(t.actions.linkCopied)
     }
   }
 
@@ -57,9 +60,9 @@ export function FloatingActionBar({
     cancelledRef.current = false
     if (undoRef.current) clearTimeout(undoRef.current)
 
-    toast.success('Ajouté à À lire', {
+    toast.success(t.article.addedToRead, {
       action: {
-        label: 'Annuler',
+        label: t.article.undo,
         onClick: () => {
           cancelledRef.current = true
           if (undoRef.current) clearTimeout(undoRef.current)
@@ -76,7 +79,7 @@ export function FloatingActionBar({
           await addToRead(articleId)
         } catch {
           setArchived(false)
-          toast.error('Échec de l\u2019ajout à À lire')
+          toast.error(t.actions.archiveFailed)
         }
       })
     }, 4000)
@@ -85,7 +88,7 @@ export function FloatingActionBar({
   if (archived) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center border-t border-border bg-background px-8 py-4">
-        <span className="font-ui text-sm text-muted-foreground">Ajouté à votre pile.</span>
+        <span className="font-ui text-sm text-muted-foreground">{t.actions.archived}</span>
       </div>
     )
   }
@@ -129,8 +132,8 @@ export function FloatingActionBar({
             disabled={!isOnline}
             className="inline-flex items-center justify-center h-11 w-11 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-share"
-            aria-label="Partager"
-            title={isOnline ? 'Partager' : 'Non disponible hors-ligne'}
+            aria-label={t.actions.share}
+            title={isOnline ? t.actions.share : t.actions.offline}
           >
             <svg
               width="18"
@@ -157,8 +160,8 @@ export function FloatingActionBar({
             disabled={!isOnline}
             className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-note"
-            aria-label="Ajouter une note"
-            title={isOnline ? undefined : 'Non disponible hors-ligne'}
+            aria-label={t.actions.noteAria}
+            title={isOnline ? undefined : t.actions.offline}
           >
             Note
           </button>
@@ -171,34 +174,46 @@ export function FloatingActionBar({
             disabled={!isOnline}
             className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
             data-testid="action-tag"
-            aria-label="Ajouter un tag"
-            title={isOnline ? undefined : 'Non disponible hors-ligne'}
+            aria-label={t.actions.tagAria}
+            title={isOnline ? undefined : t.actions.offline}
           >
             Tag
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              startMarking(async () => {
-                await markAsRead(articleId)
-                router.push(returnTo)
-              })
-            }}
-            disabled={!isOnline || isMarking}
-            className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-            data-testid="action-mark-read"
-            aria-label="Marquer comme lu"
-          >
-            Lu
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  onClick={() => {
+                    startMarking(async () => {
+                      await markAsRead(articleId)
+                      router.push(returnTo)
+                    })
+                  }}
+                  disabled={!isOnline || isMarking}
+                  className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+                  data-testid="action-mark-read"
+                  aria-label={t.reading.markReadAria}
+                />
+              }
+            >
+              {t.reading.markRead}
+            </TooltipTrigger>
+            <TooltipContent side="top" className="hidden md:block">
+              <p className="font-ui text-sm">{t.reading.markReadTooltip}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Tags affiches */}
         {tags.length > 0 && (
           <div className="flex gap-1">
-            {tags.map((t) => (
-              <span key={t} className="font-ui text-sm bg-muted text-muted-foreground px-2 py-0.5">
-                {t}
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="font-ui text-sm bg-muted text-muted-foreground px-2 py-0.5"
+              >
+                {tag}
               </span>
             ))}
           </div>
@@ -211,10 +226,10 @@ export function FloatingActionBar({
           disabled={isPending || !isOnline}
           className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm font-medium text-accent transition-colors hover:text-foreground disabled:opacity-50"
           data-testid="action-archive"
-          aria-label="Ajouter à À lire"
-          title={isOnline ? undefined : 'Non disponible hors-ligne'}
+          aria-label={t.article.addToRead}
+          title={isOnline ? undefined : t.actions.offline}
         >
-          À lire
+          {t.article.addToReadShort}
         </button>
       </div>
     </>

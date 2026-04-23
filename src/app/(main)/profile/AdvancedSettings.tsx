@@ -75,7 +75,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
 
         <div className="space-y-2">
           <Label htmlFor="serendipity" className={labelClass}>
-            Serendipite
+            Sérénidipité
           </Label>
           <select
             id="serendipity"
@@ -120,7 +120,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
         {showScoringPanel && (
           <div className="space-y-3 border border-border p-4">
             <Label className="font-ui text-sm text-muted-foreground">
-              URLs a analyser (une par ligne)
+              URLs à analyser (une par ligne)
             </Label>
             <Textarea
               placeholder={`https://example.com/article-1\nhttps://example.com/article-2`}
@@ -171,7 +171,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
       <div className="border-t border-destructive/30 pt-6 space-y-3">
         <p className="font-ui text-sm font-medium text-destructive">Zone dangereuse</p>
         <p className="font-body text-sm text-muted-foreground">
-          Supprimer votre compte et toutes vos donnees. Cette action est irreversible.
+          Supprimer votre compte et toutes vos données. Cette action est irréversible.
         </p>
         {confirmDelete ? (
           <div className="space-y-3 border border-destructive/30 p-4">
@@ -189,7 +189,9 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
                     try {
                       await deleteAccount()
                     } catch (err) {
-                      toast.error(err instanceof Error ? err.message : 'Erreur lors de la suppression.')
+                      toast.error(
+                        err instanceof Error ? err.message : 'Erreur lors de la suppression.'
+                      )
                       setConfirmDelete(false)
                     }
                   })

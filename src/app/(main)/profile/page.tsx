@@ -19,7 +19,7 @@ export default async function ProfilePage() {
       <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
         <div className="space-y-4 border-b border-border pb-8">
           <p className="font-ui text-sm text-accent">Profil</p>
-          <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
+          <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Préférences</h1>
         </div>
         <TokensSection tokens={[]} />
       </div>
@@ -45,7 +45,7 @@ export default async function ProfilePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 w-full">
         <p className="font-ui text-sm text-destructive">
-          Profil temporairement indisponible, reessayez dans un instant.
+          Profil temporairement indisponible, réessayez dans un instant.
         </p>
       </div>
     )
@@ -62,7 +62,7 @@ export default async function ProfilePage() {
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 space-y-10 w-full">
       <div className="space-y-4 border-b border-border pb-8">
         <p className="font-ui text-sm text-accent">Profil</p>
-        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Preferences</h1>
+        <h1 className="font-ui text-3xl font-bold leading-tight text-foreground">Préférences</h1>
         <p className="font-body text-sm text-muted-foreground">{user.email}</p>
       </div>
 
@@ -83,12 +83,12 @@ export default async function ProfilePage() {
             type="submit"
             className="font-ui text-sm text-muted-foreground hover:text-destructive hover:underline underline-offset-4 transition-colors"
           >
-            Se deconnecter
+            Se déconnecter
           </button>
         </form>
       </div>
 
-      {/* Parametres avances */}
+      {/* Paramètres avancés */}
       <details className="border-t border-border pt-6 group">
         <summary className="font-ui text-sm text-muted-foreground cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-1.5">
           <svg
@@ -105,7 +105,7 @@ export default async function ProfilePage() {
           >
             <path d="m9 18 6-6-6-6" />
           </svg>
-          Parametres avances
+          Paramètres avancés
         </summary>
         <div className="mt-6 space-y-10">
           <AdvancedSettings

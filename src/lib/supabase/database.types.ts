@@ -33,6 +33,7 @@ export type Database = {
           digest_email: boolean
           first_edition_empty: boolean
           discovery_mode: 'active' | 'sources_first'
+          last_soft_limit_shown_date: string | null
           created_at: string | null
           updated_at: string | null
         }
@@ -53,6 +54,7 @@ export type Database = {
           digest_email?: boolean
           first_edition_empty?: boolean
           discovery_mode?: 'active' | 'sources_first'
+          last_soft_limit_shown_date?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
@@ -73,6 +75,7 @@ export type Database = {
           digest_email?: boolean
           first_edition_empty?: boolean
           discovery_mode?: 'active' | 'sources_first'
+          last_soft_limit_shown_date?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
