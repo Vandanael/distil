@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useLocale } from '@/lib/i18n/context'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { removeFromToRead } from '@/app/(main)/article/[id]/actions'
 
 type Article = {
@@ -157,40 +158,46 @@ export function ArchiveList({ articles }: Props) {
               </div>
             </Link>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleRemove(a.id)
-              }}
-              aria-label={
-                locale === 'fr'
-                  ? `Retirer ${a.title ?? 'cet article'} de À lire`
-                  : `Remove ${a.title ?? 'this article'} from To read`
-              }
-              title={t.library.removeTitle}
-              data-testid={`archive-remove-${a.id}`}
-              className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+            <Tooltip>
+              <TooltipTrigger
+                render={<button
+                  type="button"
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleRemove(a.id)
+                  }}
+                  aria-label={
+                    locale === 'fr'
+                      ? `Retirer ${a.title ?? 'cet article'} de À lire`
+                      : `Remove ${a.title ?? 'this article'} from To read`
+                  }
+                  data-testid={`archive-remove-${a.id}`}
+                  className="absolute top-0 right-0 inline-flex items-center justify-center h-11 w-11 text-muted-foreground/60 hover:text-destructive transition-colors"
+                />}
               >
-                <path d="M3 6h18" />
-                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                <path d="M10 11v6" />
-                <path d="M14 11v6" />
-              </svg>
-            </button>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                </svg>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="hidden md:block">
+                <p className="font-ui text-sm">{t.library.removeTooltip}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         ))}
       </div>

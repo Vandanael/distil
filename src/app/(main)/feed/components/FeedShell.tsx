@@ -104,15 +104,20 @@ export function FeedShell({ className, children, articleStatuses }: Props) {
         aria-hidden="true"
         className="hidden md:block font-ui text-sm text-muted-foreground/40 pt-6 lg:col-span-2 select-none"
       >
-        ↑↓ naviguer · Enter ouvrir · d/← pas intéressé · → à lire
+        ↑↓ naviguer · Enter ouvrir · d/← moins comme ça · → à lire
       </p>
       {isEditionComplete && (
-        <p
-          data-testid="edition-complete"
-          className="font-serif text-base text-muted-foreground text-center py-8 lg:col-span-2"
-        >
-          {t.feed.editionCompletePrefix} {dateStr} {t.feed.editionCompleteSuffix}
-        </p>
+        <div className="text-center py-8 lg:col-span-2">
+          <p
+            data-testid="edition-complete"
+            className="font-serif text-base text-muted-foreground"
+          >
+            {t.feed.editionCompletePrefix} {dateStr} {t.feed.editionCompleteSuffix}
+          </p>
+          <p className="font-body text-sm text-muted-foreground/70 mt-2">
+            {t.feed.editionCompleteBody}
+          </p>
+        </div>
       )}
     </div>
   )

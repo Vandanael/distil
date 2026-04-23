@@ -10,6 +10,7 @@ import { TagInput } from './TagInput'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
 import { useAutoHideOnScroll } from '@/lib/hooks/useAutoHideOnScroll'
 import { useLocale } from '@/lib/i18n/context'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 type Props = {
   articleId: string
@@ -178,21 +179,28 @@ export function FloatingActionBar({
           >
             Tag
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              startMarking(async () => {
-                await markAsRead(articleId)
-                router.push(returnTo)
-              })
-            }}
-            disabled={!isOnline || isMarking}
-            className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-            data-testid="action-mark-read"
-            aria-label={t.reading.markReadAria}
-          >
-            {t.reading.markRead}
-          </button>
+          <Tooltip>
+            <TooltipTrigger
+              render={<button
+                type="button"
+                onClick={() => {
+                  startMarking(async () => {
+                    await markAsRead(articleId)
+                    router.push(returnTo)
+                  })
+                }}
+                disabled={!isOnline || isMarking}
+                className="inline-flex items-center justify-center h-11 px-3 font-ui text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+                data-testid="action-mark-read"
+                aria-label={t.reading.markReadAria}
+              />}
+            >
+              {t.reading.markRead}
+            </TooltipTrigger>
+            <TooltipContent side="top" className="hidden md:block">
+              <p className="font-ui text-sm">{t.reading.markReadTooltip}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Tags affiches */}

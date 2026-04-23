@@ -573,6 +573,9 @@ async function countRelevantRss(
   return data
 }
 
+const CARRY_OVER_SCORE_THRESHOLD = 0.9
+const MAX_CARRY_OVER = 4
+
 async function loadCarryOverCandidates(
   supabase: ServiceClient,
   userId: string,
@@ -586,8 +589,9 @@ async function loadCarryOverCandidates(
     .eq('carry_over_count', 0)
     .not('last_shown_in_edition_at', 'is', null)
     .lt('last_shown_in_edition_at', todayStart)
+    .gte('score', CARRY_OVER_SCORE_THRESHOLD)
     .order('score', { ascending: false })
-    .limit(2)
+    .limit(MAX_CARRY_OVER)
   return (data ?? []).filter((r): r is CarryOverArticle => r.item_id !== null)
 }
 
