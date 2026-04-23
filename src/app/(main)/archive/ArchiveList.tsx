@@ -28,10 +28,12 @@ function formatAddedDate(iso: string | null, locale: 'fr' | 'en'): string {
   const isFr = locale === 'fr'
   if (diffD === 0) return isFr ? "Ajouté aujourd'hui" : 'Added today'
   if (diffD === 1) return isFr ? 'Ajouté hier' : 'Added yesterday'
-  if (diffD < 7) return isFr ? `Ajouté il y a ${diffD}j` : `Added ${diffD}d ago`
-  return isFr
-    ? `Ajouté le ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`
-    : `Added ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+  if (diffD < 7) return isFr ? `Ajouté il y a ${diffD} jours` : `Added ${diffD}d ago`
+  const weeks = Math.floor(diffD / 7)
+  if (weeks === 1) return isFr ? 'Ajouté il y a 1 sem.' : 'Added 1w ago'
+  if (diffD < 30) return isFr ? `Ajouté il y a ${weeks} sem.` : `Added ${weeks}w ago`
+  const months = Math.floor(diffD / 30)
+  return isFr ? `Ajouté il y a ${months} mois` : `Added ${months}mo ago`
 }
 
 type Props = { articles: Article[] }
@@ -111,8 +113,14 @@ export function ArchiveList({ articles }: Props) {
 
   return (
     <div className="space-y-6">
-      {visibleArticles.length > 10 && (
-        <p className="font-ui text-sm text-muted-foreground/70 italic">{t.library.pileWarning}</p>
+      {visibleArticles.length >= 10 && (
+        <div className="flex items-center justify-between gap-3 px-3 py-2 bg-muted rounded-sm">
+          <p className="font-ui text-sm text-muted-foreground">
+            {locale === 'fr'
+              ? `Votre pile s'épaissit. ${visibleArticles.length} articles en attente. Lire ne peut pas devenir une corvée.`
+              : `Your pile is thickening. ${visibleArticles.length} articles pending. Reading shouldn't become a chore.`}
+          </p>
+        </div>
       )}
       <div
         className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0"
