@@ -13,6 +13,7 @@ import { ReadingProgress } from './components/ReadingProgress'
 import { SaveOfflineButton } from './components/SaveOfflineButton'
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus'
 import { scoreToTag, type RelevanceTag } from '@/lib/scoring/tag'
+import { extractDomain } from '@/lib/url'
 
 type Props = {
   id: string
@@ -28,14 +29,6 @@ type Props = {
   bucket: 'essential' | 'surprise' | null
   isSerendipity: boolean
   origin: string
-}
-
-function extractDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '')
-  } catch {
-    return url
-  }
 }
 
 export function ReadingView({
