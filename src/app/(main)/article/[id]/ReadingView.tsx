@@ -93,7 +93,7 @@ export function ReadingView({
       })
     : null
 
-  const sourceLabel = siteName ?? extractDomain(url) || 'Source'
+  const sourceLabel = (siteName ?? extractDomain(url)) || 'Source'
 
   return (
     <>
