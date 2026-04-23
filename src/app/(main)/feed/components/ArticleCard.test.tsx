@@ -266,4 +266,11 @@ describe('ArticleCard', () => {
     renderCard({ ...BASE_PROPS, carryOverCount: 0 })
     expect(screen.queryByTestId('carry-over-badge-abc-123')).toBeNull()
   })
+
+  it('bouton A lire present et appelle addToRead au clic', () => {
+    renderCard(BASE_PROPS)
+    const btn = screen.getByTestId('add-to-read-abc-123')
+    expect(btn).toBeTruthy()
+    expect(btn.getAttribute('aria-label')).toBe('Ajouter à la liste de lecture')
+  })
 })

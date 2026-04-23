@@ -576,6 +576,35 @@ export function ArticleCard({
                 {t.article.notInterestedShort}
               </span>
             </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleAddToRead()
+              }}
+              aria-label={t.article.addToRead}
+              data-testid={`add-to-read-${id}`}
+              className="inline-flex items-center justify-center gap-2 h-11 w-11 md:w-auto md:px-3 font-ui text-sm text-muted-foreground/60 transition-colors hover:text-accent hover:bg-muted"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              <span className="hidden md:inline whitespace-nowrap text-sm">
+                {t.article.addToReadShort}
+              </span>
+            </button>
           </div>
         </div>
       </div>
