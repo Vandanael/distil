@@ -1,22 +1,22 @@
-export type RelevanceTag = 'match_strong' | 'match' | 'discovery'
-
-const MATCH_STRONG_THRESHOLD = 80
-const MATCH_THRESHOLD = 60
+export type RelevanceTag = 'relevant' | 'discovery' | null
 
 /**
- * Derive le tag qualitatif affiche a l'utilisateur a partir du score brut.
- * - Serendipity : tag 'discovery' quel que soit le score (la decouverte prime).
- * - Score >= 80 : 'match_strong'.
- * - Score >= 60 : 'match'.
- * - Sinon : null (article filtre trop bas, pas de tag).
+ * Derive le tag qualitatif affiche a l'utilisateur.
+ * - bookmarklet : jamais de tag (3e etat null).
+ * - bucket='surprise' -> 'discovery' (source de verite).
+ * - bucket='essential' -> 'relevant'.
+ * - bucket=null : fallback sur isSerendipity, puis score.
  */
 export function scoreToTag(
   score: number | null | undefined,
-  isSerendipity: boolean
-): RelevanceTag | null {
+  bucket: 'essential' | 'surprise' | null | undefined,
+  isSerendipity: boolean,
+  origin: string,
+): RelevanceTag {
+  if (origin === 'bookmarklet') return null
+  if (bucket === 'surprise') return 'discovery'
+  if (bucket === 'essential') return 'relevant'
   if (isSerendipity) return 'discovery'
-  if (score === null || score === undefined) return null
-  if (score >= MATCH_STRONG_THRESHOLD) return 'match_strong'
-  if (score >= MATCH_THRESHOLD) return 'match'
+  if (score !== null && score !== undefined && score >= 60) return 'relevant'
   return null
 }

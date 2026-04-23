@@ -24,6 +24,7 @@ type Props = {
   justification: string | null
   isSerendipity: boolean
   origin: string
+  bucket?: 'essential' | 'surprise' | null
   sourceKind?: 'rss' | 'agent' | null
   publishedAt: string | null
   scoredAt: string | null
@@ -92,6 +93,7 @@ export function ArticleCard({
   justification,
   isSerendipity,
   origin,
+  bucket = null,
   sourceKind = null,
   publishedAt,
   scoredAt,
@@ -120,7 +122,7 @@ export function ArticleCard({
       : `fetched ${retrievedRelative}`
     : null
   const isPaywall = wordCount === 0
-  const tag: RelevanceTag | null = scoreToTag(score, isSerendipity)
+  const tag: RelevanceTag | null = scoreToTag(score, bucket, isSerendipity, origin)
   const hasSubScores =
     subScores && (subScores.q1 !== null || subScores.q2 !== null || subScores.q3 !== null)
   // Les 3 premieres cartes sont potentiellement above-the-fold
@@ -410,6 +412,11 @@ export function ArticleCard({
                 >
                   {Math.round(score)}
                   <span className="text-sm text-muted-foreground font-normal">%</span>
+                </span>
+              )}
+              {tag && (
+                <span className="font-ui text-xs uppercase tracking-wider text-muted-foreground">
+                  {tag === 'relevant' ? t.article.tagRelevant : t.article.tagDiscovery}
                 </span>
               )}
               <span data-testid={`tag-${id}`} className="sr-only">

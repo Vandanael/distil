@@ -71,8 +71,23 @@ describe('ArticleCard', () => {
 
   it('affiche le tag Decouverte si serendipity', () => {
     renderCard({ ...BASE_PROPS, isSerendipity: true })
-    const tag = screen.getByTestId('tag-abc-123')
-    expect(tag.textContent).toContain('Découverte')
+    expect(screen.getByText('Découverte')).toBeTruthy()
+  })
+
+  it('affiche Pertinent si bucket=essential', () => {
+    renderCard({ ...BASE_PROPS, bucket: 'essential' })
+    expect(screen.getByText('Pertinent')).toBeTruthy()
+  })
+
+  it('affiche Decouverte si bucket=surprise', () => {
+    renderCard({ ...BASE_PROPS, bucket: 'surprise' })
+    expect(screen.getByText('Découverte')).toBeTruthy()
+  })
+
+  it('n affiche aucun pill si origin=bookmarklet', () => {
+    renderCard({ ...BASE_PROPS, origin: 'bookmarklet', isSerendipity: true })
+    expect(screen.queryByText('Découverte')).toBeNull()
+    expect(screen.queryByText('Pertinent')).toBeNull()
   })
 
   it('affiche le score en pourcentage si score >= 60', () => {

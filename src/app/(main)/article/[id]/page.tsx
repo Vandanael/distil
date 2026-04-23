@@ -68,13 +68,27 @@ export default async function ArticlePage({ params, searchParams }: Props) {
   const { data: article } = await supabase
     .from('articles')
     .select(
-      'id, title, author, site_name, published_at, content_html, reading_time_minutes, url, status'
+      'id, item_id, title, author, site_name, published_at, content_html, reading_time_minutes, url, status, is_serendipity, origin'
     )
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
   if (!article) notFound()
+
+  let bucket: 'essential' | 'surprise' | null = null
+  if (article.item_id) {
+    const { data: rankingEntry } = await supabase
+      .from('daily_ranking')
+      .select('bucket')
+      .eq('user_id', user.id)
+      .eq('item_id', article.item_id)
+      .eq('date', new Date().toISOString().slice(0, 10))
+      .maybeSingle()
+    if (rankingEntry?.bucket === 'essential' || rankingEntry?.bucket === 'surprise') {
+      bucket = rankingEntry.bucket
+    }
+  }
 
   const { ratio, minWords } = readExtractConfig()
   const extract = truncateToExtract(article.content_html ?? '', ratio, minWords)
@@ -91,6 +105,9 @@ export default async function ArticlePage({ params, searchParams }: Props) {
       readingTimeMinutes={article.reading_time_minutes}
       url={article.url}
       returnTo={resolveReturnTo(from)}
+      bucket={bucket}
+      isSerendipity={article.is_serendipity}
+      origin={article.origin}
     />
   )
 }
