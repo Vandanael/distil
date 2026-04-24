@@ -304,7 +304,7 @@ export function ArticleCard({
         </div>
       )}
       <div
-        className="group relative block py-5 md:py-6 px-3 bg-background transition-colors hover:bg-muted/40 focus-within:ring-2 focus-within:ring-accent/50 focus-within:rounded-sm"
+        className={`group relative block py-5 md:py-6 px-3 bg-background transition-colors hover:bg-muted/40 focus-within:ring-2 focus-within:ring-accent/50 focus-within:rounded-sm${isDismissing ? ' opacity-50 transition-opacity' : ''}`}
         data-testid={`article-card-${id}`}
         data-article-card
         data-article-id={id}
