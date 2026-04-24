@@ -7,6 +7,8 @@ import { logError } from '@/lib/errors/log-error'
 import { redirect } from 'next/navigation'
 import { rankForUser } from '@/lib/agents/ranking-agent'
 import { embedNewItems } from '@/lib/ingestion/embed-items'
+import { sendEmail } from '@/lib/email/send'
+import { buildWelcomeHtml, buildWelcomeText } from '@/lib/email/welcome-template'
 
 export type ProfileInput = {
   method: 'express' | 'wizard'
@@ -147,6 +149,20 @@ export async function createProfile(input: ProfileInput) {
   // Erreurs internes gérées dans triggerFirstEditionRanking : l'utilisateur est
   // redirigé dans tous les cas.
   await triggerFirstEditionRanking(user.id)
+
+  // Mail de bienvenue - fire and forget, ne bloque pas la redirection.
+  if (user.email) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://distildev.netlify.app'
+    const feedbackEmail = process.env.FEEDBACK_EMAIL ?? 'yvan@distil.app'
+    sendEmail({
+      to: user.email,
+      subject: 'Bienvenue sur Distil - ta première édition t\'attend',
+      html: buildWelcomeHtml({ appUrl, feedbackEmail }),
+      text: buildWelcomeText({ appUrl, feedbackEmail }),
+    })
+      .then(() => supabase.from('profiles').update({ welcome_sent: true }).eq('id', user.id))
+      .catch((err: unknown) => logError({ route: 'onboarding.sendWelcomeEmail', error: err, userId: user.id }))
+  }
 
   redirect('/onboarding/welcome')
 }

@@ -73,3 +73,6 @@ docs/screenshots/
 
 # Lighthouse temp Chrome profiles (WSL2 cree un dossier literal "C:\Users\..." dans le repo)
 C:*
+
+# Backups locaux
+distil-backups/

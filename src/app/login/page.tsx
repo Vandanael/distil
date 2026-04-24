@@ -50,6 +50,7 @@ function LoginPageInner() {
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
         skipBrowserRedirect: true,
+        scopes: 'email',
       },
     })
     if (authError || !data?.url) {
