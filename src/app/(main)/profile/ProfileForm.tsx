@@ -11,6 +11,7 @@ import { useLocale } from '@/lib/i18n/context'
 import { normalizeKeyword } from '@/lib/keywords'
 import { updateProfile } from './actions'
 import { DiscoveryToggle } from './DiscoveryToggle'
+import { Spinner } from '@/components/ui/spinner'
 
 type ProfileData = {
   profile_text: string | null
@@ -189,6 +190,7 @@ export function ProfileForm({ profile }: Props) {
 
       <div className="flex items-center gap-4 pt-2">
         <Button type="submit" disabled={isPending} data-testid="save-profile">
+          {isPending && <Spinner className="size-4" />}
           {isPending ? t.profile.saving : t.profile.save}
         </Button>
         {saved && <span className="font-ui text-sm text-muted-foreground">{t.profile.saved}</span>}

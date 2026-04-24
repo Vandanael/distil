@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { deleteAccount, updateProfile } from './actions'
+import { Spinner } from '@/components/ui/spinner'
 
 async function runScoring(urls: string[]): Promise<{ accepted: number; rejected: number }> {
   const res = await fetch('/api/scoring/run', {
@@ -162,6 +163,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
                 })
               }}
             >
+              {isScoringPending && <Spinner className="size-4" />}
               {isScoringPending ? 'Analyse en cours...' : 'Analyser'}
             </Button>
           </div>
@@ -197,6 +199,7 @@ export function AdvancedSettings({ dailyCap: initialCap, serendipityQuota: initi
                   })
                 }}
               >
+                {isDeleting && <Spinner className="size-4" />}
                 {isDeleting ? 'Suppression...' : 'Confirmer la suppression'}
               </Button>
               <Button

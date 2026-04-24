@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { toggleDigestEmail } from './actions'
+import { Spinner } from '@/components/ui/spinner'
 
 type Props = { enabled: boolean }
 
@@ -37,13 +38,13 @@ export function DigestToggle({ enabled: initial }: Props) {
         disabled={pending}
         data-testid="digest-toggle-btn"
         className={[
-          'font-ui text-sm px-3 py-1.5 border transition-colors disabled:opacity-40',
+          'inline-flex items-center justify-center font-ui text-sm px-3 py-1.5 border transition-colors disabled:opacity-40',
           enabled
             ? 'border-accent text-accent hover:bg-accent/10'
             : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground',
         ].join(' ')}
       >
-        {pending ? '...' : enabled ? 'Active' : 'Activer'}
+        {pending ? <Spinner className="size-4" /> : enabled ? 'Active' : 'Activer'}
       </button>
     </div>
   )
