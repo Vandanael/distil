@@ -1,3 +1,5 @@
+// Masque en PR 15, conserve pour reactivation post-i18n complete. Voir BACKLOG.md.
+
 'use client'
 
 import { useLocale } from '@/lib/i18n/context'
