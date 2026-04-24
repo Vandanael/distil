@@ -85,7 +85,9 @@ export default async function FeedPage() {
       const todayDate = todayStartISO.slice(0, 10)
       softLimitAlreadyShown = profileResult.data?.last_soft_limit_shown_date === todayDate
 
-      const [articlesResult, lastRunResult] = await Promise.all([
+      const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString()
+
+      const [articlesResult, lastRunResult, hitsResult] = await Promise.all([
         supabase
           .from('articles')
           .select(
@@ -105,11 +107,15 @@ export default async function FeedPage() {
           .order('completed_at', { ascending: false })
           .limit(1)
           .single(),
+        interests.length > 0
+          ? supabase.rpc('list_keyword_hits', {
+              target_user_id: user.id,
+              cutoff_time: cutoff48h,
+            })
+          : Promise.resolve({ data: null }),
       ])
 
       articles = articlesResult.data ?? []
-      // Sépare les articles visibles de la réserve (au-delà de dailyCap)
-      // articles est déjà trié par score desc côté Supabase
       lastRefreshAt = lastRunResult.data?.completed_at ?? null
 
       // Bannière retour d'absence : lecture via service role (auth.users)
@@ -131,34 +137,27 @@ export default async function FeedPage() {
 
       // Section "Tous vos mots-cles" : items des 48h matchant un keyword de l'user
       // et qui ne sont pas dans le feed (NOT EXISTS articles, cote RPC).
-      if (interests.length > 0) {
-        const cutoff = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString()
-        const { data: hitsRows } = await supabase.rpc('list_keyword_hits', {
-          target_user_id: user.id,
-          cutoff_time: cutoff,
-        })
-        if (hitsRows) {
-          const groupMap = new Map<string, KeywordGroup>()
-          for (const row of hitsRows) {
-            const existing = groupMap.get(row.keyword)
-            const hit = {
-              itemId: row.item_id,
-              url: row.url,
-              title: row.title,
-              siteName: row.site_name,
-              publishedAt: row.published_at,
-              wordCount: row.word_count,
-            }
-            if (existing) {
-              existing.hits.push(hit)
-            } else {
-              groupMap.set(row.keyword, { keyword: row.keyword, hits: [hit] })
-            }
+      if (hitsResult.data) {
+        const groupMap = new Map<string, KeywordGroup>()
+        for (const row of hitsResult.data) {
+          const existing = groupMap.get(row.keyword)
+          const hit = {
+            itemId: row.item_id,
+            url: row.url,
+            title: row.title,
+            siteName: row.site_name,
+            publishedAt: row.published_at,
+            wordCount: row.word_count,
           }
-          keywordGroups = Array.from(groupMap.values()).sort(
-            (a, b) => b.hits.length - a.hits.length
-          )
+          if (existing) {
+            existing.hits.push(hit)
+          } else {
+            groupMap.set(row.keyword, { keyword: row.keyword, hits: [hit] })
+          }
         }
+        keywordGroups = Array.from(groupMap.values()).sort(
+          (a, b) => b.hits.length - a.hits.length
+        )
       }
 
       // Sous-scores Q1/Q2/Q3 : stockes dans daily_ranking, pas sur articles.
